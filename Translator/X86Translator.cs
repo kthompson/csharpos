@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,7 @@ namespace Translator
 
         public byte[] GetAssemblyBytes(Code opcode)
         {
+			throw new NotImplementedException();
             switch (opcode)
             {
                 case Code.Add:
