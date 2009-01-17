@@ -1,0 +1,7 @@
+C:\Documents and Settings\kthompson\Local Settings\Application Data\Temporary Projects\Translator\bin\Debug\Translator.exe
+C:\Documents and Settings\kthompson\Local Settings\Application Data\Temporary Projects\Translator\bin\Debug\Translator.pdb
+C:\Documents and Settings\kthompson\Local Settings\Application Data\Temporary Projects\Translator\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\kthompson\Local Settings\Application Data\Temporary Projects\Translator\obj\Debug\Translator.exe
+C:\Documents and Settings\kthompson\Local Settings\Application Data\Temporary Projects\Translator\obj\Debug\Translator.pdb
+C:\Documents and Settings\kthompson\code\csharpos\Translator\obj\Debug\Translator.exe
+C:\Documents and Settings\kthompson\code\csharpos\Translator\obj\Debug\Translator.pdb

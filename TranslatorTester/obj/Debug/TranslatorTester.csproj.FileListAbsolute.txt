@@ -1,0 +1,2 @@
+C:\Documents and Settings\kthompson\code\csharpos\TranslatorTester\obj\Debug\Translator.exe
+C:\Documents and Settings\kthompson\code\csharpos\TranslatorTester\obj\Debug\Translator.pdb
