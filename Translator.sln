@@ -20,6 +20,11 @@ Global
 		{457965B7-FD67-493E-B46A-EEFE59486A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{457965B7-FD67-493E-B46A-EEFE59486A4C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		name = Translator
+		version = 0.1
+		StartupItem = TranslatorTester\TranslatorTester.csproj
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
