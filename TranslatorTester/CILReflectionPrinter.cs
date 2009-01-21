@@ -81,12 +81,7 @@ namespace TranslatorTester
                     Type operandType = instruction.Operand.GetType();
 
                     if (typeof(MethodReference).IsAssignableFrom(operandType))
-                    {
-                        var mr = instruction.Operand as MethodReference;
-                        VisitTypeReference(mr.ReturnType.ReturnType);
-                        Console.Write(" ");
-                        VisitMemberReference(mr);
-                    }
+                        VisitMemberReference(instruction.Operand as MethodReference);
                     else if (typeof(TypeReference).IsAssignableFrom(operandType))
                         VisitTypeReference(instruction.Operand as TypeReference);
                     else if(typeof(MemberReference).IsAssignableFrom(operandType))
@@ -106,13 +101,13 @@ namespace TranslatorTester
                 Console.WriteLine();
             }
             Console.WriteLine("}");
+            Console.WriteLine();
             this.LastMethod = method;
         }
 
         public override void VisitMemberReference(MemberReference member)
         {
-            VisitTypeReference(member.DeclaringType);
-            Console.Write("::" + member.Name);
+            Console.Write(member.ToString());
         }
 
         public override void VisitParameterDefinitionCollection(ParameterDefinitionCollection parameters)
