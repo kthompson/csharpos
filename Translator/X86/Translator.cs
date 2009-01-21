@@ -17,6 +17,20 @@ namespace Translator.X86
 			throw new NotImplementedException();
         }
 
+        public List<MethodReference> CollectMethodReferences(MethodDefinition method)
+        {
+            var list = new List<MethodReference>();
+            foreach (Mono.Cecil.Cil.Instruction instruction in method.Body.Instructions)
+            {
+                var reference = instruction.Operand as MethodReference;
+                if (reference == null)
+                    continue;
+
+                //reference
+            }
+            return list;
+        }
+
         #endregion
     }
 }
