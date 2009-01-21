@@ -12,8 +12,8 @@ namespace TranslatorTester
     {
         static void Main(string[] args)
         {
-			string appLocation = Assembly.GetExecutingAssembly().Location;
-			AssemblyDefinition definition = AssemblyFactory.GetAssembly(appLocation);
+			var location = Assembly.GetExecutingAssembly().Location;
+			var definition = AssemblyFactory.GetAssembly(location);
             definition.MainModule.Accept(new CILReflectionPrinter());
 
             Console.Read();
