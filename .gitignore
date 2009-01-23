@@ -2,3 +2,4 @@ bin
 obj
 *.pidb
 *.suo
+*.user

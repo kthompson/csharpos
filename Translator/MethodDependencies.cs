@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Microsoft.Glee.Drawing;
 
 namespace Translator
 {
@@ -12,13 +11,11 @@ namespace Translator
     {
         public List<MethodDefinition> Dependencies { get; private set; }
         public List<AssemblyDefinition> Assemblies { get; private set; }
-        public Graph Graph { get; private set; }
 
         public MethodDependencies()
         {
             this.Dependencies = new List<MethodDefinition>();
             this.Assemblies = new List<AssemblyDefinition>();
-            this.Graph = new Graph("Method Tree");
         }
 
         private void LoadAssemblies(MethodDefinition method)
@@ -99,14 +96,12 @@ namespace Translator
                             var md = ResolveMethodReference(operand as MethodReference);
                             if (md != null)
                             {
-                                this.Graph.AddEdge(method.Name, md.Name);
                                 VisitMethodDefinition(md);
                             }
                         }
                         else if (operand is MemberReference)
                         {
                             var mr = operand as MemberReference;
-                            this.Graph.AddEdge(method.Name, mr.Name);
                             VisitMemberReference(mr);
                         }
                     }

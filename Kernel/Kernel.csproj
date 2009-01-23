@@ -46,8 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressSpace.cs" />
+    <Compile Include="AssemblyAttribute.cs" />
     <Compile Include="Cpu.cs" />
     <Compile Include="Heap.cs" />
+    <Compile Include="InternalCalls\String.cs" />
+    <Compile Include="MemorySpace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
