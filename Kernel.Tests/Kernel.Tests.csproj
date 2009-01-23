@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TranslatorTester</RootNamespace>
-    <AssemblyName>TranslatorTester</AssemblyName>
+    <RootNamespace>Kernel.Tests</RootNamespace>
+    <AssemblyName>Kernel.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,37 +31,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.5.0.8189, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\nunit-2.5\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Mono.Cecil, Version=0.6.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Resources\cecil-0.6\Mono.Cecil.dll</HintPath>
-    </Reference>
+    <Reference Include="TypeMock, Version=5.1.2.0, Culture=neutral, PublicKeyToken=3dae460033b8d8e2, processorArchitecture=MSIL" />
+    <Reference Include="Typemock.ArrangeActAssert, Version=5.1.2.0, Culture=neutral, PublicKeyToken=3dae460033b8d8e2, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CILReflectionPrinter.cs" />
-    <Compile Include="CILStructurePrinter.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="HeapTests.cs" />
+    <Compile Include="MemorySpaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kernel\Kernel.csproj">
       <Project>{35CA875B-70E6-420F-B8A3-7D568F0161BA}</Project>
       <Name>Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Translator\Translator.csproj">
-      <Project>{457965B7-FD67-493E-B46A-EEFE59486A4C}</Project>
-      <Name>Translator</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

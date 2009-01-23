@@ -5,6 +5,7 @@ using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Reflection;
+using Kernel;
 
 namespace TranslatorTester
 {
@@ -12,8 +13,8 @@ namespace TranslatorTester
     {
         static void Main(string[] args)
         {
-			var location = Assembly.GetExecutingAssembly().Location;
-			var definition = AssemblyFactory.GetAssembly(location);
+            var location = Assembly.GetExecutingAssembly().Location;
+            var definition = AssemblyFactory.GetAssembly(location);
             definition.MainModule.Accept(new CILReflectionPrinter());
 
             Console.Read();
