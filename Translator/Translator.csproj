@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{457965B7-FD67-493E-B46A-EEFE59486A4C}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -55,9 +55,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IMethod.cs" />
     <Compile Include="X86\Instruction.cs" />
-    <Compile Include="X86\Instructions\Add.cs" />
     <Compile Include="X86\Translator.cs" />
     <Compile Include="IInstruction.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="X86\Instructions\x86reference.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="X86\Instructions\x86reference.dtd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
