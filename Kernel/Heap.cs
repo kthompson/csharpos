@@ -8,53 +8,49 @@ namespace Kernel
     /// <summary>
     /// System used to allocate memory
     /// </summary>
-    public class Heap : MemorySpace
+    public class Heap 
     {
-        private List<MemorySpace> _allocatedMemory;
+        private MemorySpace _first;
+
+        public MemorySpace All { get; private set; }
 
         private Heap(uint startAddress, uint size)
-            : base(startAddress, size)
         {
-
-#warning setup our memory start and end addresses from the kernel
-            _allocatedMemory = new List<MemorySpace>();
+            this.All = new MemorySpace(startAddress, size);
         }
 
-        public MemorySpace AllocateMemory(uint requiredSize)
+        public MemorySpace AllocateMemory(uint size)
         {
-            // give first non-overlapping memoryspace
-            int index = 0;
-
-            MemorySpace test = new MemorySpace(this.StartAddress, requiredSize);
-
-            while (!TestSpace(test)) 
+            if (_first == null)
             {
-                if (index > _allocatedMemory.Count)
+                if (size > All.Size)
                     throw new OutOfMemoryException();
 
-                test = new MemorySpace(_allocatedMemory[index].EndAddress + 1, requiredSize);
-                index++;
+                _first = new MemorySpace(All.StartAddress, size);
+                return _first;
             }
 
-            _allocatedMemory.Add(test);
-            return test;
-        }
+            MemorySpace n = _first;
+            while (n.Next != null)
+                n = n.Next;
 
-        private bool TestSpace(MemorySpace test)
-        {
-            for (var i = 0; i < _allocatedMemory.Count; i++)
-                if (_allocatedMemory[i].Intersects(test))
-                    return false;
+            if (n.EndAddress + size > All.EndAddress)
+                throw new OutOfMemoryException();
 
-            return true;
+            n.Next = new MemorySpace(n.EndAddress + 1, size);
+
+            return n.Next;
         }
 
         public void FreeMemory(MemorySpace space)
         {
-            if (_allocatedMemory.Contains(space))
-                _allocatedMemory.Remove(space);
-            else
-                throw new InvalidOperationException();
+            MemorySpace prev = space.Previous;
+            MemorySpace next = space.Next;
+            if (prev != null)
+                prev.Next = next;
+            
+            if (next != null)
+                next.Previous = prev;
         }
 
         public static Heap Instance = new Heap(0,0);

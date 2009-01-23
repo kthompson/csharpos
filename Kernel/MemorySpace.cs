@@ -17,6 +17,8 @@ namespace Kernel
         public uint StartAddress { get; private set; }
         public uint EndAddress { get; private set; }
         public uint Size { get; private set; }
+        public MemorySpace Previous { get; set; }
+        public MemorySpace Next { get; set; }
 
         public bool Contains(uint address)
         {
