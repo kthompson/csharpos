@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using System.Reflection;
-using TypeMock;
-using TypeMock.ArrangeActAssert;
 
 namespace Kernel.Tests
 {

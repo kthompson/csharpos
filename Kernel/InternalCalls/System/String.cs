@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kernel.InternalCalls
+namespace Kernel.InternalCalls.System
 {
-    class String
+    internal class String
     {
     }
 }
