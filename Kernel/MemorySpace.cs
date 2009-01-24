@@ -7,8 +7,6 @@ namespace Kernel
 {
     public class MemorySpace
     {
-     
-
         public MemorySpace(bool free, uint startAddress, uint endAddress)
             : this(free, startAddress, endAddress, null, null)
         {

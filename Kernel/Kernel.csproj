@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{35CA875B-70E6-420F-B8A3-7D568F0161BA}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -50,6 +50,7 @@
     <Compile Include="Cpu.cs" />
     <Compile Include="Heap.cs" />
     <Compile Include="InternalCalls\System\String.cs" />
+    <Compile Include="MemorySegment.cs" />
     <Compile Include="MemorySpace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

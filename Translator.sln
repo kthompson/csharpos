@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel.Tests", "Kernel.Tests\Kernel.Tests.csproj", "{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU", "external\Indy.IL2CPU\Indy.IL2CPU.csproj", "{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Tests", "external\Indy.IL2CPU.Tests\Indy.IL2CPU.Tests.csproj", "{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,14 @@ Global
 		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
