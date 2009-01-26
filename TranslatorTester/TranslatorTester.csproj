@@ -55,6 +55,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\external\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Kernel\Kernel.csproj">
       <Project>{35CA875B-70E6-420F-B8A3-7D568F0161BA}</Project>
       <Name>Kernel</Name>
