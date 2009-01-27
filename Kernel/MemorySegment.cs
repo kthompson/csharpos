@@ -10,7 +10,7 @@ namespace Kernel
         public MemorySpace First { get; protected set; }
         public uint Length { get; protected set; }
 
-        internal MemorySegment(uint startAddress, uint size)
+        protected MemorySegment(uint startAddress, uint size)
         {
             First = new MemorySpace(startAddress, size, true);
             this.Length = size;

@@ -48,12 +48,16 @@ namespace Kernel
 
         public class VTableEntry
         {
-            public int BaseType
+            public TypeReference Type { get; private set; }
+            //public TypeReference BaseType { get; private set; }
+            public MethodDefinition Method { get; private set; }
             public uint Address { get; private set; }
             public bool IsCompiled { get; private set; }
 
             public VTableEntry(MethodDefinition method)
             {
+                this.Type = method.DeclaringType;
+                //this.BaseType = this.Type;
                 this.Method = method;
             }
 
