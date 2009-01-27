@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU", "external\Ind
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Tests", "external\Indy.IL2CPU.Tests\Indy.IL2CPU.Tests.csproj", "{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualExecutionSystem", "VirtualExecutionSystem\VirtualExecutionSystem.csproj", "{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualExecutionSystem.Tests", "VirtualExecutionSystem.Tests\VirtualExecutionSystem.Tests.csproj", "{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,14 @@ Global
 		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
