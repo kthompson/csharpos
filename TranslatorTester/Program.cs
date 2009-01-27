@@ -23,19 +23,7 @@ namespace TranslatorTester
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.dll",
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.dll"
             };
-            engine.CompilingMethods += new Action<int, int>(engine_CompilingMethods);
-            engine.CompilingStaticFields += new Action<int, int>(engine_CompilingStaticFields);
             engine.Execute(location, TargetPlatformEnum.X86,  g => Path.Combine(asmPath, g + ".asm"), plugs, DebugMode.None, false, 0, asmPath, false);
-        }
-
-        static void engine_CompilingStaticFields(int arg1, int arg2)
-        {
-
-        }
-
-        static void engine_CompilingMethods(int arg1, int arg2)
-        {
-                
         }
 
         public static void Init()

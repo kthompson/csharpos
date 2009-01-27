@@ -1087,7 +1087,7 @@ namespace Indy.IL2CPU {
                     }
                     xCurrentField = mStaticFields.Keys.ElementAt(i);
                 }
-                CompilingStaticFields(i, xCount);
+                OnCompilingStaticFields(i, xCount);
                 //ProgressChanged.Invoke(String.Format("Processing static field: {0}", xCurrentField.GetFullName()));
                 string xFieldName = xCurrentField.GetFullName();
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
@@ -1168,7 +1168,14 @@ namespace Indy.IL2CPU {
                     mStaticFields[xCurrentField].Processed = true;
                 }
             }
-            CompilingStaticFields(i, xCount);
+            OnCompilingStaticFields(i, xCount);
+        }
+
+        private void OnCompilingStaticFields(int i, int xCount)
+        {
+            Action<int, int> handler = this.CompilingStaticFields;
+            if (handler != null)
+                handler(i, xCount);
         }
 
         //private ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly) {
@@ -1188,7 +1195,7 @@ namespace Indy.IL2CPU {
                     }
                     xCurrentMethod = mMethods.Keys.ElementAt(i);
                 }
-                CompilingMethods(i, xCount);
+                OnCompilingMethods(i, xCount);
                 OnDebugLog(LogSeverityEnum.Informational, "Processing method {0}", xCurrentMethod.GetFullName());
                 try {
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
@@ -1424,7 +1431,14 @@ namespace Indy.IL2CPU {
                     throw;
                 }
             }
-            CompilingMethods(i, xCount);
+            OnCompilingMethods(i, xCount);
+        }
+
+        private void OnCompilingMethods(int i, int xCount)
+        {
+            Action<int, int> handler = this.CompilingMethods;
+            if (handler != null)
+                handler(i, xCount);
         }
 
         private IList<Assembly> GetPlugAssemblies() {
