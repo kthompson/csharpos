@@ -15,16 +15,15 @@ namespace TranslatorTester
     {
         static void Main(string[] args)
         {
-            var engine = new Engine { DebugMode = DebugMode.None };
+            var engine = new Engine { DebugMode = DebugMode.None, OutputDirectory = @"C:\Program Files\Cosmos User Kit\Tools\asm\" };
             var location = Assembly.GetExecutingAssembly().Location;
-            var asmPath = @"C:\Program Files\Cosmos User Kit\Tools\asm\";
             var plugs = new string[] {
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll",
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.dll",
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.dll"
             };
             
-            engine.Execute(location, null, plugs, false, asmPath, false);
+            engine.Execute(location, null, plugs, false, false);
         }
 
         public static void Init()

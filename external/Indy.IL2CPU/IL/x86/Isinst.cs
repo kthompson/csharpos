@@ -5,6 +5,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -35,19 +36,18 @@ namespace Indy.IL2CPU.IL.X86
         }
 
         public Isinst(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
-            : base(aReader,
-                   aMethodInfo)
+            : base(instruction, aMethodInfo)
         {
-            var type = aReader.OperandValueType;
+            var type = (TypeReference)instruction.Operand;
             if (type == null)
             {
                 throw new Exception("Unable to determine Type!");
             }
             
             mTypeId = Engine.RegisterType(type);
-            mThisLabel = GetInstructionLabel(aReader.Position);
-            mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
-            mCurrentILOffset = (int)aReader.Position;
+            mThisLabel = GetInstructionLabel(instruction.Offset);
+            mNextOpLabel = GetInstructionLabel(instruction.Next.Offset);
+            mCurrentILOffset = instruction.Offset;
             mDebugMode = aMethodInfo.DebugMode;
         }
 

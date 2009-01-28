@@ -47,13 +47,13 @@ namespace Indy.IL2CPU.IL
                 {
                     Type[] xTypeGenArgs = null;
                     Type[] xMethodGenArgs = null;
-                    if (mMethod.DeclaringType.IsGenericType)
+                    if (mMethod.DeclaringType.GenericParameters.Count > 0)
                     {
-                        xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
+                        xTypeGenArgs = mMethod.DeclaringType.GenericParameters;
                     }
-                    if (mMethod.IsGenericMethod)
+                    if (mMethod.GenericParameters.Count > 0)
                     {
-                        xMethodGenArgs = mMethod.GetGenericArguments();
+                        xMethodGenArgs = mMethod.GenericParameters;
                     }
                     mOperandValueMethod = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
                 }

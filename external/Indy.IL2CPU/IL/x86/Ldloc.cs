@@ -4,13 +4,14 @@ using Indy.IL2CPU.Assembler;
 
 
 using CPU = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
     [OpCode(OpCodeEnum.Ldloc)]
     public class Ldloc : Op
     {
-        private MethodInformation.Variable mLocal;
+        private VariableReference mLocal;
         protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo)
         {
             mLocal = aMethodInfo.Locals[aIndex];

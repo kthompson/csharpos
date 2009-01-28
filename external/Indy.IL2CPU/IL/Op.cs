@@ -48,11 +48,11 @@ namespace Indy.IL2CPU.IL
 
         public Op(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
         {
-            if (aReader != null)
+            if (instruction != null)
             {
-                mCurrentInstructionLabel = GetInstructionLabel(aReader);
+                mCurrentInstructionLabel = GetInstructionLabel(instruction);
                 // todo: need to add the real operand here?
-                mILComment = "; IL: " + aReader.OpCode + " " + aReader.Operand;
+                mILComment = "; IL: " + instruction.OpCode + " " + instruction.Operand.ToString();
             }
         }
 

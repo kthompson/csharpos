@@ -30,9 +30,9 @@ namespace Indy.IL2CPU.IL.X86
             }
             mTypeSize = Engine.GetFieldStorageSize(_type);
             mTypeId = Engine.RegisterType(_type);
-            mThisLabel = GetInstructionLabel(aReader);
-            mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
-            mCurrentILOffset = aReader.Position;
+            mThisLabel = GetInstructionLabel(instruction);
+            mNextOpLabel = GetInstructionLabel(instruction.Next);
+            mCurrentILOffset = instruction.Offset;
             mDebugMode = aMethodInfo.DebugMode;
         }
         public override void DoAssemble()

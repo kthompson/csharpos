@@ -36,16 +36,16 @@ namespace Indy.IL2CPU.IL.X86
         public Castclass(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var type = aReader.OperandValueType;
+            var type = (TypeReference)instruction.Operand;
             if (type == null)
             {
                 throw new Exception("Unable to determine Type!");
             }
             mCastAsType = type;
             mTypeId = Engine.RegisterType(mCastAsType);
-            mThisLabel = GetInstructionLabel(aReader);
-            mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
-            mCurrentILOffset = (int)aReader.Position;
+            mThisLabel = GetInstructionLabel(instruction);
+            mNextOpLabel = GetInstructionLabel(instruction.Next);
+            mCurrentILOffset = (int)instruction.Offset;
             mMethodInfo = aMethodInfo;
         }
 

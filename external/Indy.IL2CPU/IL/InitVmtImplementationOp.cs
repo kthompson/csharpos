@@ -110,11 +110,11 @@ namespace Indy.IL2CPU.IL
                         if (Methods.Contains(ctor) && !ctor.IsAbstract)
                             xEmittedMethods.Add(ctor, false);
 
-                    foreach (var xIntf in xType.GetInterfaces())
+                    foreach (TypeReference xIntf in xType.Interfaces)
                     {
                         foreach (var xMethodIntf in xIntf.GetMethods())
                         {
-                            var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
+                            var xActualMethod = xType.Methods.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
                                                                 (from xParam in xMethodIntf.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
 
@@ -203,12 +203,12 @@ namespace Indy.IL2CPU.IL
                         xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
                         Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                         Push(xDataName);
-                        xData = new byte[16 + Encoding.Unicode.GetByteCount(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName)];
+                        xData = new byte[16 + Encoding.Unicode.GetByteCount(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName)];
                         xTemp = BitConverter.GetBytes(ArrayTypeId);
                         Array.Copy(xTemp, 0, xData, 0, 4);
                         xTemp = BitConverter.GetBytes(0x80000002); // embedded array
                         Array.Copy(xTemp, 0, xData, 4, 4);
-                        xTemp = BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Length);
+                        xTemp = BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Length);
                         Array.Copy(xTemp, 0, xData, 8, 4);
                         xTemp = BitConverter.GetBytes(2); // embedded array
                         Array.Copy(xTemp, 0, xData, 12, 4);
@@ -233,14 +233,14 @@ namespace Indy.IL2CPU.IL
                         {
                             if (xEmittedMethods.Values[j])
                             {
-                                var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
+                                var xNewMethod = xType.Methods.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
                                                                     (from xParam in xMethod.GetParameters()
                                                                      select xParam.ParameterType).ToArray());
 
                                 if (xNewMethod == null)
                                 {
                                     // get private implemenation
-                                    xNewMethod = xType.GetMethod(xMethod.Name,
+                                    xNewMethod = xType.Methods.GetMethod(xMethod.Name,
                                                                     (from xParam in xMethod.GetParameters()
                                                                      select xParam.ParameterType).ToArray());
                                 }

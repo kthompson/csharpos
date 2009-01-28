@@ -36,14 +36,13 @@ namespace Indy.IL2CPU
         #endregion
     }
 
-    public class FieldInfoComparer : IComparer<FieldInfo>
+    public class FieldDefinitionComparer : IComparer<FieldDefinition>
     {
-        #region IComparer<FieldInfo> Members
+        #region IComparer<FieldDefinition> Members
 
-        public int Compare(FieldInfo x,
-                           FieldInfo y)
+        public int Compare(FieldDefinition x, FieldDefinition y)
         {
-            return x.GetFullName().CompareTo(y.GetFullName());
+            return x.ToString().CompareTo(y.ToString());
         }
 
         #endregion
@@ -58,15 +57,14 @@ namespace Indy.IL2CPU
         }
     }
 
-    public class TypeEqualityComparer : IEqualityComparer<Type>
+    public class TypeEqualityComparer : IEqualityComparer<TypeDefinition>
     {
-        public bool Equals(Type x,
-                           Type y)
+        public bool Equals(TypeDefinition x, TypeDefinition y)
         {
             return x.FullName.Equals(y.FullName);
         }
 
-        public int GetHashCode(Type obj)
+        public int GetHashCode(TypeDefinition obj)
         {
             return obj.FullName.GetHashCode();
         }
@@ -101,7 +99,7 @@ namespace Indy.IL2CPU
         public int Index;
         public MLDebugSymbol[] Instructions;
         public readonly SortedList<string, object> Info = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
-        public MethodBase Implementation;
+        public MethodDefinition Implementation;
     }
 
     public class QueuedStaticFieldInformation
@@ -112,27 +110,27 @@ namespace Indy.IL2CPU
     public class Engine
     {
         protected static Engine _current;
-        protected AssemblyDefinition _crawledAssembly;        
+        protected AssemblyDefinition _crawledAssembly;
         protected OpCodeMap _map;
         protected Assembler.Assembler _assembler;
 
         public TraceAssemblies TraceAssemblies { get; set; }
 
-        private SortedList<string, MethodBase> _plugMethods;
+        private SortedList<string, MethodDefinition> _plugMethods;
         private SortedList<Type, Dictionary<string, PlugFieldAttribute>> _plugFields;
 
         /// <summary>
         /// Contains a list of all methods. This includes methods to be processed and already processed.
         /// </summary>
-        protected IDictionary<MethodDefinition, QueuedMethodInformation> _methods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
+        protected IDictionary<MethodDefinition, QueuedMethodInformation> _methods = new SortedList<MethodDefinition, QueuedMethodInformation>(new MethodDefinitionComparer());
         protected ReaderWriterLocker _methodsLocker = new ReaderWriterLocker();
 
         /// <summary>
         /// Contains a list of all static fields. This includes static fields to be processed and already processed.
         /// </summary>
-        protected IDictionary<FieldInfo, QueuedStaticFieldInformation> mStaticFields = new SortedList<FieldInfo, QueuedStaticFieldInformation>(new FieldInfoComparer());
+        protected IDictionary<FieldDefinition, QueuedStaticFieldInformation> _staticFields = new SortedList<FieldDefinition, QueuedStaticFieldInformation>(new FieldDefinitionComparer());
         protected ReaderWriterLocker mStaticFieldsLocker = new ReaderWriterLocker();
-        protected IList<Type> _types = new List<Type>();
+        protected TypeDefinitionCollection _types = new TypeDefinitionCollection(null);
         protected ReaderWriterLocker _typesLocker = new ReaderWriterLocker();
         protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
         public DebugMode DebugMode { get; set; }
@@ -173,10 +171,11 @@ namespace Indy.IL2CPU
                 if (entryPoint == null)
                     throw new NotSupportedException("No EntryPoint found!");
 
-                var entryPointType = entryPoint.DeclaringType;
-                entryPoint = entryPointType.GetMethod("Init", new Type[0]);
+                var entryPointType = TypeResolver.Resolve(entryPoint.DeclaringType);
+
+                entryPoint = entryPointType.Methods.GetMethod("Init", new Type[0]);
                 AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(assemblyPath));
-                
+
                 switch (this.TargetPlatform)
                 {
                     case TargetPlatformEnum.X86:
@@ -211,81 +210,22 @@ namespace Indy.IL2CPU
                     try
                     {
                         using (_typesLocker.AcquireWriterLock())
-                            _types.Add(typeof(object));
-                        
+                            _types.Add(TypeResolver.Resolve<object>());
+
                         using (_methodsLocker.AcquireWriterLock())
                         {
-                            _methods.Add(RuntimeEngineRefs.InitializeApplicationRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(RuntimeEngineRefs.FinalizeApplicationRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(typeof(Assembler.Assembler).GetMethod("PrintException"),
-                                         new QueuedMethodInformation()
-                                         {
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(VTablesImplRefs.LoadTypeTableRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(VTablesImplRefs.SetMethodInfoRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(VTablesImplRefs.IsInstanceRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(VTablesImplRefs.SetTypeInfoRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(VTablesImplRefs.GetMethodAddressForTypeRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(GCImplementationRefs.IncRefCountRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(GCImplementationRefs.DecRefCountRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(GCImplementationRefs.AllocNewObjectRef,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
-                            _methods.Add(entryPoint,
-                                         new QueuedMethodInformation()
-                                         {
-                                             Processed = false,
-                                             Index = _methods.Count
-                                         });
+                            _methods.Add(RuntimeEngineRefs.InitializeApplicationRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(RuntimeEngineRefs.FinalizeApplicationRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(TypeResolver.Resolve<Assembler.Assembler>().Methods.GetMethod("PrintException")[0], new QueuedMethodInformation() { Index = _methods.Count });
+                            _methods.Add(VTablesImplRefs.LoadTypeTableRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(VTablesImplRefs.SetMethodInfoRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(VTablesImplRefs.IsInstanceRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(VTablesImplRefs.SetTypeInfoRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(VTablesImplRefs.GetMethodAddressForTypeRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(GCImplementationRefs.IncRefCountRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(GCImplementationRefs.DecRefCountRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(GCImplementationRefs.AllocNewObjectRef, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
+                            _methods.Add(entryPoint, new QueuedMethodInformation() { Processed = false, Index = _methods.Count });
                         }
                         ScanAllMethods();
                         ScanAllStaticFields();
@@ -311,51 +251,44 @@ namespace Indy.IL2CPU
                             }
                         } while (true);
                         // initialize the runtime engine
-                        MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(_map.MainEntryPointOp,
-                                                                                         null,
-                                                                                         null);
-                        xEntryPointOp.Assembler = _assembler;
-                        xEntryPointOp.Enter(Assembler.Assembler.EntryPointName);
-                        xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
-                        xEntryPointOp.Call("____INIT__VMT____");
+                        MainEntryPointOp entryPointOp = (MainEntryPointOp)GetOpFromType(_map.MainEntryPointOp, null, null);
+                        entryPointOp.Assembler = _assembler;
+                        entryPointOp.Enter(Assembler.Assembler.EntryPointName);
+                        entryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
+                        entryPointOp.Call("____INIT__VMT____");
                         using (_typesLocker.AcquireWriterLock())
                         {
-                            foreach (Type xType in _types)
-                            {
-                                foreach (MethodBase xMethod in xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
-                                {
-                                    if (xMethod.IsStatic)
-                                    {
-                                        xEntryPointOp.Call(xMethod);
-                                    }
-                                }
-                            }
+                            // call all static constructors
+                            foreach (TypeDefinition type in _types)
+                                foreach (MethodDefinition method in type.Constructors)
+                                    if (method.IsStatic)
+                                        entryPointOp.Call(method);
                         }
-                        xEntryPointOp.Call(entryPoint);
-                        if (entryPoint.ReturnType == typeof(void))
+                        entryPointOp.Call(entryPoint);
+                        if (entryPoint.ReturnType.ReturnType.Name == TypeResolver.Resolve(typeof(void)).FullName)
                         {
-                            xEntryPointOp.Push(0);
+                            entryPointOp.Push(0);
                         }
                         // todo: implement support for returncodes?
-                        xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
-                        xEntryPointOp.Exit();
+                        entryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
+                        entryPointOp.Exit();
                         using (_methodsLocker.AcquireWriterLock())
                         {
-                            _methods = new ReadOnlyDictionary<MethodBase, QueuedMethodInformation>(_methods);
+                            _methods = new ReadOnlyDictionary<MethodDefinition, QueuedMethodInformation>(_methods);
                         }
                         using (mStaticFieldsLocker.AcquireWriterLock())
                         {
-                            mStaticFields = new ReadOnlyDictionary<FieldInfo, QueuedStaticFieldInformation>(mStaticFields);
+                            _staticFields = new ReadOnlyDictionary<FieldInfo, QueuedStaticFieldInformation>(_staticFields);
                         }
                         ProcessAllMethods();
                         _map.PostProcess(_assembler);
                         ProcessAllStaticFields();
-                        GenerateVMT(mDebugMode != DebugMode.None);
+                        GenerateVMT(this.DebugMode != DebugMode.None);
                         using (mSymbolsLocker.AcquireReaderLock())
                         {
                             if (mSymbols != null)
                             {
-                                string xOutputFile = Path.Combine(mOutputDir, "debug.cxdb");
+                                string xOutputFile = Path.Combine(this.OutputDirectory, "debug.cxdb");
                                 MLDebugSymbol.WriteSymbolsListToFile(mSymbols, xOutputFile);
                             }
                         }
@@ -364,7 +297,7 @@ namespace Indy.IL2CPU
                     {
                         if (aUseBinaryEmission)
                         {
-                            using (Stream xOutStream = new FileStream(Path.Combine(outputDir, "output.bin"), FileMode.Create))
+                            using (Stream xOutStream = new FileStream(Path.Combine(this.OutputDirectory, "output.bin"), FileMode.Create))
                             {
                                 Stopwatch xSW = new Stopwatch();
                                 xSW.Start();
@@ -433,65 +366,61 @@ namespace Indy.IL2CPU
             int xThreadIndex = (int)aData;
             try
             {
-                int xIndex = -1;
-                MethodBase xCurrentMethod;
+                int index = -1;
+                MethodDefinition currentMethod;
                 while (true)
                 {
-                    xIndex++;
-                    if ((xIndex % mThreadCount) != xThreadIndex)
+                    index++;
+                    if ((index % mThreadCount) != xThreadIndex)
                     {
                         continue;
                     }
                     using (_methodsLocker.AcquireReaderLock())
                     {
-                        xCurrentMethod = (from item in _methods.Keys
-                                          where !_methods[item].PreProcessed
-                                          select item).FirstOrDefault();
+                        currentMethod = (from item in _methods.Keys
+                                         where !_methods[item].PreProcessed
+                                         select item).FirstOrDefault();
                     }
-                    if (xCurrentMethod == null)
+                    if (currentMethod == null)
                     {
                         break;
                     }
                     //ProgressChanged.Invoke(String.Format("Scanning method: {0}", xCurrentMethod.GetFullName()));
-                    EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
+                    EmitDependencyGraphLine(true, currentMethod.ToString());
                     try
                     {
-                        RegisterType(xCurrentMethod.DeclaringType);
+                        RegisterType(currentMethod.DeclaringType);
                         using (_methodsLocker.AcquireReaderLock())
                         {
-                            _methods[xCurrentMethod].PreProcessed = true;
+                            _methods[currentMethod].PreProcessed = true;
                         }
-                        if (xCurrentMethod.IsAbstract)
+                        if (currentMethod.IsAbstract)
                         {
                             continue;
                         }
-                        string xMethodName = Label.GenerateLabelName(xCurrentMethod);
+                        string methodName = Label.GenerateLabelName(currentMethod);
                         TypeInformation xTypeInfo = null;
-                        if (!xCurrentMethod.IsStatic)
+                        if (!currentMethod.IsStatic)
                         {
-                            xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
+                            xTypeInfo = GetTypeInfo(currentMethod.DeclaringType);
                         }
                         MethodInformation xMethodInfo;
                         using (_methodsLocker.AcquireReaderLock())
                         {
-                            xMethodInfo = GetMethodInfo(xCurrentMethod,
-                                                        xCurrentMethod,
-                                                        xMethodName,
-                                                        xTypeInfo,
-                                                        mDebugMode != DebugMode.None,
-                                                        _methods[xCurrentMethod].Info);
+                            xMethodInfo = GetMethodInfo(currentMethod, currentMethod, methodName, xTypeInfo, this.DebugMode != DebugMode.None, _methods[currentMethod].Info);
                         }
-                        MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
-                        if (xCustomImplementation != null)
+
+                        var customImplementation = GetCustomMethodImplementation(methodName);
+                        if (customImplementation != null)
                         {
-                            QueueMethod(xCustomImplementation);
+                            QueueMethod(customImplementation);
                             using (_methodsLocker.AcquireReaderLock())
                             {
-                                _methods[xCurrentMethod].Implementation = xCustomImplementation;
+                                _methods[currentMethod].Implementation = customImplementation;
                             }
                             continue;
                         }
-                        Type xOpType = _map.GetOpForCustomMethodImplementation(xMethodName);
+                        Type xOpType = _map.GetOpForCustomMethodImplementation(methodName);
                         if (xOpType != null)
                         {
                             Op xMethodOp = GetOpFromType(xOpType, null, xMethodInfo);
@@ -507,20 +436,20 @@ namespace Indy.IL2CPU
                         }
 
                         //xCurrentMethod.GetMethodImplementationFlags() == MethodImplAttributes.
-                        MethodBody xBody = xCurrentMethod.GetMethodBody();
+                        var body = currentMethod.Body;
                         // todo: add better detection of implementation state
-                        if (xBody != null)
+                        if (body != null)
                         {
                             mInstructionsToSkip = 0;
                             _assembler.StackContents.Clear();
-                            ILReader xReader = new ILReader(xCurrentMethod);
+                            ILReader xReader = new ILReader(currentMethod);
                             var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
                             while (xReader.Read())
                             {
                                 SortedList<string, object> xInfo = null;
                                 using (_methodsLocker.AcquireReaderLock())
                                 {
-                                    xInfo = _methods[xCurrentMethod].Info;
+                                    xInfo = _methods[currentMethod].Info;
                                 }
                                 _map.ScanILCode(xReader, xMethodInfo, xInfo);
                             }
@@ -528,23 +457,20 @@ namespace Indy.IL2CPU
                     }
                     catch (Exception e)
                     {
-                        OnDebugLog(LogSeverityEnum.Error, xCurrentMethod.GetFullName());
+                        OnDebugLog(LogSeverityEnum.Error, currentMethod.ToString());
                         OnDebugLog(LogSeverityEnum.Warning, e.ToString());
                         throw;
                     }
                 }
                 using (_typesLocker.AcquireReaderLock())
                 {
-                    foreach (Type xType in _types)
-                    {
-                        foreach (MethodBase xMethod in xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
-                        {
-                            if (xMethod.IsStatic)
-                            {
-                                QueueMethod(xMethod);
-                            }
+                    _types.Accept(new AbstractReflectionVisitor{ 
+                        VisitTypeDefinition = (a,b) => b.Constructors.Accept(a), 
+                        VisitConstructor = delegate(AbstractReflectionVisitor a, MethodDefinition method){ 
+                            if(method.IsStatic)
+                                QueueMethod(method);
                         }
-                    }
+                    });
                 }
             }
             finally
@@ -709,8 +635,7 @@ namespace Indy.IL2CPU
             xInitVmtOp.SetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
             xInitVmtOp.SetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
             xInitVmtOp.LoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
-            xInitVmtOp.TypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
-                                                                               BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            xInitVmtOp.TypesFieldRef = VTablesImplRefs.VTablesImplDef.Fields.GetField("mTypes");
             using (_methodsLocker.AcquireReaderLock())
             {
                 xInitVmtOp.Methods = _methods.Keys.ToList();
@@ -718,21 +643,21 @@ namespace Indy.IL2CPU
             xInitVmtOp.VTableEntrySize = GetFieldStorageSize(GetType("",
                                                                      typeof(VTable).FullName.Replace('+',
                                                                                                      '.')));
-            xInitVmtOp.GetMethodIdentifier += delegate(MethodBase aMethod)
+            xInitVmtOp.GetMethodIdentifier += delegate(MethodDefinition method)
             {
-                if (aMethod.GetFullName() == "System.Reflection.Cache.InternalCache  System.Reflection.MemberInfo.get_Cache()")
+                if (method.ToString() == "System.Reflection.Cache.InternalCache System.Reflection.MemberInfo.get_Cache()")
                 {
                     System.Diagnostics.Debugger.Break();
                 }
-                ParameterInfo[] xParams = aMethod.GetParameters();
-                Type[] xParamTypes = new Type[xParams.Length];
-                for (int i = 0; i < xParams.Length; i++)
+                ParameterDefinitionCollection xParams = method.Parameters;
+                TypeReference[] xParamTypes = new TypeReference[xParams.Count];
+                for (int i = 0; i < xParams.Count; i++)
                 {
                     xParamTypes[i] = xParams[i].ParameterType;
                 }
-                MethodBase xMethod = GetUltimateBaseMethod(aMethod,
+                var xMethod = GetUltimateBaseMethod(method,
                                                            xParamTypes,
-                                                           aMethod.DeclaringType);
+                                                           method.DeclaringType);
                 return GetMethodIdentifier(xMethod);
             };
             using (_typesLocker.AcquireWriterLock())
@@ -757,55 +682,53 @@ namespace Indy.IL2CPU
 
         private void ScanForMethodsToIncludeForVMT()
         {
-            List<Type> xCheckedTypes = new List<Type>();
+            List<TypeDefinition> checkedTypes = new List<TypeDefinition>();
             int i = -1;
             while (true)
             {
                 i++;
-                MethodBase xMethod;
+                MethodDefinition method;
                 using (_methodsLocker.AcquireReaderLock())
                 {
                     if (i == _methods.Count)
                     {
                         break;
                     }
-                    xMethod = _methods.ElementAt(i).Key;
+                    method = _methods.ElementAt(i).Key;
                 }
-                if (xMethod.IsStatic)
+                if (method.IsStatic)
                 {
                     continue;
                 }
-                Type xCurrentType = xMethod.DeclaringType;
-                if (!xCheckedTypes.Contains(xCurrentType,
-                                            mTypesEqualityComparer))
+                var currentType = TypeResolver.Resolve(method.DeclaringType);
+                if (!checkedTypes.Contains(currentType, mTypesEqualityComparer))
                 {
-                    xCheckedTypes.Add(xCurrentType);
+                    checkedTypes.Add(currentType);
                 }
-                QueueMethod(GetUltimateBaseMethod(xMethod,
-                                                  (from item in xMethod.GetParameters()
+
+                QueueMethod(GetUltimateBaseMethod(method,
+                                                  (from item in method.Parameters.Cast<ParameterDefinition>()
                                                    select item.ParameterType).ToArray(),
-                                                  xCurrentType));
+                                                  currentType));
             }
             using (_typesLocker.AcquireReaderLock())
             {
-                foreach (Type xType in _types)
+                foreach (TypeDefinition type in _types)
                 {
-                    if (!xCheckedTypes.Contains(xType,
-                                                mTypesEqualityComparer))
+                    if (!checkedTypes.Contains(type, mTypesEqualityComparer))
                     {
-                        xCheckedTypes.Add(xType);
+                        checkedTypes.Add(type);
                     }
                 }
             }
-            for (i = 0; i < xCheckedTypes.Count; i++)
+            for (i = 0; i < checkedTypes.Count; i++)
             {
-                Type xCurrentType = xCheckedTypes[i];
+                Type xCurrentType = checkedTypes[i];
                 while (xCurrentType != null)
                 {
-                    if (!xCheckedTypes.Contains(xCurrentType,
-                                                mTypesEqualityComparer))
+                    if (!checkedTypes.Contains(xCurrentType, mTypesEqualityComparer))
                     {
-                        xCheckedTypes.Add(xCurrentType);
+                        checkedTypes.Add(xCurrentType);
                     }
                     if (xCurrentType.FullName == "System.Object")
                     {
@@ -818,7 +741,7 @@ namespace Indy.IL2CPU
                     xCurrentType = xCurrentType.BaseType;
                 }
             }
-            foreach (Type xTD in xCheckedTypes)
+            foreach (Type xTD in checkedTypes)
             {
                 foreach (MethodBase xMethod in xTD.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
@@ -837,7 +760,7 @@ namespace Indy.IL2CPU
                             {
                                 xMethodParams[k] = xParams[k].ParameterType;
                             }
-                            MethodBase xBaseMethod = GetUltimateBaseMethod(xMethod,
+                            var xBaseMethod = GetUltimateBaseMethod(xMethod,
                                                                            xMethodParams,
                                                                            xTD);
                             if (xBaseMethod != null && xBaseMethod != xMethod)
@@ -932,9 +855,9 @@ namespace Indy.IL2CPU
             }
         }
 
-        private static MethodBase GetUltimateBaseMethod(MethodBase aMethod,
-                                                        Type[] aMethodParams,
-                                                        Type aCurrentInspectedType)
+        private static MethodDefinition GetUltimateBaseMethod(MethodDefinition aMethod,
+                                                        TypeReference[] aMethodParams,
+                                                        TypeReference aCurrentInspectedType)
         {
             MethodBase xBaseMethod = null;
             //try {
@@ -1102,8 +1025,15 @@ namespace Indy.IL2CPU
         /// <remarks>For classes, this is the pointer size.</remarks>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static uint GetFieldStorageSize(TypeReference type)
+        public static uint GetFieldStorageSize(TypeReference typeRef)
         {
+            TypeDefinition type;
+
+            if (typeRef is TypeDefinition)
+                type = typeRef;
+            else
+                type = TypeResolver.Resolve(typeRef);
+
             if (type.FullName == "System.Void")
             {
                 return 0;
@@ -1157,7 +1087,7 @@ namespace Indy.IL2CPU
             //}
             if (type.IsEnum)
             {
-                return GetFieldStorageSize(type.GetField("value__").FieldType);
+                return GetFieldStorageSize(type.Fields.GetField("value__").FieldType);
             }
             if (type.IsValueType)
             {
@@ -1195,11 +1125,11 @@ namespace Indy.IL2CPU
             {
                 return;
             }
-            else if (mDebugMode == DebugMode.None)
+            else if (this.DebugMode == DebugMode.None)
             {
                 return;
             }
-            else if (mDebugMode == DebugMode.Source)
+            else if (this.DebugMode == DebugMode.Source)
             {
                 // If the current position equals one of the offsets, then we have
                 // reached a new atomic C# statement
@@ -1262,23 +1192,23 @@ namespace Indy.IL2CPU
             while (true)
             {
                 i++;
-                FieldInfo xCurrentField;
+                FieldDefinition currentField;
                 using (mStaticFieldsLocker.AcquireReaderLock())
                 {
-                    xCount = mStaticFields.Count;
+                    xCount = _staticFields.Count;
                     if (i == xCount)
                     {
                         break;
                     }
-                    xCurrentField = mStaticFields.Keys.ElementAt(i);
+                    currentField = _staticFields.Keys.ElementAt(i);
                 }
                 OnCompilingStaticFields(i, xCount);
                 //ProgressChanged.Invoke(String.Format("Processing static field: {0}", xCurrentField.GetFullName()));
-                string xFieldName = xCurrentField.GetFullName();
-                xFieldName = DataMember.GetStaticFieldName(xCurrentField);
+                string xFieldName = currentField.GetFullName();
+                xFieldName = DataMember.GetStaticFieldName(currentField);
                 if (_assembler.DataMembers.Count(x => x.Name == xFieldName) == 0)
                 {
-                    var xItem = (from item in xCurrentField.GetCustomAttributes(false)
+                    var xItem = (from item in currentField.GetCustomAttributes(false)
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
                                  select item).FirstOrDefault();
                     string xManifestResourceName = null;
@@ -1325,13 +1255,13 @@ namespace Indy.IL2CPU
                     }
                     else
                     {
-                        RegisterType(xCurrentField.FieldType);
+                        RegisterType(currentField.FieldType);
                         uint xTheSize;
                         //string theType = "db";
-                        Type xFieldTypeDef = xCurrentField.FieldType;
+                        Type xFieldTypeDef = currentField.FieldType;
                         if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
                         {
-                            xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+                            xTheSize = GetFieldStorageSize(currentField.FieldType);
                         }
                         else
                         {
@@ -1340,7 +1270,7 @@ namespace Indy.IL2CPU
                         byte[] xData = new byte[xTheSize];
                         try
                         {
-                            object xValue = xCurrentField.GetValue(null);
+                            object xValue = currentField.GetValue(null);
                             if (xValue != null)
                             {
                                 try
@@ -1368,7 +1298,7 @@ namespace Indy.IL2CPU
                 }
                 using (mStaticFieldsLocker.AcquireReaderLock())
                 {
-                    mStaticFields[xCurrentField].Processed = true;
+                    _staticFields[currentField].Processed = true;
                 }
             }
             OnCompilingStaticFields(i, xCount);
@@ -1392,7 +1322,7 @@ namespace Indy.IL2CPU
             while (true)
             {
                 i++;
-                MethodBase xCurrentMethod;
+                MethodDefinition currentMethod;
                 using (_methodsLocker.AcquireReaderLock())
                 {
                     xCount = _methods.Count;
@@ -1400,35 +1330,34 @@ namespace Indy.IL2CPU
                     {
                         break;
                     }
-                    xCurrentMethod = _methods.Keys.ElementAt(i);
+                    currentMethod = _methods.Keys.ElementAt(i);
                 }
                 OnCompilingMethods(i, xCount);
-                OnDebugLog(LogSeverityEnum.Informational, "Processing method {0}", xCurrentMethod.GetFullName());
+                OnDebugLog(LogSeverityEnum.Informational, "Processing method {0}", currentMethod.ToString());
                 try
                 {
-                    EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
-                    RegisterType(xCurrentMethod.DeclaringType);
-                    if (xCurrentMethod.IsAbstract)
+                    EmitDependencyGraphLine(true, currentMethod.ToString());
+                    RegisterType(currentMethod.DeclaringType);
+                    if (currentMethod.IsAbstract)
                     {
                         using (_methodsLocker.AcquireReaderLock())
                         {
-                            _methods[xCurrentMethod].Processed = true;
+                            _methods[currentMethod].Processed = true;
                         }
                         continue;
                     }
-                    string xMethodName = Label.GenerateLabelName(xCurrentMethod);
+                    string xMethodName = Label.GenerateLabelName(currentMethod);
                     TypeInformation xTypeInfo = null;
-                    if (!xCurrentMethod.IsStatic)
+                    if (!currentMethod.IsStatic)
                     {
-                        xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
+                        xTypeInfo = GetTypeInfo(currentMethod.DeclaringType);
                     }
                     SortedList<string, object> xMethodScanInfo;
                     using (_methodsLocker.AcquireReaderLock())
                     {
-                        xMethodScanInfo = _methods[xCurrentMethod].Info;
+                        xMethodScanInfo = _methods[currentMethod].Info;
                     }
-                    MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
-                     , xMethodName, xTypeInfo, mDebugMode != DebugMode.None, xMethodScanInfo);
+                    MethodInformation xMethodInfo = GetMethodInfo(currentMethod, currentMethod, xMethodName, xTypeInfo, this.DebugMode != DebugMode.None, xMethodScanInfo);
 
                     Op xOp = GetOpFromType(_map.MethodHeaderOp, null, xMethodInfo);
                     xOp.Assembler = _assembler;
@@ -1490,13 +1419,12 @@ namespace Indy.IL2CPU
                         }
                         else
                         {
-                            MethodBody xBody = xCurrentMethod.GetMethodBody();
+                            var xBody = currentMethod.Body;
                             // todo: add better detection of implementation state
                             if (xBody != null)
                             {
                                 mInstructionsToSkip = 0;
                                 _assembler.StackContents.Clear();
-                                var xReader = new ILReader(xCurrentMethod);
                                 var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
 
                                 // Section currently is dead code. Working on matching it up 
@@ -1523,6 +1451,8 @@ namespace Indy.IL2CPU
                                 //}
 
                                 // Scan each IL op in the method
+                                currentMethod.Accept(new AbstractCodeVisitor { });
+
                                 while (xReader.Read())
                                 {
                                     ExceptionHandlingClause xCurrentHandler = null;
@@ -1608,7 +1538,7 @@ namespace Indy.IL2CPU
                                     }
 
                                     // Possibly emit Tracer call
-                                    EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
+                                    EmitTracer(xOp, currentMethod.DeclaringType.Namespace, (int)xReader.Position,
                                         xCodeOffsets, xLabel);
 
                                     using (mSymbolsLocker.AcquireWriterLock())
@@ -1623,9 +1553,9 @@ namespace Indy.IL2CPU
                                                                               : (item.Size + (4 - (item.Size % 4)))
                                                               select xSize).Sum();
                                             xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
-                                            xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
-                                            xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
-                                            xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
+                                            xMLSymbol.AssemblyFile = currentMethod.DeclaringType.Module.Image.FileInformation.FullName;
+                                            xMLSymbol.MethodToken = currentMethod.MetadataToken;
+                                            xMLSymbol.TypeToken = currentMethod.DeclaringType.MetadataToken;
                                             xMLSymbol.ILOffset = (int)xReader.Position;
                                             mSymbols.Add(xMLSymbol);
                                         }
@@ -1649,24 +1579,24 @@ namespace Indy.IL2CPU
                                     }
                                     using (_methodsLocker.AcquireReaderLock())
                                     {
-                                        _methods[xCurrentMethod].Instructions = xSymbols;
+                                        _methods[currentMethod].Instructions = xSymbols;
                                     }
                                 }
                             }
                             else
                             {
-                                if ((xCurrentMethod.Attributes & MethodAttributes.PinvokeImpl) != 0)
+                                if ((currentMethod.Attributes & Mono.Cecil.MethodAttributes.PInvokeImpl) != 0)
                                 {
                                     OnDebugLog(LogSeverityEnum.Error,
                                                "Method '{0}' not generated!",
-                                               xCurrentMethod.GetFullName());
+                                               currentMethod.ToString());
                                     new Comment("Method not being generated yet, as it's handled by a PInvoke");
                                 }
                                 else
                                 {
                                     OnDebugLog(LogSeverityEnum.Error,
                                                "Method '{0}' not generated!",
-                                               xCurrentMethod.GetFullName());
+                                               currentMethod.ToString());
                                     new Comment("Method not being generated yet, as it's handled by an iCall");
                                 }
                             }
@@ -1678,12 +1608,12 @@ namespace Indy.IL2CPU
                     _assembler.StackContents.Clear();
                     using (_methodsLocker.AcquireReaderLock())
                     {
-                        _methods[xCurrentMethod].Processed = true;
+                        _methods[currentMethod].Processed = true;
                     }
                 }
                 catch (Exception e)
                 {
-                    OnDebugLog(LogSeverityEnum.Error, xCurrentMethod.GetFullName());
+                    OnDebugLog(LogSeverityEnum.Error, currentMethod.ToString());
                     OnDebugLog(LogSeverityEnum.Warning, e.ToString());
                     throw;
                 }
@@ -2013,7 +1943,7 @@ namespace Indy.IL2CPU
             }
         }
 
-        private MethodBase GetCustomMethodImplementation(string aMethodName)
+        private MethodDefinition GetCustomMethodImplementation(string aMethodName)
         {
             if (_plugMethods.ContainsKey(aMethodName))
             {
@@ -2022,8 +1952,14 @@ namespace Indy.IL2CPU
             return null;
         }
 
-        public static TypeInformation GetTypeInfo(TypeReference type)
+        public static TypeInformation GetTypeInfo(TypeReference typeRef)
         {
+            TypeDefinition type;
+            if (typeRef is TypeDefinition)
+                type = typeRef;
+            else
+                type = TypeResolver.Resolve(typeRef);
+
             TypeInformation xTypeInfo;
             uint xObjectStorageSize;
             var xTypeFields = GetTypeFieldInfo(type, out xObjectStorageSize);
@@ -2040,7 +1976,7 @@ namespace Indy.IL2CPU
         {
             MethodInformation xMethodInfo;
             {
-                
+
                 MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
                 int xCurOffset = 0;
                 // todo:implement check for body
@@ -2070,8 +2006,8 @@ namespace Indy.IL2CPU
                 MethodInformation.Argument[] xArgs;
                 if (!aCurrentMethodForArguments.IsStatic)
                 {
-                    ParameterInfo[] xParameters = aCurrentMethodForArguments.GetParameters();
-                    xArgs = new MethodInformation.Argument[xParameters.Length + 1];
+                    ParameterDefinitionCollection xParameters = aCurrentMethodForArguments.Parameters;
+                    xArgs = new MethodInformation.Argument[xParameters.Count + 1];
                     xCurOffset = 0;
                     uint xArgSize;
                     for (int i = xArgs.Length - 1; i > 0; i--)
@@ -2308,7 +2244,7 @@ namespace Indy.IL2CPU
             } while (true);
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(TypeReference aType, out uint aObjectStorageSize)
+        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out uint aObjectStorageSize)
         {
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
@@ -2359,16 +2295,16 @@ namespace Indy.IL2CPU
             }
             using (_current.mStaticFieldsLocker.AcquireReaderLock())
             {
-                if (_current.mStaticFields.ContainsKey(aField))
+                if (_current._staticFields.ContainsKey(aField))
                 {
                     return;
                 }
             }
             using (_current.mStaticFieldsLocker.AcquireWriterLock())
             {
-                if (!_current.mStaticFields.ContainsKey(aField))
+                if (!_current._staticFields.ContainsKey(aField))
                 {
-                    _current.mStaticFields.Add(aField,
+                    _current._staticFields.Add(aField,
                                                new QueuedStaticFieldInformation());
                 }
             }
@@ -2439,12 +2375,10 @@ namespace Indy.IL2CPU
                 {
                     if (_current._methods is ReadOnlyDictionary<MethodBase, QueuedMethodInformation>)
                     {
-                        EmitDependencyGraphLine(false,
-                                                aMethod.GetFullName());
-                        throw new Exception("Cannot queue " + aMethod.GetFullName());
+                        EmitDependencyGraphLine(false, aMethod.ToString());
+                        throw new Exception("Cannot queue " + aMethod.ToString());
                     }
-                    EmitDependencyGraphLine(false,
-                                            aMethod.GetFullName());
+                    EmitDependencyGraphLine(false, aMethod.ToString());
                     _current._methods.Add(aMethod,
                                           new QueuedMethodInformation()
                                           {
@@ -2481,8 +2415,14 @@ namespace Indy.IL2CPU
         /// </summary>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static int RegisterType(TypeReference type)
+        public static int RegisterType(TypeReference typeRef)
         {
+            TypeDefinition type;
+            if (typeRef is TypeDefinition)
+                type = typeRef;
+            else
+                type = TypeResolver.Resolve(typeRef);
+
             if (type == null)
             {
                 throw new ArgumentNullException("type");
@@ -2678,12 +2618,12 @@ namespace Indy.IL2CPU
                     continue;
                 }
                 var @params = method.Parameters;
-                if (@params.Length != paramTypes.Length)
+                if (@params.Count != paramTypes.Length)
                 {
                     continue;
                 }
                 bool errorFound = false;
-                for (int i = 0; i < @params.Length; i++)
+                for (int i = 0; i < @params.Count; i++)
                 {
                     if (@params[i].ParameterType.FullName != paramTypes[i])
                     {

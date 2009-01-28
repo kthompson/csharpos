@@ -34,5 +34,10 @@ namespace Indy.IL2CPU
             }
             return null;
         }
+
+        public static TypeDefinition Resolve(TypeReference typeRef)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

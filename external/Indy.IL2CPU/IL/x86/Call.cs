@@ -159,7 +159,8 @@ namespace Indy.IL2CPU.IL.X86
         {
             MethodBase xMethod = aReader.OperandValueMethod;
             mMethodInfo = aMethodInfo;
-            if (!aReader.EndOfStream)
+            //not the last instruction
+            if (instruction.Next!=null)
             {
                 mNextLabelName = GetInstructionLabel(aReader.NextPosition);
             }
@@ -167,7 +168,7 @@ namespace Indy.IL2CPU.IL.X86
             {
                 mNextLabelName = X86MethodFooterOp.EndOfMethodLabelNameNormal;
             }
-            Initialize(xMethod, (uint)aReader.Position, aMethodInfo.DebugMode);
+            Initialize(xMethod, (uint)instruction.Offset, aMethodInfo.DebugMode);
         }
         public void Assemble(string aMethod, int aArgumentCount)
         {
