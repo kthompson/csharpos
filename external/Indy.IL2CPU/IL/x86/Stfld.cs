@@ -13,27 +13,27 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly TypeInformation.Field mField;
 		private readonly TypeInformation mType;
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            FieldInfo xField = aReader.OperandValueField;
+            var xField = aReader.OperandValueField;
             if (xField == null)
             {
                 throw new Exception("Field not found!");
             }
             Engine.RegisterType(xField.FieldType);
         }
-		public Stfld(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Stfld(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 			if (aReader == null) {
 				throw new ArgumentNullException("aReader");
 			}
 			if (aMethodInfo == null) {
 				throw new ArgumentNullException("aMethodInfo");
 			}
-			FieldInfo xField = aReader.OperandValueField;
-			if (xField == null) {
+			var field = aReader.OperandValueField;
+			if (field == null) {
 				throw new Exception("Field not found!");
 			}
-			string xFieldId = xField.GetFullName();
-			mType = Engine.GetTypeInfo(xField.DeclaringType);
+			string xFieldId = field.Name;
+			mType = Engine.GetTypeInfo(field.DeclaringType);
 			mField = mType.Fields[xFieldId];
 		}
 

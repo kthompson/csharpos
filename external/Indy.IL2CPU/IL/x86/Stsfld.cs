@@ -5,60 +5,72 @@ using Indy.IL2CPU.Assembler;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
+using Mono.Cecil;
 
-namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Stsfld)]
-	public class Stsfld: Op {
-		private string mDataName;
-		private uint mSize;
-		private Type mDataType;
-		private bool mNeedsGC;
-		private string mBaseLabel;
+namespace Indy.IL2CPU.IL.X86
+{
+    [OpCode(OpCodeEnum.Stsfld)]
+    public class Stsfld : Op
+    {
+        private string mDataName;
+        private uint mSize;
+        private TypeReference _dataType;
+        private bool mNeedsGC;
+        private string mBaseLabel;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            FieldInfo xField = aReader.OperandValueField;
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        {
+            var xField = aReader.OperandValueField;
             Engine.QueueStaticField(xField);
         }
 
-		public Stsfld(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			FieldInfo xField = aReader.OperandValueField;
-			mSize = Engine.GetFieldStorageSize(xField.FieldType);
-			Engine.QueueStaticField(xField, out mDataName);
-			mNeedsGC = !xField.FieldType.IsValueType;
-			mDataType = xField.FieldType;
-			mBaseLabel = GetInstructionLabel(aReader);
-		}
+        public Stsfld(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
+            var field = aReader.OperandValueField;
+            mSize = Engine.GetFieldStorageSize(field.FieldType);
+            Engine.QueueStaticField(field, out mDataName);
+            mNeedsGC = !field.FieldType.IsValueType;
+            _dataType = field.FieldType;
+            mBaseLabel = GetInstructionLabel(aReader);
+        }
 
-		public override void DoAssemble() {
-			if (mNeedsGC) {
+        public override void DoAssemble()
+        {
+            if (mNeedsGC)
+            {
                 new CPUx86.Push { DestinationRef = new ElementReference(mDataName), DestinationIsIndirect = true };
-				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
+                Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
                 new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
-			}
-			for (int i = 0; i < (mSize / 4); i++) {
+            }
+            for (int i = 0; i < (mSize / 4); i++)
+            {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Move { DestinationRef = new ElementReference(mDataName, i * 4), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-			}
-			switch (mSize % 4) {
-				case 1: {
+            }
+            switch (mSize % 4)
+            {
+                case 1:
+                    {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                         new CPUx86.Move { DestinationRef = new ElementReference(mDataName, (int)((mSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
-						break;
-					}
-				case 2: {
+                        break;
+                    }
+                case 2:
+                    {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                         new CPUx86.Move { DestinationRef = new ElementReference(mDataName, (int)((mSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
                         break;
-					}
-				case 0: {
-						break;
-					}
-				default:
-					throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
+                    }
+                case 0:
+                    {
+                        break;
+                    }
+                default:
+                    throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
 
-			}
-			Assembler.StackContents.Pop();
-		}
-	}
+            }
+            Assembler.StackContents.Pop();
+        }
+    }
 }

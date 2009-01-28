@@ -7,8 +7,8 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Conv_R4)]
 	public class Conv_R4: Op {
-		public Conv_R4(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Conv_R4(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
 			throw new Exception("Floats not yet supported!");

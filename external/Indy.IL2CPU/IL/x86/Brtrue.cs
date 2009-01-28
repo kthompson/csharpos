@@ -8,9 +8,9 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Brtrue)]
 	public class Brtrue: Op {
 		public readonly string TargetLabel;
-		public Brtrue(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
+		public Brtrue(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+                TargetLabel = GetInstructionLabel((long)instruction.Operand);
 		}
 
 		public override void DoAssemble() {

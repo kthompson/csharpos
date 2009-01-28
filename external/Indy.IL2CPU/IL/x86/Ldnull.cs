@@ -8,8 +8,8 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldnull)]
 	public class Ldnull: Op {
-		public Ldnull(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Ldnull(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
             new CPU.Push { DestinationValue = 0 };

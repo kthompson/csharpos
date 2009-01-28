@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Initobj)]
@@ -8,17 +9,17 @@ namespace Indy.IL2CPU.IL.X86 {
 		private uint mObjSize;
 
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            Type xTypeRef = aReader.OperandValueType;
-            if (xTypeRef == null)
+            var typeRef = aReader.OperandValueType;
+            if (typeRef == null)
             {
                 throw new Exception("Type not found!");
             }
-            Engine.RegisterType(xTypeRef);
+            Engine.RegisterType(typeRef);
         }
 
-		public Initobj(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			Type xTypeRef = aReader.OperandValueType;
+		public Initobj(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+                var xTypeRef = (TypeReference)instruction.Operand;
 			if (xTypeRef == null) {
 				throw new Exception("Type not found!");
 			}

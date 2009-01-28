@@ -11,10 +11,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Throw: Op {
 		private MethodInformation mMethodInfo;
 		private int mCurrentILOffset;
-		public Throw(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Throw(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 			mMethodInfo = aMethodInfo;
-			mCurrentILOffset = (int)aReader.Position;
+			mCurrentILOffset = instruction.Offset;
 		}
 
 		public static void Assemble(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, int aCurrentILOffset) {

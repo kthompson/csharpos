@@ -16,12 +16,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			SetValue((Int32)UInt32.Parse(aValue));
 		}
 
-		public Ldc_I4(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			if (aReader != null) {
-				SetValue(aReader.OperandValueInt32);
-			}
-		}
+        public Ldc_I4(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
+            if (instruction != null)
+            {
+                SetValue((Int32)instruction.Operand);
+            }
+        }
 
 		public int Value {
 			get {

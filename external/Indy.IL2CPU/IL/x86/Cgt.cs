@@ -12,10 +12,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Cgt: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
-		public Cgt(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
+		public Cgt(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			NextInstructionLabel = GetInstructionLabel(instruction.Next);
+			CurInstructionLabel = GetInstructionLabel(instruction);
 		}
 		public override void DoAssemble() {
 			var xStackItem= Assembler.StackContents.Pop();

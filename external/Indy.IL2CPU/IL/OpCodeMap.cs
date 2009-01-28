@@ -6,6 +6,7 @@ using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL;
 using Indy.IL2CPU.Plugs;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
@@ -40,7 +41,7 @@ namespace Indy.IL2CPU.IL {
             }
         }
 
-	    public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies) {
+	    public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aApplicationAssemblies) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
 								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
 								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null

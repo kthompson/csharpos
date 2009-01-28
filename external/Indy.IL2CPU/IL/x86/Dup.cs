@@ -1,12 +1,14 @@
 using System;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Dup)]
 	public class Dup: Op {
-		public Dup(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Dup(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 		public override void DoAssemble() {
 			var xStackContent = Assembler.StackContents.Peek();

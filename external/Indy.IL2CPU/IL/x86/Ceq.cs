@@ -10,10 +10,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ceq: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
-		public Ceq(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
+		public Ceq(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			NextInstructionLabel = GetInstructionLabel(instruction.Next);
+			CurInstructionLabel = GetInstructionLabel(instruction);
 		}
 		private void Assemble4Byte() {
 			Assembler.StackContents.Push(new StackContent(4, typeof(bool)));

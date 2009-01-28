@@ -11,10 +11,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Bge: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;
-		public Bge(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
+		public Bge(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+                TargetLabel = GetInstructionLabel((Mono.Cecil.Cil.Instruction)instruction.Operand);
+			CurInstructionLabel = GetInstructionLabel(instruction);
 		}
 
 		private void DoAssemble32Bit() {

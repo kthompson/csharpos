@@ -17,11 +17,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			SetArgIndex(aIndex, aMethodInfo);
 		}
 
-		public Ldarg(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Ldarg(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 			int xArgIndex;
-			if (aReader != null) {
-				xArgIndex = aReader.OperandValueInt32;
+            if (instruction != null)
+            {
+                xArgIndex = (int)instruction.Operand;
 				SetArgIndex(xArgIndex, aMethodInfo);
 				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
 				//if (xParam != null) {

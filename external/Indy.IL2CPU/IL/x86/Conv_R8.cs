@@ -8,8 +8,8 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Conv_R8)]
 	public class Conv_R8: Op {
-		public Conv_R8(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Conv_R8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
 			var xStackItem = Assembler.StackContents.Peek();

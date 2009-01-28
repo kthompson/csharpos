@@ -6,8 +6,9 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Xor)]
 	public class Xor: Op {
-		public Xor(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Xor(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 		public override void DoAssemble() {
 			if (Assembler.StackContents.Peek().IsFloat) {

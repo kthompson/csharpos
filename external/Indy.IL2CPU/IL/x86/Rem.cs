@@ -6,8 +6,9 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Rem)]
 	public class Rem: Op {
-		public Rem(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Rem(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 		public override void DoAssemble() {
 			if (Assembler.StackContents.Peek().IsFloat) {

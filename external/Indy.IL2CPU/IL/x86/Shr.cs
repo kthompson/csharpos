@@ -7,9 +7,9 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Shr)]
 	public class Shr: Op {
         private string mLabelName;
-		public Shr(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-            mLabelName= GetInstructionLabel(aReader);
+		public Shr(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+            mLabelName= GetInstructionLabel(instruction);
 		}
 		public override void DoAssemble() {
             var xStackItem_ShiftAmount = Assembler.StackContents.Pop();

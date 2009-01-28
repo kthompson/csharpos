@@ -12,8 +12,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly MethodInformation.Argument[] Args;
 		public readonly bool DebugMode;
 	    public readonly bool MethodIsNonDebuggable;
-		public X86MethodHeaderOp(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public X86MethodHeaderOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			Args = aMethodInfo.Arguments.ToArray();
 			Locals = aMethodInfo.Locals.ToArray();

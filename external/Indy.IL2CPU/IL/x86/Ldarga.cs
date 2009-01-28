@@ -17,10 +17,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			SetArgIndex(aIndex, aMethodInfo);
 		}
 
-		public Ldarga(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			if (aReader != null) {
-				SetArgIndex(aReader.OperandValueInt32, aMethodInfo);
+		public Ldarga(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			if (instruction != null) {
+				SetArgIndex((int)instruction.Operand, aMethodInfo);
 				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
 				//if (xParam != null) {
 				//    SetArgIndex(xParam.Sequence - 1, aMethodInfo);

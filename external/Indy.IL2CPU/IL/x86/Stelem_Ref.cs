@@ -7,8 +7,9 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Stelem_Ref)]
 	public class Stelem_Ref: Op {
-		public Stelem_Ref(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Stelem_Ref(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 
 		public static void Assemble(CPU.Assembler aAssembler, uint aElementSize) {

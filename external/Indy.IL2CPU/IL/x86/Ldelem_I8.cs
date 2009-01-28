@@ -11,11 +11,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldelem_I8: Op {
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            Engine.RegisterType(typeof(long));
+            Engine.RegisterType<long>();
         }
 
-        public Ldelem_I8(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Ldelem_I8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		
 		public override void DoAssemble() {

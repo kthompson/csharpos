@@ -1,12 +1,14 @@
 using System;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Div_Un)]
 	public class Div_Un: Op {
-		public Div_Un(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Div_Un(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 		public override void DoAssemble() {
 			var xStackItem= Assembler.StackContents.Pop();

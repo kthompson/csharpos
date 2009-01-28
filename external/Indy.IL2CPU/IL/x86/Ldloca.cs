@@ -11,9 +11,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddresses.LastOrDefault();
 		}
-		public Ldloca(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			SetLocalIndex(aReader.OperandValueInt32, aMethodInfo);
+		public Ldloca(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			SetLocalIndex((int)instruction.Operand, aMethodInfo);
 			//    return;
 			//}
 			//VariableDefinition xVarDef = aReader.Operand as VariableDefinition;

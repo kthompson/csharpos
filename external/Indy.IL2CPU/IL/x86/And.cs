@@ -8,8 +8,8 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.And)]
 	public class And: Op {
-		public And(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public And(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
 			StackContent xStackContent = Assembler.StackContents.Peek();

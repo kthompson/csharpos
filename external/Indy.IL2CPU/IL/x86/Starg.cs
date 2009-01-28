@@ -11,9 +11,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			mAddresses = aMethodInfo.Arguments[aIndex].VirtualAddresses;
 
 		}
-		public Starg(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			SetArgIndex(aReader.OperandValueInt32, aMethodInfo);
+		public Starg(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			SetArgIndex((int)instruction.Operand, aMethodInfo);
 		}
 		public override void DoAssemble() {
 			if (mAddresses == null || mAddresses.Length == 0) {

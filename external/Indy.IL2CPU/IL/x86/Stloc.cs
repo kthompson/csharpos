@@ -18,11 +18,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			mNeedsGC &= aMethodInfo.Locals[aIndex].VariableType.FullName != "System.String";
 		}
 
-		public Stloc(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Stloc(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 			int xLocalIndex;
-			mBaseLabel = GetInstructionLabel(aReader);
-			xLocalIndex = aReader.OperandValueInt32;
+			mBaseLabel = GetInstructionLabel(instruction);
+			xLocalIndex = (Int32)instruction.Operand;
 			SetLocalIndex(xLocalIndex, aMethodInfo);
 			//VariableDefinition xVarDef = aReader.Operand as VariableDefinition;
 			//if (xVarDef != null) {

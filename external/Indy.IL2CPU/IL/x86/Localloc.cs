@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Localloc: Op {
         public const string LocAllocCountMethodDataEntry = "LocAllocCount";
         public const string LocAllicItemMethodDataEntryTemplate = "LocAllocItem_L{0}";
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
             // xCurrentMethodLocallocCount contains the number of LocAlloc occurrences
             int xCurrentMethodLocallocCount = 0;
             if (aMethodData.ContainsKey(LocAllocCountMethodDataEntry)) {
@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86 {
             xCurrentMethodLocallocCount++;
             aMethodData[LocAllocCountMethodDataEntry] = xCurrentMethodLocallocCount;
             string xCurrentItem = String.Format(LocAllicItemMethodDataEntryTemplate,
-                                                aReader.Position);
+                                                instruction.Offset);
 #if DEBUG
             if (aMethodData.ContainsKey(xCurrentItem)) {
                 throw new Exception("Localloc item already exists in MethodData!");
@@ -29,8 +29,8 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
 	    private readonly int mLocallocOffset = 0;
-		public Localloc(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Localloc(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		    mLocallocOffset = (int)aMethodInfo.MethodData[String.Format(LocAllicItemMethodDataEntryTemplate,
 		                                                                aReader.Position)];
 		    mLocallocOffset *= 4;

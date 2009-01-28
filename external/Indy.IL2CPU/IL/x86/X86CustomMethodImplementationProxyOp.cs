@@ -8,8 +8,8 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86CustomMethodImplementationProxyOp: CustomMethodImplementationProxyOp {
 		private readonly bool mDebugMode;
-		public X86CustomMethodImplementationProxyOp(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public X86CustomMethodImplementationProxyOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 			mDebugMode = aMethodInfo.DebugMode;
 		}
 

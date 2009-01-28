@@ -12,10 +12,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Clt_Un: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
-		public Clt_Un(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
+		public Clt_Un(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			NextInstructionLabel = GetInstructionLabel(instruction.Next);
+			CurInstructionLabel = GetInstructionLabel(instruction);
 		}
 		public override void DoAssemble() {
 			if (Assembler.StackContents.Peek().IsFloat) {

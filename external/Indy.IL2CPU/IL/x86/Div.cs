@@ -1,12 +1,14 @@
 using System;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Div)]
 	public class Div: Op {
-		public Div(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Div(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 		public override void DoAssemble() {
 			var xSize = Assembler.StackContents.Pop();

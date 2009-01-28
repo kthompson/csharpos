@@ -5,10 +5,13 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil;
 
-namespace Indy.IL2CPU.IL.X86 {
+namespace Indy.IL2CPU.IL.X86
+{
     [OpCode(OpCodeEnum.Callvirt)]
-    public class Callvirt : Op {
+    public class Callvirt : Op
+    {
         private readonly int mMethodIdentifier;
         private readonly string mNormalAddress;
         private readonly string mMethodDescription;
@@ -23,73 +26,83 @@ namespace Indy.IL2CPU.IL.X86 {
 
         public static void ScanOp(ILReader aReader,
                                   MethodInformation aMethodInfo,
-                                  SortedList<string, object> aMethodData) {
-            MethodBase xMethod = aReader.OperandValueMethod;
-            if (xMethod == null) {
+                                  SortedList<string, object> aMethodData)
+        {
+            MethodDefinition method = aReader.OperandValueMethod;
+            if (method == null)
+            {
                 throw new Exception("Unable to determine Method!");
             }
-            MethodBase xMethodDef = xMethod;
-            var xMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
-            var xTargetMethodInfo = Engine.GetMethodInfo(xMethodDef,
-                                                         xMethodDef,
-                                                         xMethodDescription,
+
+            var methodDescription = CPU.Label.GenerateLabelName(method);
+            var xTargetMethodInfo = Engine.GetMethodInfo(method,
+                                                         method,
+                                                         methodDescription,
                                                          null,
                                                          aMethodInfo.DebugMode);
-            foreach (var xParam in xMethodDef.GetParameters()) {
-                Engine.RegisterType(xParam.ParameterType);
+            foreach (ParameterDefinition param in method.Parameters)
+            {
+                Engine.RegisterType(param.ParameterType);
             }
             Engine.RegisterType(xTargetMethodInfo.ReturnType);
-            Engine.QueueMethod(xMethodDef);
+            Engine.QueueMethod(method);
             Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
             Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
-            Engine.RegisterType(typeof(NullReferenceException));
-            Engine.QueueMethod(typeof(NullReferenceException).GetConstructor(new Type[0]));
+            Engine.RegisterType<NullReferenceException>();
+            Engine.QueueMethod(TypeResolver.GetConstructor<NullReferenceException>());
         }
 
-        public Callvirt(ILReader aReader,
-                        MethodInformation aMethodInfo)
-            : base(aReader,
-                   aMethodInfo) {
+        public Callvirt(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
             mLabelName = GetInstructionLabel(aReader);
             mCurrentMethodInfo = aMethodInfo;
-            MethodBase xMethod = aReader.OperandValueMethod;
-            if (xMethod == null) {
+            var xMethod = aReader.OperandValueMethod;
+            if (xMethod == null)
+            {
                 throw new Exception("Unable to determine Method!");
             }
-            MethodBase xMethodDef = xMethod;
-            mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
-            mTargetMethodInfo = Engine.GetMethodInfo(xMethodDef,
-                                                     xMethodDef,
+            
+            mMethodDescription = CPU.Label.GenerateLabelName(xMethod);
+            mTargetMethodInfo = Engine.GetMethodInfo(xMethod,
+                                                     xMethod,
                                                      mMethodDescription,
                                                      null,
                                                      aMethodInfo.DebugMode);
-            if (xMethodDef.IsStatic || !xMethodDef.IsVirtual || xMethod.IsFinal) {
-                Engine.QueueMethod(xMethodDef);
-                mNormalAddress = CPU.Label.GenerateLabelName(xMethodDef);
+            if (xMethod.IsStatic || !xMethod.IsVirtual || xMethod.IsFinal)
+            {
+                Engine.QueueMethod(xMethod);
+                mNormalAddress = CPU.Label.GenerateLabelName(xMethod);
             }
-            mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
+            mMethodIdentifier = Engine.GetMethodIdentifier(xMethod);
             Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
             mArgumentCount = (uint)mTargetMethodInfo.Arguments.Length;
             mReturnSize = mTargetMethodInfo.ReturnSize;
             mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
-            if (mTargetMethodInfo.ExtraStackSize > 0) {
+            if (mTargetMethodInfo.ExtraStackSize > 0)
+            {
                 mThisOffset -= mTargetMethodInfo.ExtraStackSize;
             }
             mCurrentILOffset = aReader.Position;
             mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
         }
 
-        public override void DoAssemble() {
+        public override void DoAssemble()
+        {
             new Comment("ThisOffset = " + mThisOffset);
-            Action xEmitCleanup = delegate() {
-                                      foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
-                                          new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xArg.Size };
-                                      }
-                                  };
-            if (!String.IsNullOrEmpty(mNormalAddress)) {
+            Action xEmitCleanup = delegate()
+            {
+                foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments)
+                {
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xArg.Size };
+                }
+            };
+            if (!String.IsNullOrEmpty(mNormalAddress))
+            {
                 EmitCompareWithNull(Assembler,
                                     mCurrentMethodInfo,
-                                    delegate(CPUx86.Compare c){
+                                    delegate(CPUx86.Compare c)
+                                    {
                                         c.DestinationReg = CPUx86.Registers.ESP;
                                         c.DestinationIsIndirect = true;
                                         c.DestinationDisplacement = mThisOffset;
@@ -99,11 +112,14 @@ namespace Indy.IL2CPU.IL.X86 {
                                     xEmitCleanup,
                                     (int)mCurrentILOffset);
                 new CPU.Label(mLabelName + "_AfterNullRefCheck");
-                if (mExtraStackSpace > 0) {
+                if (mExtraStackSpace > 0)
+                {
                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mExtraStackSpace };
                 }
                 new CPUx86.Call { DestinationLabel = mNormalAddress };
-            } else {
+            }
+            else
+            {
                 /*
                  * On the stack now:
                  * $esp                 Params
@@ -113,11 +129,12 @@ namespace Indy.IL2CPU.IL.X86 {
                 //Assembler.Add(new CPUx86.Pushd("eax"));
                 EmitCompareWithNull(Assembler,
                                     mCurrentMethodInfo,
-                                    delegate(CPUx86.Compare c) {
+                                    delegate(CPUx86.Compare c)
+                                    {
                                         c.DestinationReg = CPUx86.Registers.ESP;
                                         c.DestinationIsIndirect = true;
                                         c.DestinationDisplacement = mThisOffset;
-                                    }, 
+                                    },
                                     mLabelName,
                                     mLabelName + "_AfterNullRefCheck",
                                     xEmitCleanup,
@@ -142,7 +159,8 @@ namespace Indy.IL2CPU.IL.X86 {
                                         true,
                                         xEmitCleanup);
                 new CPU.Label(mLabelName + "_AfterAddressCheck");
-                if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object)) {
+                if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object))
+                {
                     /*
                      * On the stack now:
                      * $esp                     method to call
@@ -195,7 +213,8 @@ namespace Indy.IL2CPU.IL.X86 {
                 }
                 new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                if (mExtraStackSpace > 0) {
+                if (mExtraStackSpace > 0)
+                {
                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mExtraStackSpace };
                 }
                 new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
@@ -221,10 +240,12 @@ namespace Indy.IL2CPU.IL.X86 {
 
             new CPU.Label(mLabelName + "__NO_EXCEPTION_AFTER_CALL");
             new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
-            for (int i = 0; i < mArgumentCount; i++) {
+            for (int i = 0; i < mArgumentCount; i++)
+            {
                 Assembler.StackContents.Pop();
             }
-            if (mReturnSize > 0) {
+            if (mReturnSize > 0)
+            {
                 Assembler.StackContents.Push(new StackContent((int)mReturnSize));
             }
         }

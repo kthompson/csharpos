@@ -5,19 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Indy.IL2CPU.IL {
+namespace Indy.IL2CPU.IL
+{
     // TODO: abstract this one out to a X86 specific one
-    public class MethodInformation {
-        public struct Variable {
-            public Variable(int aOffset,
-                            int aSize,
-                            bool aIsReferenceTypeField,
-                            Type aVariableType) {
+    public class MethodInformation
+    {
+        public struct Variable
+        {
+            public Variable(int aOffset, int aSize, bool aIsReferenceTypeField, Type aVariableType)
+            {
                 Offset = aOffset;
                 Size = aSize;
                 VirtualAddresses = new int[Size / 4];
-                for (int i = 0; i < (Size / 4); i++) {
-                    VirtualAddresses[i] =0-(Offset + ((i + 1) * 4) + 0);
+                for (int i = 0; i < (Size / 4); i++)
+                {
+                    VirtualAddresses[i] = 0 - (Offset + ((i + 1) * 4) + 0);
                 }
                 IsReferenceType = aIsReferenceTypeField;
                 VariableType = aVariableType;
@@ -34,8 +36,10 @@ namespace Indy.IL2CPU.IL {
             public readonly int[] VirtualAddresses;
         }
 
-        public struct Argument {
-            public enum KindEnum {
+        public struct Argument
+        {
+            public enum KindEnum
+            {
                 In,
                 ByRef,
                 Out
@@ -46,7 +50,8 @@ namespace Indy.IL2CPU.IL {
                             KindEnum aKind,
                             bool aIsReferenceType,
                 TypeInformation aTypeInfo,
-                            Type aArgumentType) {
+                            Type aArgumentType)
+            {
                 mSize = aSize;
                 mVirtualAddresses = new int[mSize / 4];
                 mKind = aKind;
@@ -59,47 +64,61 @@ namespace Indy.IL2CPU.IL {
 
             private int[] mVirtualAddresses;
 
-            public int[] VirtualAddresses {
-                get {
+            public int[] VirtualAddresses
+            {
+                get
+                {
                     return mVirtualAddresses;
                 }
-                internal set {
+                internal set
+                {
                     mVirtualAddresses = value;
                 }
             }
 
             private uint mSize;
 
-            public uint Size {
-                get {
+            public uint Size
+            {
+                get
+                {
                     return mSize;
                 }
-                internal set {
+                internal set
+                {
                     mSize = value;
                 }
             }
 
             private bool mIsReferenceType;
 
-            public bool IsReferenceType {
-                get {
+            public bool IsReferenceType
+            {
+                get
+                {
                     return mIsReferenceType;
                 }
-                internal set {
+                internal set
+                {
                     mIsReferenceType = value;
                 }
             }
 
             private int mOffset;
 
-            public int Offset {
-                get {
+            public int Offset
+            {
+                get
+                {
                     return mOffset;
                 }
-                internal set {
-                    if (mOffset != value) {
+                internal set
+                {
+                    if (mOffset != value)
+                    {
                         mOffset = value;
-                        for (int i = 0; i < (mSize / 4); i++) {
+                        for (int i = 0; i < (mSize / 4); i++)
+                        {
                             mVirtualAddresses[i] = (mOffset + ((i + 1) * 4) + 4);
                         }
                     }
@@ -108,22 +127,28 @@ namespace Indy.IL2CPU.IL {
 
             private KindEnum mKind;
 
-            public KindEnum Kind {
-                get {
+            public KindEnum Kind
+            {
+                get
+                {
                     return mKind;
                 }
-                internal set {
+                internal set
+                {
                     mKind = value;
                 }
             }
 
             private Type mArgumentType;
 
-            public Type ArgumentType {
-                get {
+            public Type ArgumentType
+            {
+                get
+                {
                     return mArgumentType;
                 }
-                internal set {
+                internal set
+                {
                     mArgumentType = value;
                 }
             }
@@ -140,7 +165,8 @@ namespace Indy.IL2CPU.IL {
                                  MethodBase aMethod,
                                  Type aReturnType,
                                  bool debugMode,
-                                 IDictionary<string, object> aMethodData) {
+                                 IDictionary<string, object> aMethodData)
+        {
             Locals = aLocals;
             DebugMode = debugMode;
             LabelName = aLabelName;
@@ -156,7 +182,8 @@ namespace Indy.IL2CPU.IL {
                                           ? item.Size
                                           : (item.Size + (4 - (item.Size % 4)))
                           select xSize).Sum();
-            if (aMethod != null) {
+            if (aMethod != null)
+            {
                 IsNonDebuggable = aMethod.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
                                                               false).Length != 0 || aMethod.DeclaringType.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
                                                                                                                               false).Length != 0 || aMethod.DeclaringType.Module.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
@@ -164,16 +191,20 @@ namespace Indy.IL2CPU.IL {
                                                                                                                                                                                                                                                                               false).Length != 0;
             }
             var xRoundedSize = ReturnSize;
-            if (xRoundedSize % 4 > 0) {
+            if (xRoundedSize % 4 > 0)
+            {
                 xRoundedSize += (4 - (ReturnSize % 4));
             }
 
             ExtraStackSize = (int)xRoundedSize;
-            foreach (var xItem in aArguments) {
+            foreach (var xItem in aArguments)
+            {
                 ExtraStackSize -= (int)xItem.Size;
             }
-            if (ExtraStackSize > 0) {
-                for (int i = 0; i < Arguments.Length; i++) {
+            if (ExtraStackSize > 0)
+            {
+                for (int i = 0; i < Arguments.Length; i++)
+                {
                     Arguments[i].Offset += ExtraStackSize;
                 }
             }
@@ -199,16 +230,19 @@ namespace Indy.IL2CPU.IL {
         public readonly bool DebugMode;
         public readonly bool IsNonDebuggable;
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var xSB = new StringBuilder();
             xSB.AppendLine(String.Format("Method '{0}'\r\n",
                                          Method.GetFullName()));
             xSB.AppendLine("Locals:");
-            if (Locals.Length == 0) {
+            if (Locals.Length == 0)
+            {
                 xSB.AppendLine("\t(none)");
             }
             var xCurIndex = 0;
-            foreach (var xVar in Locals) {
+            foreach (var xVar in Locals)
+            {
                 xSB.AppendFormat("\t({0}) {1}\t{2}\t{3} (Type = {4})\r\n\r\n",
                                  xCurIndex++,
                                  xVar.Offset,
@@ -217,11 +251,13 @@ namespace Indy.IL2CPU.IL {
                                  xVar.VariableType.FullName);
             }
             xSB.AppendLine("Arguments:");
-            if (Arguments.Length == 0) {
+            if (Arguments.Length == 0)
+            {
                 xSB.AppendLine("\t(none)");
             }
             xCurIndex = 0;
-            foreach (var xArg in Arguments) {
+            foreach (var xArg in Arguments)
+            {
                 xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3} (Type = {4})\r\n",
                                              xCurIndex++,
                                              xArg.Offset,

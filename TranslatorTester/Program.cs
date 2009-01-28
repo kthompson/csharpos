@@ -15,7 +15,7 @@ namespace TranslatorTester
     {
         static void Main(string[] args)
         {
-            var engine = new Engine();
+            var engine = new Engine { DebugMode = DebugMode.None };
             var location = Assembly.GetExecutingAssembly().Location;
             var asmPath = @"C:\Program Files\Cosmos User Kit\Tools\asm\";
             var plugs = new string[] {
@@ -23,7 +23,8 @@ namespace TranslatorTester
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.dll",
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.dll"
             };
-            engine.Execute(location, TargetPlatformEnum.X86,  g => Path.Combine(asmPath, g + ".asm"), plugs, DebugMode.None, false, 0, asmPath, false);
+            
+            engine.Execute(location, null, plugs, false, asmPath, false);
         }
 
         public static void Init()
@@ -31,7 +32,19 @@ namespace TranslatorTester
             //var location = Assembly.GetExecutingAssembly().Location;
             //var definition = AssemblyFactory.GetAssembly(location);
             //definition.MainModule.Accept(new CILReflectionPrinter());
+            var engine = new VirtualExecutionSystem.Engine(typeof(Program).GetMethod("DebuggerTest"));
+            engine.Start();
+
             Console.WriteLine("hello world");
+        }
+
+        public static void DebuggerTest()
+        {
+            var i = 1;
+            var j = 2 + i;
+            var k = 3 + j;
+            var l = 4 + k;
+            var m = 5 + l;
         }
     }
 }

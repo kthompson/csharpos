@@ -4,6 +4,7 @@ using System.IO;
 
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Blt)]
@@ -11,11 +12,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;
 		public readonly string NextInstructionLabel;
-		public Blt(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
-			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
+		public Blt(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+                TargetLabel = GetInstructionLabel((Instruction)instruction.Operand);
+			CurInstructionLabel = GetInstructionLabel(instruction);
+			NextInstructionLabel = GetInstructionLabel(instruction.Next);
 		}
 		public override void DoAssemble() {
 			if (Assembler.StackContents.Peek().IsFloat) {

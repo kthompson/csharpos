@@ -6,8 +6,9 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldind_I1)]
 	public class Ldind_I1: Op {
-		public Ldind_I1(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+        public Ldind_I1(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 		}
 		public override void DoAssemble() {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };

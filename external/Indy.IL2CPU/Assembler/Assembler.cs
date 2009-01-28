@@ -6,6 +6,7 @@ using System.Text;
 using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.Assembler {
     public abstract class Assembler : IDisposable {
@@ -30,28 +31,30 @@ namespace Indy.IL2CPU.Assembler {
             Console.WriteLine("The Cosmos Project would appreciate your feedback about this issue.");
         }
 
-        private static FieldInfo mCurrentExceptionRef;
+        private static FieldDefinition _currentExceptionRef;
 
-        public static FieldInfo CurrentExceptionRef {
+        public static FieldDefinition CurrentExceptionRef
+        {
             get {
-                if (mCurrentExceptionRef == null) {
-                    var xThisType = typeof(Assembler);
-                    mCurrentExceptionRef = xThisType.GetField("CurrentException");
-                    if (mCurrentExceptionRef == null) {
+                if (_currentExceptionRef == null) {
+                    var thisType = TypeResolver.Resolve<Assembler>();
+                    _currentExceptionRef = thisType.Fields.GetField("CurrentException");
+                    if (_currentExceptionRef == null) {
                         throw new Exception("Couldn't find CurrentException field!");
                     }
                 }
-                return mCurrentExceptionRef;
+                return _currentExceptionRef;
             }
         }
 
-        private static MethodInfo mCurrentExceptionOccurredRef;
+        private static MethodDefinition mCurrentExceptionOccurredRef;
 
-        public static MethodInfo CurrentExceptionOccurredRef {
+        public static MethodDefinition CurrentExceptionOccurredRef
+        {
             get {
                 if (mCurrentExceptionOccurredRef == null) {
-                    var xThisType = typeof(Assembler);
-                    mCurrentExceptionOccurredRef = xThisType.GetMethod("ExceptionOccurred");
+                    var thisType = TypeResolver.Resolve<Assembler>();
+                    mCurrentExceptionOccurredRef = thisType.Methods.GetMethod("ExceptionOccurred")[0];
                     if (mCurrentExceptionOccurredRef == null) {
                         throw new Exception("Couldn't find ExceptionOccurred method!");
                     }

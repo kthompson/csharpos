@@ -8,8 +8,8 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Stind_I)]
 	public class Stind_I: Op {
-		public Stind_I(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Stind_I(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		public static void Assemble(Assembler.Assembler aAssembler, int aSize) {
 			new CPU.Comment("address at: [esp + " + aSize + "]");

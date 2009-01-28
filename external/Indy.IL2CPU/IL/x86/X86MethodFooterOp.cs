@@ -16,8 +16,8 @@ namespace Indy.IL2CPU.IL.X86
         public readonly bool MethodIsNonDebuggable;
         public readonly uint LocAllocItemCount;
 
-        public X86MethodFooterOp(ILReader aReader, MethodInformation aMethodInfo)
-            : base(aReader, aMethodInfo)
+        public X86MethodFooterOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
         {
             if (aMethodInfo != null)
             {
@@ -100,7 +100,7 @@ namespace Indy.IL2CPU.IL.X86
             new Label(EndOfMethodLabelNameException);
             for (int i = 0; i < aLocAllocItemCount;i++ )
             {
-                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(TypeResolver.Resolve(typeof(RuntimeEngine)).Methods.GetMethod("Heap_Free")[0]) };
             }
             if (aDebugMode && aIsNonDebuggable)
             {

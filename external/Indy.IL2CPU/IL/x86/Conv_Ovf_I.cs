@@ -8,9 +8,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Conv_Ovf_I)]
 	public class Conv_Ovf_I: Op {
 		private readonly string NextInstructionLabel;
-		public Conv_Ovf_I(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-				NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
+		public Conv_Ovf_I(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+
+            NextInstructionLabel = GetInstructionLabel(instruction.Next);
 		}
 		public override void DoAssemble() {
 			var xSource = Assembler.StackContents.Pop();

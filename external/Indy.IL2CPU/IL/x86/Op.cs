@@ -5,6 +5,7 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86 {
     public abstract class Op : IL.Op {
@@ -32,9 +33,9 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Jump { DestinationLabel = aNextLabel };
             //new CPUx86.JumpIfNotEqual(aNextLabel);
             new Label(aCurrentLabel + "_Step1");
-            Type xNullRefExcType = typeof(NullReferenceException);
+            TypeDefinition xNullRefExcType = TypeResolver.Resolve<NullReferenceException>();
             Newobj.Assemble(aAssembler,
-                            xNullRefExcType.GetConstructor(new Type[0]),
+                            TypeResolver.GetConstructor(xNullRefExcType),
                             Engine.RegisterType(xNullRefExcType),
                             aCurrentLabel,
                             aMethodInfo,
@@ -58,12 +59,11 @@ namespace Indy.IL2CPU.IL.X86 {
                                     null);
         }
 
-        public Op(ILReader aReader,
-                  MethodInformation aMethodInfo)
-            : base(aReader,
+        public Op(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction,
                    aMethodInfo) {
             if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
-                mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerOffset > 0 && aMethodInfo.CurrentHandler.HandlerOffset == aReader.Position) || ((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == aReader.Position)) && (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
+                mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerOffset > 0 && aMethodInfo.CurrentHandler.HandlerOffset == instruction.Position) || ((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == instruction.Position)) && (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
                 // todo: add support for exception clear again
                 //mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (aReader.Offset + 1)) || 
                 //    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (aReader.Offset + 1));
@@ -85,7 +85,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 mCatchType = null;
             }
             if (mCatchType != null && aMethodInfo != null && aMethodInfo.CurrentHandler != null && aMethodInfo.CurrentHandler.HandlerOffset > 0) {
-                mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerOffset == aReader.NextPosition;
+                mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerOffset == instruction.NextPosition;
             }
         }
 

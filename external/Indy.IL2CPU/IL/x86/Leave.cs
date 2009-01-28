@@ -3,16 +3,22 @@ using System.IO;
 
 
 using CPU = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
-namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Leave)]
-	public class Leave: Op {public readonly string TargetLabel;
-	public Leave(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
-		}
-		public override void DoAssemble() {
-        new CPU.Jump { DestinationLabel = TargetLabel };
-		}
-	}
+namespace Indy.IL2CPU.IL.X86
+{
+    [OpCode(OpCodeEnum.Leave)]
+    public class Leave : Op
+    {
+        public readonly string TargetLabel;
+        public Leave(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
+            TargetLabel = GetInstructionLabel((Instruction)instruction.Operand);
+        }
+        public override void DoAssemble()
+        {
+            new CPU.Jump { DestinationLabel = TargetLabel };
+        }
+    }
 }

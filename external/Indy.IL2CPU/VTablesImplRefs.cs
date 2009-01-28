@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class VTablesImplRefs {
-		public static readonly Assembly RuntimeAssemblyDef;
-		public static readonly Type VTablesImplDef;
-		public static readonly MethodBase LoadTypeTableRef;
-		public static readonly MethodBase SetTypeInfoRef;
-		public static readonly MethodBase SetMethodInfoRef;
-		public static readonly MethodBase GetMethodAddressForTypeRef;
-		public static readonly MethodBase IsInstanceRef;
+		public static readonly AssemblyDefinition RuntimeAssemblyDef;
+		public static readonly TypeDefinition VTablesImplDef;
+        public static readonly MethodDefinition LoadTypeTableRef;
+        public static readonly MethodDefinition SetTypeInfoRef;
+        public static readonly MethodDefinition SetMethodInfoRef;
+        public static readonly MethodDefinition GetMethodAddressForTypeRef;
+        public static readonly MethodDefinition IsInstanceRef;
 
 		static VTablesImplRefs() {
-			VTablesImplDef = typeof(VTablesImpl);
-			foreach (FieldInfo xField in typeof(VTablesImplRefs).GetFields()) {
-				if (xField.Name.EndsWith("Ref")) {
-					MethodBase xTempMethod = VTablesImplDef.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
-					if (xTempMethod == null) {
-						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");
+            VTablesImplDef = TypeResolver.Resolve(typeof(VTablesImpl));
+			foreach (FieldInfo field in typeof(VTablesImplRefs).GetFields()) {
+				if (field.Name.EndsWith("Ref")) {
+                    var tempMethod = VTablesImplDef.Methods.GetMethod(field.Name.Substring(0, field.Name.Length - "Ref".Length)).First();
+					if (tempMethod == null) {
+						throw new Exception("Method '" + field.Name.Substring(0, field.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");
 					}
-					xField.SetValue(null, xTempMethod);
+					field.SetValue(null, tempMethod);
 				}
 			}
 		}

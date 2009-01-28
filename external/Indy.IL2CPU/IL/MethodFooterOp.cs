@@ -8,8 +8,8 @@ namespace Indy.IL2CPU.IL {
 		public const string EndOfMethodLabelNameNormal = ".END__OF__METHOD_NORMAL";
 		public const string EndOfMethodLabelNameException = ".END__OF__METHOD_EXCEPTION";
 
-		public MethodFooterOp(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public MethodFooterOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 	}
 }

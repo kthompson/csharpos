@@ -8,9 +8,9 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldc_R4)]
 	public class Ldc_R4: Op {
 		private Single mValue;
-		public Ldc_R4(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			mValue = aReader.OperandValueSingle;
+		public Ldc_R4(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+                mValue = (Single)instruction.Operand;
 		}
 		public override void DoAssemble() {
 			new CPU.Push{DestinationValue=BitConverter.ToUInt32(BitConverter.GetBytes(mValue), 0)};

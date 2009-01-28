@@ -6,9 +6,11 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
 
-namespace Indy.IL2CPU.IL.X86 {
+namespace Indy.IL2CPU.IL.X86
+{
     [OpCode(OpCodeEnum.Isinst)]
-    public class Isinst : Op {
+    public class Isinst : Op
+    {
         private int mTypeId;
         private string mThisLabel;
         private string mNextOpLabel;
@@ -17,36 +19,40 @@ namespace Indy.IL2CPU.IL.X86 {
 
         public static void ScanOp(ILReader aReader,
                                   MethodInformation aMethodInfo,
-                                  SortedList<string, object> aMethodData) {
-            Type xType = aReader.OperandValueType;
-            if (xType == null) {
+                                  SortedList<string, object> aMethodData)
+        {
+            var type = aReader.OperandValueType;
+            if (type == null)
+            {
                 throw new Exception("Unable to determine Type!");
             }
-            Engine.RegisterType(xType);
-            Call.ScanOp(Engine.GetMethodBase(typeof(VTablesImpl),
+            Engine.RegisterType(type);
+            Call.ScanOp(Engine.GetMethodDefinition(TypeResolver.Resolve(typeof(VTablesImpl)),
                                              "IsInstance",
                                              "System.Int32",
                                              "System.Int32"));
-            Newobj.ScanOp(typeof(InvalidCastException).GetConstructor(new Type[0]));
+            Newobj.ScanOp(TypeResolver.GetConstructor<InvalidCastException>());
         }
 
-        public Isinst(ILReader aReader,
-                      MethodInformation aMethodInfo)
+        public Isinst(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(aReader,
-                   aMethodInfo) {
-            Type xType = aReader.OperandValueType;
-            if (xType == null) {
+                   aMethodInfo)
+        {
+            var type = aReader.OperandValueType;
+            if (type == null)
+            {
                 throw new Exception("Unable to determine Type!");
             }
-            Type xTypeDef = xType;
-            mTypeId = Engine.RegisterType(xTypeDef);
+            
+            mTypeId = Engine.RegisterType(type);
             mThisLabel = GetInstructionLabel(aReader.Position);
             mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
             mCurrentILOffset = (int)aReader.Position;
             mDebugMode = aMethodInfo.DebugMode;
         }
 
-        public override void DoAssemble() {
+        public override void DoAssemble()
+        {
             string mReturnNullLabel = mThisLabel + "_ReturnNull";
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
@@ -57,7 +63,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                                           typeof(object)));
             Assembler.StackContents.Push(new StackContent(4,
                                                           typeof(object)));
-            MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl),
+            var xMethodIsInstance = Engine.GetMethodDefinition(TypeResolver.Resolve(typeof(VTablesImpl)),
                                                                 "IsInstance",
                                                                 "System.Int32",
                                                                 "System.Int32");
@@ -65,7 +71,7 @@ namespace Indy.IL2CPU.IL.X86 {
             Op xOp = new Call(xMethodIsInstance,
                               (uint)mCurrentILOffset,
                               mDebugMode,
-                              mThisLabel+ "_After_IsInstance_Call");
+                              mThisLabel + "_After_IsInstance_Call");
             xOp.Assembler = Assembler;
             xOp.Assemble();
             new Label(mThisLabel + "_After_IsInstance_Call");

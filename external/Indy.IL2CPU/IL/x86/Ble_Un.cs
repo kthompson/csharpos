@@ -11,10 +11,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ble_Un: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;
-		public Ble_Un(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
+		public Ble_Un(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+                TargetLabel = GetInstructionLabel((Mono.Cecil.Cil.Instruction)instruction.Operand);
+			CurInstructionLabel = GetInstructionLabel(instruction);
 		}
 		public override void DoAssemble() {
 			StackContent xItem1 = Assembler.StackContents.Pop();

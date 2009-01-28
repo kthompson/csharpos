@@ -3,16 +3,17 @@ using System.IO;
 
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Brfalse)]
 	public class Brfalse: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;
-		public Brfalse(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
-			CurInstructionLabel = GetInstructionLabel(aReader);
+		public Brfalse(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			TargetLabel = GetInstructionLabel((Instruction)instruction.Operand);
+            CurInstructionLabel = GetInstructionLabel(instruction);
 		}
 
 		public override void DoAssemble() {

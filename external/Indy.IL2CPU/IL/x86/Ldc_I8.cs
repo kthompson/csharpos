@@ -8,18 +8,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldc_I8)]
 	public class Ldc_I8: Op {
 		private readonly long mValue;
-		public Ldc_I8(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo)
+		public Ldc_I8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo)
 		{
-			Debug.Assert(aReader.Operand.Length == 8);
-
-			ulong value = 0;
-			for (int i = 7; i >=0; i--)
-			{
-				value <<= 8;
-				value |= aReader.Operand[i];
-			}
-			mValue = (long)value;
+            mValue = (long)instruction.Operand;
 		}
 		public override void DoAssemble() {
 			string theValue = mValue.ToString("X16");

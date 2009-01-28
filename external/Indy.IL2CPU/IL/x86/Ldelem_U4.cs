@@ -10,11 +10,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldelem_U4)]
 	public class Ldelem_U4: Op {
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            Engine.RegisterType(typeof(uint));
+            Engine.RegisterType<uint>();
         }
 
-		public Ldelem_U4(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public Ldelem_U4(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
 		}
 		
 		public override void DoAssemble() {

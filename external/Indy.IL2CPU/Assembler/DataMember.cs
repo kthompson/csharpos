@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.Assembler {
 	public class DataMember: BaseAssemblerElement, IComparable<DataMember> {
 		public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
-		public static string GetStaticFieldName(FieldInfo aField) {
+		public static string GetStaticFieldName(FieldDefinition aField) {
 			return FilterStringForIncorrectChars("static_field__" + aField.DeclaringType.FullName + "." + aField.Name);
 		}
 

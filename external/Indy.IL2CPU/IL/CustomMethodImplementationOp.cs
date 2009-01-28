@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	public enum CustomMethodEnum {
@@ -18,8 +19,9 @@ namespace Indy.IL2CPU.IL {
 	}
 	public abstract class CustomMethodImplementationOp: Op {
 		public MethodInformation MethodInfo;
-		public CustomMethodImplementationOp(ILReader aILReader , MethodInformation aMethodInfo)
-			: base(aILReader, aMethodInfo) {
+		public CustomMethodImplementationOp(Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
 			MethodInfo = aMethodInfo;
 		}
 		public CustomMethodEnum Method {

@@ -8,9 +8,9 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Br)]
 	public class Br: Op {
 		private readonly string mTargetInstructionName;
-		public Br(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			mTargetInstructionName = GetInstructionLabel(aReader.OperandValueBranchPosition);
+		public Br(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+			: base(instruction, aMethodInfo) {
+			mTargetInstructionName = GetInstructionLabel((long)instruction.Operand);
 		}
 		public override void DoAssemble() {
             new CPU.Jump { DestinationLabel = mTargetInstructionName };

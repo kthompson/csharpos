@@ -9,11 +9,10 @@ namespace Indy.IL2CPU.IL.X86 {
     public class Conv_Ovf_I_Un : Op {
         private readonly string NextInstructionLabel;
 
-        public Conv_Ovf_I_Un(ILReader aReader,
-                             MethodInformation aMethodInfo)
-            : base(aReader,
-                   aMethodInfo) {
-            NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
+        public Conv_Ovf_I_Un(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
+            NextInstructionLabel = GetInstructionLabel(instruction.Next);
         }
 
         public override void DoAssemble() {
