@@ -21,9 +21,9 @@ namespace Indy.IL2CPU.IL.X86
         private int mCurrentILOffset;
         private MethodInformation mMethodInfo;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var type = aReader.OperandValueType;
+            var type = instruction.Operand;
             if (type == null)
             {
                 throw new Exception("Unable to determine Type!");

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class Utilities {
-		public static string GetFullName(MethodBase aMethod) {
+		public static string GetFullName(MethodDefinition aMethod) {
 			StringBuilder xBuilder = new StringBuilder();
 			string[] xParts = aMethod.ToString().Split(' ');
 			string[] xParts2 = xParts.Skip(1).ToArray();

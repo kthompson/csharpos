@@ -11,7 +11,7 @@ using Mono.Cecil;
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
 		protected readonly SortedList<OpCodeEnum, Type> mMap = new SortedList<OpCodeEnum, Type>();
-        protected readonly SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>>> mScanMethods = new SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>>>();
+        protected readonly SortedList<OpCodeEnum, Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>> mScanMethods = new SortedList<OpCodeEnum, Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>>();
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();								   
@@ -33,9 +33,10 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-        public void ScanILCode(ILReader aReader, MethodInformation aMethod, SortedList<string, object> aMethodData) {
-            if(mScanMethods.ContainsKey(aReader.OpCode)) {
-                mScanMethods[aReader.OpCode](aReader,
+        public void ScanILCode(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethod, SortedList<string, object> aMethodData)
+        {
+            if(mScanMethods.ContainsKey(instruction.OpCode)) {
+                mScanMethods[instruction.OpCode](instruction,
                                              aMethod,
                                              aMethodData);
             }
@@ -91,7 +92,7 @@ namespace Indy.IL2CPU.IL {
 		    return xResult;
 		}
 
-		public MethodBase GetCustomMethodImplementation(string aOrigMethodName) {
+		public MethodDefinition GetCustomMethodImplementation(string aOrigMethodName) {
 			return null;
 		}
 
@@ -125,7 +126,7 @@ namespace Indy.IL2CPU.IL {
 
 		public abstract void EmitOpDebugHeader(Assembler.Assembler aAssembler, uint aOpId, string aOpLabel);
 
-        protected virtual void RegisterAllUtilityMethods(Action<MethodBase> aRegister) {
+        protected virtual void RegisterAllUtilityMethods(Action<MethodDefinition> aRegister) {
         }
 
 	    public virtual void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)

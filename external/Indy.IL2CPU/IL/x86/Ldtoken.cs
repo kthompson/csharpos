@@ -14,9 +14,9 @@ namespace Indy.IL2CPU.IL.X86
     {
         private string mTokenAddress;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xFieldDef = aReader.OperandValueField;
+            var xFieldDef = instruction.Operand;
             if (xFieldDef != null)
             {
                 if (!xFieldDef.IsStatic)
@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.IL.X86
                 Engine.QueueStaticField(xFieldDef);
                 return;
             }
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef != null)
             {
                 return;
@@ -37,7 +37,7 @@ namespace Indy.IL2CPU.IL.X86
             : base(instruction, aMethodInfo)
         {
             // todo: add support for type tokens and method tokens
-            var xFieldDef = aReader.OperandValueField;
+            var xFieldDef = instruction.Operand;
             if (xFieldDef != null)
             {
                 if (!xFieldDef.IsStatic)
@@ -48,7 +48,7 @@ namespace Indy.IL2CPU.IL.X86
                 mTokenAddress = DataMember.GetStaticFieldName(xFieldDef);
                 return;
             }
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef != null)
             {
                 throw new Exception("Type Tokens not supported atm!");

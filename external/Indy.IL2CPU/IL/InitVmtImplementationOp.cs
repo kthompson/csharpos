@@ -220,7 +220,7 @@ namespace Indy.IL2CPU.IL
                     }
                     for (int j = 0; j < xEmittedMethods.Count; j++)
                     {
-                        MethodBase xMethod = xEmittedMethods.Keys[j];
+                        MethodDefinition xMethod = xEmittedMethods.Keys[j];
                         var xMethodId = GetMethodIdentifier(xMethod);
                         if (mDebugMode)
                         {

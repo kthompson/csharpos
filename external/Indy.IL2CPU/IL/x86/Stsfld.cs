@@ -18,21 +18,21 @@ namespace Indy.IL2CPU.IL.X86
         private bool mNeedsGC;
         private string mBaseLabel;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = aReader.OperandValueField;
+            var xField = instruction.Operand;
             Engine.QueueStaticField(xField);
         }
 
         public Stsfld(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var field = aReader.OperandValueField;
+            var field = instruction.Operand;
             mSize = Engine.GetFieldStorageSize(field.FieldType);
             Engine.QueueStaticField(field, out mDataName);
             mNeedsGC = !field.FieldType.IsValueType;
             _dataType = field.FieldType;
-            mBaseLabel = GetInstructionLabel(aReader);
+            mBaseLabel = GetInstructionLabel(instruction);
         }
 
         public override void DoAssemble()

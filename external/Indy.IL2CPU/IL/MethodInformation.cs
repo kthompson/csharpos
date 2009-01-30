@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL
 {
@@ -162,7 +163,7 @@ namespace Indy.IL2CPU.IL
                                  uint aReturnSize,
                                  bool aIsInstanceMethod,
                                  TypeInformation aTypeInfo,
-                                 MethodBase aMethod,
+                                 MethodDefinition aMethod,
                                  Type aReturnType,
                                  bool debugMode,
                                  IDictionary<string, object> aMethodData)
@@ -218,7 +219,7 @@ namespace Indy.IL2CPU.IL
         /// </summary>
         public ExceptionHandlingClause CurrentHandler;
 
-        public readonly MethodBase Method;
+        public readonly MethodDefinition Method;
         public readonly string LabelName;
         public readonly Variable[] Locals;
         public readonly Argument[] Arguments;

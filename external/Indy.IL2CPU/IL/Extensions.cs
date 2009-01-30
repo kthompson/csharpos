@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Mono.Cecil;
 
 namespace System {
 	public static class Extensions {
-		public static string GetFullName(this MethodBase aMethod) {
+		public static string GetFullName(this MethodDefinition aMethod) {
 			StringBuilder xBuilder = new StringBuilder();
 			string[] xParts = aMethod.ToString().Split(' ');
 			string[] xParts2 = xParts.Skip(1).ToArray();

@@ -23,12 +23,12 @@ namespace Indy.IL2CPU
 {
     public enum DebugMode { None, IL, Source, MLUsingGDB }
 
-    public class MethodBaseComparer : IComparer<MethodBase>
+    public class MethodDefinitionComparer : IComparer<MethodDefinition>
     {
-        #region IComparer<MethodBase> Members
+        #region IComparer<MethodDefinition> Members
 
-        public int Compare(MethodBase x,
-                           MethodBase y)
+        public int Compare(MethodDefinition x,
+                           MethodDefinition y)
         {
             return x.GetFullName().CompareTo(y.GetFullName());
         }
@@ -543,7 +543,7 @@ namespace Indy.IL2CPU
 						}
 						xDbgType.Field = xTypeFields.ToArray();
 						var xTypeMethods = new List<DebugSymbolsAssemblyTypeMethod>();
-						foreach (var xMethod in xType.GetMethods(BindingFlags.ExactBinding | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).Cast<MethodBase>().Union(xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))) {
+						foreach (var xMethod in xType.GetMethods(BindingFlags.ExactBinding | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).Cast<MethodDefinition>().Union(xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))) {
 							var xIdxMethods = mMethods.IndexOfKey(xMethod);
 							if (xIdxMethods == -1) {
 								continue;
@@ -743,7 +743,7 @@ namespace Indy.IL2CPU
             }
             foreach (Type xTD in checkedTypes)
             {
-                foreach (MethodBase xMethod in xTD.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (MethodDefinition xMethod in xTD.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
                     if (!xMethod.IsStatic)
                     {
@@ -783,7 +783,7 @@ namespace Indy.IL2CPU
             while (true)
             {
                 j++;
-                KeyValuePair<MethodBase, QueuedMethodInformation> xMethod;
+                KeyValuePair<MethodDefinition, QueuedMethodInformation> xMethod;
                 using (_methodsLocker.AcquireReaderLock())
                 {
                     if (j == _methods.Count)
@@ -859,7 +859,7 @@ namespace Indy.IL2CPU
                                                         TypeReference[] aMethodParams,
                                                         TypeReference aCurrentInspectedType)
         {
-            MethodBase xBaseMethod = null;
+            MethodDefinition xBaseMethod = null;
             //try {
             while (true)
             {
@@ -868,7 +868,7 @@ namespace Indy.IL2CPU
                     break;
                 }
                 aCurrentInspectedType = aCurrentInspectedType.BaseType;
-                MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
+                MethodDefinition xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
                                                                           BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
                                                                           Type.DefaultBinder,
                                                                           aMethodParams,
@@ -925,7 +925,7 @@ namespace Indy.IL2CPU
         }
 
         //todo: remove?
-        public static MethodBase GetDefinitionFromMethodBase2(MethodBase aRef)
+        public static MethodDefinition GetDefinitionFromMethodDefinition2(MethodDefinition aRef)
         {
             Type xTypeDef;
             bool xIsArray = false;
@@ -938,7 +938,7 @@ namespace Indy.IL2CPU
             {
                 xTypeDef = aRef.DeclaringType;
             }
-            MethodBase xMethod = null;
+            MethodDefinition xMethod = null;
             if (xIsArray)
             {
                 Type[] xParams = (from item in aRef.GetParameters()
@@ -956,7 +956,7 @@ namespace Indy.IL2CPU
             }
             if (xMethod == null)
             {
-                foreach (MethodBase xFoundMethod in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+                foreach (MethodDefinition xFoundMethod in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
                 {
                     if (xFoundMethod.Name != aRef.Name)
                     {
@@ -1012,8 +1012,8 @@ namespace Indy.IL2CPU
             {
                 return xMethod;
             }
-            //xMethod = xTypeDef.GetConstructor(aRef.Name == MethodBase.Cctor, aRef.Parameters);
-            //if (xMethod != null && (aRef.Name == MethodBase.Cctor || aRef.Name == MethodBase.Ctor)) {
+            //xMethod = xTypeDef.GetConstructor(aRef.Name == MethodDefinition.Cctor, aRef.Parameters);
+            //if (xMethod != null && (aRef.Name == MethodDefinition.Cctor || aRef.Name == MethodDefinition.Ctor)) {
             //    return xMethod;
             //}
             throw new Exception("Couldn't find Method! ('" + aRef.GetFullName() + "'");
@@ -1208,7 +1208,7 @@ namespace Indy.IL2CPU
                 xFieldName = DataMember.GetStaticFieldName(currentField);
                 if (_assembler.DataMembers.Count(x => x.Name == xFieldName) == 0)
                 {
-                    var xItem = (from item in currentField.GetCustomAttributes(false)
+                    var xItem = (from item in currentField.CustomAttributes.Cast<CustomAttribute>()
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
                                  select item).FirstOrDefault();
                     string xManifestResourceName = null;
@@ -1380,7 +1380,7 @@ namespace Indy.IL2CPU
                     }
 #endif
                     xOp.Assemble();
-                    MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
+                    MethodDefinition xCustomImplementation = GetCustomMethodImplementation(xMethodName);
                     bool xIsCustomImplementation = (xCustomImplementation != null);
                     // what to do if a method doesn't have a body?
                     bool xContentProduced = false;
@@ -1451,7 +1451,7 @@ namespace Indy.IL2CPU
                                 //}
 
                                 // Scan each IL op in the method
-                                currentMethod.Accept(new AbstractCodeVisitor { });
+                                currentMethod.Accept(new AbstractReflectionVisitor { });
 
                                 while (xReader.Read())
                                 {
@@ -1519,8 +1519,7 @@ namespace Indy.IL2CPU
                                     #endregion
 
                                     xMethodInfo.CurrentHandler = xCurrentHandler;
-                                    xOp = GetOpFromType(_map.GetOpForOpCode(xReader.OpCode), xReader
-                                     , xMethodInfo);
+                                    xOp = GetOpFromType(_map.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
 
                                     xOp.Assembler = _assembler;
                                     new Comment("StackItems = " + _assembler.StackContents.Count);
@@ -1640,8 +1639,8 @@ namespace Indy.IL2CPU
         /// </summary>
         /// <param name="aMethod"></param>
         /// <returns></returns>
-        private static string GetStrippedMethodBaseFullName(MethodBase aMethod,
-                                                            MethodBase aRefMethod)
+        private static string GetStrippedMethodDefinitionFullName(MethodDefinition aMethod,
+                                                            MethodDefinition aRefMethod)
         {
             StringBuilder xBuilder = new StringBuilder();
             string[] xParts = aMethod.ToString().Split(' ');
@@ -1700,7 +1699,7 @@ namespace Indy.IL2CPU
                 throw new Exception("PlugFields list already initialized!");
             }
 
-            _plugMethods = new SortedList<string, MethodBase>();
+            _plugMethods = new SortedList<string, MethodDefinition>();
             _plugFields = new SortedList<Type, Dictionary<string, PlugFieldAttribute>>(new TypeComparer());
 
             AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
@@ -1878,7 +1877,7 @@ namespace Indy.IL2CPU
                     }
                 }
 
-                foreach (MethodBase xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                foreach (MethodDefinition xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static))
                 {
                     PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute),
                                                                                         true).Cast<PlugMethodAttribute>().FirstOrDefault();
@@ -1908,11 +1907,11 @@ namespace Indy.IL2CPU
                             continue;
                         }
                     }
-                    foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
+                    foreach (MethodDefinition xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
                     {
-                        string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod,
+                        string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod,
                                                                                   xOrigMethodDef);
-                        string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef,
+                        string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef,
                                                                                       null);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
@@ -1923,11 +1922,11 @@ namespace Indy.IL2CPU
                             }
                         }
                     }
-                    foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
+                    foreach (MethodDefinition xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
                     {
-                        string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod,
+                        string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod,
                                                                                   xOrigMethodDef);
-                        string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef,
+                        string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef,
                                                                                       null);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
@@ -1992,13 +1991,13 @@ namespace Indy.IL2CPU
                         {
                             xVarSize += 4 - (xVarSize % 4);
                         }
-                        xVars[varDef.LocalIndex] = new MethodInformation.Variable(xCurOffset,
+                        xVars[varDef.Index] = new MethodInformation.Variable(xCurOffset,
                                                                                    xVarSize,
-                                                                                   !varDef.LocalType.IsValueType,
-                                                                                   varDef.LocalType);
+                                                                                   !varDef.VariableType.IsValueType,
+                                                                                   varDef.VariableType);
                         // todo: implement support for generic parameters?
                         //if (!(xVarDef.VariableType is GenericParameter)) {
-                        RegisterType(varDef.LocalType);
+                        RegisterType(varDef.VariableType);
                         //}
                         xCurOffset += xVarSize;
                     }
@@ -2104,7 +2103,7 @@ namespace Indy.IL2CPU
             return xMethodInfo;
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
+        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod,
                                                                                  out uint aObjectStorageSize)
         {
             Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
@@ -2282,9 +2281,9 @@ namespace Indy.IL2CPU
             return xResult;
         }
 
-        private static Op GetOpFromType(Type aType, ILReader aReader, MethodInformation aMethodInfo)
+        private static Op GetOpFromType(Type aType, Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
         {
-            return (Op)Activator.CreateInstance(aType, aReader, aMethodInfo);
+            return (Op)Activator.CreateInstance(aType, instruction, aMethodInfo);
         }
 
         public static void QueueStaticField(FieldDefinition aField)
@@ -2373,7 +2372,7 @@ namespace Indy.IL2CPU
             {
                 if (!_current._methods.ContainsKey(aMethod))
                 {
-                    if (_current._methods is ReadOnlyDictionary<MethodBase, QueuedMethodInformation>)
+                    if (_current._methods is ReadOnlyDictionary<MethodDefinition, QueuedMethodInformation>)
                     {
                         EmitDependencyGraphLine(false, aMethod.ToString());
                         throw new Exception("Cannot queue " + aMethod.ToString());
@@ -2489,7 +2488,7 @@ namespace Indy.IL2CPU
                                         string aType,
                                         string aMethod)
         {
-            MethodBase xMethodDef;
+            MethodDefinition xMethodDef;
             QueueMethod2(aAssembly,
                          aType,
                          aMethod,
@@ -2499,14 +2498,14 @@ namespace Indy.IL2CPU
         public static void QueueMethod2(string aAssembly,
                                         string aType,
                                         string aMethod,
-                                        out MethodBase aMethodDef)
+                                        out MethodDefinition aMethodDef)
         {
             Type xTypeDef = GetType(aAssembly,
                                     aType);
             // todo: find a way to specify one overload of a method
             int xCount = 0;
             aMethodDef = null;
-            foreach (MethodBase xMethodDef in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (MethodDefinition xMethodDef in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
             {
                 if (xMethodDef.Name == aMethod)
                 {
@@ -2518,7 +2517,7 @@ namespace Indy.IL2CPU
                     xCount++;
                 }
             }
-            foreach (MethodBase xMethodDef in xTypeDef.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (MethodDefinition xMethodDef in xTypeDef.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
             {
                 if (xMethodDef.Name == aMethod)
                 {

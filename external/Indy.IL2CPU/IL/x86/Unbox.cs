@@ -18,12 +18,12 @@ namespace Indy.IL2CPU.IL.X86
         private string mNextOpLabel;
         private TypeReference _type;
         private uint mTypeSize;
-        private uint mCurrentILOffset;
+        private int mCurrentILOffset;
         private bool mDebugMode;
         public Unbox(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            _type = aReader.OperandValueType;
+            _type = instruction.Operand;
             if (_type == null)
             {
                 throw new Exception("Unable to determine Type!");

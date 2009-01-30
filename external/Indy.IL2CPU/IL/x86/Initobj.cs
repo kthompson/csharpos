@@ -8,8 +8,8 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Initobj: Op {
 		private uint mObjSize;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            var typeRef = aReader.OperandValueType;
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            var typeRef = (TypeReference)instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("Type not found!");

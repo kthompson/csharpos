@@ -12,8 +12,8 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Stfld: Op {
 		private readonly TypeInformation.Field mField;
 		private readonly TypeInformation mType;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            var xField = aReader.OperandValueField;
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            var xField = instruction.Operand;
             if (xField == null)
             {
                 throw new Exception("Field not found!");
@@ -22,13 +22,13 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 		public Stfld(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {
-			if (aReader == null) {
-				throw new ArgumentNullException("aReader");
+			if (instruction == null) {
+				throw new ArgumentNullException("instruction");
 			}
 			if (aMethodInfo == null) {
 				throw new ArgumentNullException("aMethodInfo");
 			}
-			var field = aReader.OperandValueField;
+            var field = instruction.Operand;
 			if (field == null) {
 				throw new Exception("Field not found!");
 			}

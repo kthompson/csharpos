@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			SetLocalIndex((int)instruction.Operand, aMethodInfo);
 			//    return;
 			//}
-			//VariableDefinition xVarDef = aReader.Operand as VariableDefinition;
+			//VariableDefinition xVarDef = instruction.Operand as VariableDefinition;
 			//if (xVarDef != null) {
 			//    mIsReferenceTypeField = xVarDef.VariableType.IsClass;
 			//    SetLocalIndex(xVarDef.Index, aMethodInfo);

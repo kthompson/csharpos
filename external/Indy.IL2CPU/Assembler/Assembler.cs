@@ -124,8 +124,8 @@ namespace Indy.IL2CPU.Assembler {
             CurrentInstance.Pop();
         }
 
-        public void Add(params Instruction[] aReaders) {
-            foreach (Instruction xInstruction in aReaders) {
+        public void Add(params Instruction[] instructions) {
+            foreach (Instruction xInstruction in instructions) {
                 mInstructions.Add(xInstruction);
             }
         }

@@ -15,9 +15,9 @@ namespace Indy.IL2CPU.IL.X86
         private string mDataName;
         private uint mSize;
         private bool mNeedsGC;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = aReader.OperandValueField;
+            var xField = instruction.Operand;
             Engine.QueueStaticField(xField);
         }
 

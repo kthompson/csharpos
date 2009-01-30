@@ -24,11 +24,11 @@ namespace Indy.IL2CPU.IL.X86
         private readonly uint mCurrentILOffset;
         private readonly int mExtraStackSpace;
 
-        public static void ScanOp(ILReader aReader,
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction,
                                   MethodInformation aMethodInfo,
                                   SortedList<string, object> aMethodData)
         {
-            MethodDefinition method = aReader.OperandValueMethod;
+            MethodDefinition method = instruction.Operand;
             if (method == null)
             {
                 throw new Exception("Unable to determine Method!");
@@ -55,9 +55,9 @@ namespace Indy.IL2CPU.IL.X86
         public Callvirt(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            mLabelName = GetInstructionLabel(aReader);
+            mLabelName = GetInstructionLabel(instruction);
             mCurrentMethodInfo = aMethodInfo;
-            var xMethod = aReader.OperandValueMethod;
+            var xMethod = instruction.Operand;
             if (xMethod == null)
             {
                 throw new Exception("Unable to determine Method!");
@@ -83,7 +83,7 @@ namespace Indy.IL2CPU.IL.X86
             {
                 mThisOffset -= mTargetMethodInfo.ExtraStackSize;
             }
-            mCurrentILOffset = aReader.Position;
+            mCurrentILOffset = instruction.Offset;
             mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
         }
 

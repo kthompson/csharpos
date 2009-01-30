@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.IL.X86
             : base(instruction, aMethodInfo)
         {
             SetLocalIndex((int)instruction.Operand, aMethodInfo);
-            //VariableDefinition xVarDef = aReader.Operand as VariableDefinition;
+            //VariableDefinition xVarDef = instruction.Operand as VariableDefinition;
             //if (xVarDef != null) {
             //    SetLocalIndex(xVarDef.Index, aMethodInfo);
             //}

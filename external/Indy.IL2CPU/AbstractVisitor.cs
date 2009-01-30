@@ -15,7 +15,7 @@ namespace Indy.IL2CPU
         protected void Run<T>(Action<V, T> action, T item)
         {
             if (action != null)
-                action(this, item);
+                action((V)this, item);
         }
 
         protected void Run<T>(Action<V, T> action, IEnumerable collection)

@@ -18,7 +18,7 @@ namespace Indy.IL2CPU {
 			}
 			foreach (FieldInfo xField in typeof(GCImplementationRefs).GetFields()) {
 				if (xField.Name.EndsWith("Ref")) {
-					MethodBase xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
+					MethodDefinition xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
 					if (xTempMethod == null) {
 						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");
 					}

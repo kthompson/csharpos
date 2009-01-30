@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86
     [OpCode(OpCodeEnum.Ldelem_U2)]
     public class Ldelem_U2 : Op
     {
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
             Engine.RegisterType<ushort>();
         }

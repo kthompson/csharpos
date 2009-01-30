@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
             {
                 xArgIndex = (int)instruction.Operand;
 				SetArgIndex(xArgIndex, aMethodInfo);
-				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
+				//ParameterDefinition xParam = instruction.Operand as ParameterDefinition;
 				//if (xParam != null) {
 				//    SetArgIndex(xParam.Sequence - 1, aMethodInfo);
 				//}

@@ -29,20 +29,20 @@ namespace Indy.IL2CPU.IL.X86
             Call.ScanOp(GCImplementationRefs.IncRefCountRef);
         }
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xCtorDef = aReader.OperandValueMethod;
+            var xCtorDef = instruction.Operand;
             ScanOp(xCtorDef);
         }
 
         public Newobj(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            Constructor = aReader.OperandValueMethod;
-            CurrentLabel = GetInstructionLabel(aReader);
+            Constructor = instruction.Operand;
+            CurrentLabel = GetInstructionLabel(instruction);
             MethodInformation = aMethodInfo;
-            ILOffset = aReader.Position;
-            mNextLabel = GetInstructionLabel(aReader.NextPosition);
+            ILOffset = instruction.Offset;
+            mNextLabel = GetInstructionLabel(instruction.Next.Offset);
         }
 
         private string mNextLabel;

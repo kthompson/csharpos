@@ -14,9 +14,9 @@ namespace Indy.IL2CPU.IL.X86
     {
         private readonly TypeInformation.Field mField;
         private readonly TypeInformation mType;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = aReader.OperandValueField;
+            var xField = instruction.Operand;
             if (xField == null)
             {
                 throw new Exception("Field not found!");

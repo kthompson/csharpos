@@ -71,8 +71,8 @@ namespace Indy.IL2CPU.IL.X86
             {
                 mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerOffset > 0 && aMethodInfo.CurrentHandler.HandlerOffset == instruction.Offset) || ((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == instruction.Offset)) && (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
                 // todo: add support for exception clear again
-                //mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (aReader.Offset + 1)) || 
-                //    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (aReader.Offset + 1));
+                //mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (instruction.Offset + 1)) || 
+                //    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (instruction.Offset + 1));
                 if (mNeedsExceptionPush && aMethodInfo.CurrentHandler.CatchType != null)
                 {
                     mCatchType = aMethodInfo.CurrentHandler.CatchType;

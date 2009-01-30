@@ -13,9 +13,9 @@ namespace Indy.IL2CPU.IL.X86
         private uint mTheSize;
         private int mTypeId;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("Couldn't determine Type!");
@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86
         public Box(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("Couldn't determine Type!");

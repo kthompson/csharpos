@@ -10,9 +10,9 @@ namespace Indy.IL2CPU.IL.X86
     {
         private uint mElementSize;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xType = aReader.OperandValueType;
+            var xType = (TypeReference)instruction.Operand;
             if (xType == null)
                 throw new Exception("Unable to determine Type!");
             Engine.RegisterType(xType);

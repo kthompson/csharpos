@@ -13,9 +13,9 @@ namespace Indy.IL2CPU.IL.X86
     {
         private TypeInformation mType;
         private TypeInformation.Field mField;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = aReader.OperandValueField;
+            var xField = instruction.Operand;
             if (xField == null)
             {
                 throw new Exception("Field not found!");
@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86
         public Ldflda(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var field = aReader.OperandValueField;
+            var field = instruction.Operand;
             if (field == null)
             {
                 throw new Exception("Field not found!");

@@ -24,9 +24,9 @@ namespace Indy.IL2CPU.IL.X86
         private string mNextLabelName;
         private uint mCurrentILOffset;
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var method = aReader.OperandValueMethod;
+            var method = instruction.Operand;
             ScanOp(method);
         }
 
@@ -157,12 +157,12 @@ namespace Indy.IL2CPU.IL.X86
         public Call(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            MethodBase xMethod = aReader.OperandValueMethod;
+            MethodDefinition xMethod = instruction.Operand;
             mMethodInfo = aMethodInfo;
             //not the last instruction
             if (instruction.Next!=null)
             {
-                mNextLabelName = GetInstructionLabel(aReader.NextPosition);
+                mNextLabelName = GetInstructionLabel(instruction.Next.Offset);
             }
             else
             {

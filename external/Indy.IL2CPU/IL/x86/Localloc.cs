@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Localloc(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {
 		    mLocallocOffset = (int)aMethodInfo.MethodData[String.Format(LocAllicItemMethodDataEntryTemplate,
-		                                                                aReader.Position)];
+		                                                                instruction.Offset)];
 		    mLocallocOffset *= 4;
 		    mLocallocOffset += aMethodInfo.LocalsSize;
 

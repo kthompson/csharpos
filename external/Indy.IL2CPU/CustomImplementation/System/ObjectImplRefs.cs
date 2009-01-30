@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class ObjectImplRefs {
@@ -13,6 +14,6 @@ namespace Indy.IL2CPU {
 				throw new Exception("Implementation of Object_Ctor not found!");
 		}
 
-		public static readonly MethodBase Object_Ctor;
+		public static readonly MethodDefinition Object_Ctor;
 	}
 }

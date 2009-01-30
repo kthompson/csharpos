@@ -12,9 +12,9 @@ namespace Indy.IL2CPU.IL.X86
     public class Sizeof : Op
     {
         private uint mTheSize;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("Type not found!");
@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86
         public Sizeof(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("Type not found!");

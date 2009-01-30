@@ -7,6 +7,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL.X86.CustomImplementations.System;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -108,7 +109,7 @@ namespace Indy.IL2CPU.IL.X86
 			}
 		}
 
-		private static readonly MethodBase InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
+		private static readonly MethodDefinition InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
         public override void ScanCustomAssembleImplementation(MethodInformation aMethod)
         {
             base.ScanCustomAssembleImplementation(aMethod);

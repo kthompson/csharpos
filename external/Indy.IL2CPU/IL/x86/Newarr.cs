@@ -13,9 +13,9 @@ namespace Indy.IL2CPU.IL.X86
     {
         private uint mElementSize;
         private string mCtorName;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("No TypeRef found!");
@@ -36,12 +36,12 @@ namespace Indy.IL2CPU.IL.X86
         public Newarr(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var typeRef = aReader.OperandValueType;
+            var typeRef = instruction.Operand;
             if (typeRef == null)
             {
                 throw new Exception("No TypeRef found!");
             }
-            Initialize(typeRef, GetInstructionLabel(aReader));
+            Initialize(typeRef, GetInstructionLabel(instruction));
         }
 
         private void Initialize(TypeReference aTypeRef, string aBaseLabelName)

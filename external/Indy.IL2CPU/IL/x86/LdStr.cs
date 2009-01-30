@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
     public class LdStr : Op {
         private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
         public readonly string LiteralStr;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
             Engine.RegisterType<string>();
         }
 

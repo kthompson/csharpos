@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.CustomImplementation.System {
 	public static class ArrayImplRefs {
@@ -10,7 +11,7 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			Type xType = typeof(ArrayImpl);
 			foreach (FieldInfo xField in typeof(ArrayImplRefs).GetFields()) {
 				if (xField.Name.EndsWith("Ref")) {
-					MethodBase xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
+					MethodDefinition xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
 					if (xTempMethod == null) {
 						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on ArrayImpl!");
 					}
@@ -19,6 +20,6 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			}
 		}
 
-		//public static readonly MethodBase InitArrayWithReferenceTypesRef;
+		//public static readonly MethodDefinition InitArrayWithReferenceTypesRef;
 	}
 }

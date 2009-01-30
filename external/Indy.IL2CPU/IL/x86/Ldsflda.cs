@@ -9,8 +9,8 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldsflda)]
 	public class Ldsflda: Op {
 		private readonly string mDataName;
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-            var field = aReader.OperandValueField;
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            var field = instruction.Operand;
             Engine.QueueStaticField(field);
         }
 
