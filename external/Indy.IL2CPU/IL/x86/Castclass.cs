@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var type = instruction.Operand;
+            var type = instruction.Operand as TypeReference;
             if (type == null)
             {
                 throw new Exception("Unable to determine Type!");

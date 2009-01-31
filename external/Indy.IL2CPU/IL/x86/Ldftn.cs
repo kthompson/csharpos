@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            MethodDefinition xMethodRef = instruction.Operand;
+            var xMethodRef = instruction.Operand as MethodDefinition;
             if (xMethodRef == null)
             {
                 throw new Exception("Unable to determine Method!");
@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86
         public Ldftn(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var methodRef = instruction.Operand;
+            var methodRef = instruction.Operand as MethodReference;
             if (methodRef == null)
             {
                 throw new Exception("Unable to determine Method!");

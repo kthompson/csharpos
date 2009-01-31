@@ -7,38 +7,40 @@ namespace Indy.IL2CPU
 {
     public static class ObjectUtilities
     {
-        public static bool IsDelegate(Type aType)
+        public static bool IsDelegate(TypeReference aType)
         {
             if (aType.FullName == "System.Object")
             {
                 return false;
             }
-            if (aType.BaseType.FullName == "System.Delegate")
+            var baseType = aType.Resolve().BaseType;
+            if (baseType.FullName == "System.Delegate")
             {
                 return true;
             }
-            if (aType.BaseType.FullName == "System.Object")
+            if (baseType.FullName == "System.Object")
             {
                 return false;
             }
-            return IsDelegate(aType.BaseType);
+            return IsDelegate(baseType);
         }
 
-        public static bool IsArray(Type aType)
+        public static bool IsArray(TypeReference aType)
         {
             if (aType.FullName == "System.Object")
             {
                 return false;
             }
-            if (aType.BaseType.FullName == "System.Array")
+            var baseType = aType.Resolve().BaseType;
+            if (baseType.FullName == "System.Array")
             {
                 return true;
             }
-            if (aType.BaseType.FullName == "System.Object")
+            if (baseType.FullName == "System.Object")
             {
                 return false;
             }
-            return IsArray(aType.BaseType);
+            return IsArray(baseType);
         }
 
         public static uint GetObjectStorageSize(TypeReference aType)

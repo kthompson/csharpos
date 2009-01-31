@@ -10,6 +10,11 @@ namespace Indy.IL2CPU.Assembler
 {
     public class Label : Instruction
     {
+        public static string GetFullName(MethodReference method)
+        {
+            return GetFullName(method.Resolve());
+        }
+
         public static string GetFullName(MethodDefinition method)
         {
             var builder = new StringBuilder();
@@ -102,7 +107,7 @@ namespace Indy.IL2CPU.Assembler
             return Name + ":";
         }
 
-        public static string GenerateLabelName(MethodDefinition method)
+        public static string GenerateLabelName(MethodReference method)
         {
             string xResult = DataMember.FilterStringForIncorrectChars(GetFullName(method));
             if (xResult.Length > 245)

@@ -9,7 +9,7 @@ using Mono.Cecil;
 namespace Indy.IL2CPU.Assembler {
 	public class DataMember: BaseAssemblerElement, IComparable<DataMember> {
 		public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
-		public static string GetStaticFieldName(FieldDefinition aField) {
+		public static string GetStaticFieldName(FieldReference aField) {
 			return FilterStringForIncorrectChars("static_field__" + aField.DeclaringType.FullName + "." + aField.Name);
 		}
 

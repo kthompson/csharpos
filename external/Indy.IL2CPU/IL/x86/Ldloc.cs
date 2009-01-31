@@ -5,27 +5,28 @@ using Indy.IL2CPU.Assembler;
 
 using CPU = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil.Cil;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
     [OpCode(OpCodeEnum.Ldloc)]
     public class Ldloc : Op
     {
-        private VariableReference mLocal;
-        protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo)
+        private MethodInformation.Variable _local;
+        protected void SetLocalIndex(int aIndex, MethodInformation method)
         {
-            mLocal = aMethodInfo.Locals[aIndex];
+            _local = method.Locals[aIndex];
         }
-        public Ldloc(MethodInformation aMethodInfo, int aIndex)
-            : base(null, aMethodInfo)
+        public Ldloc(MethodInformation method, int aIndex)
+            : base(null, method)
         {
-            SetLocalIndex(aIndex, aMethodInfo);
+            SetLocalIndex(aIndex, method);
         }
 
-        public Ldloc(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
-            : base(instruction, aMethodInfo)
+        public Ldloc(Mono.Cecil.Cil.Instruction instruction, MethodInformation method)
+            : base(instruction, method)
         {
-            SetLocalIndex((int)instruction.Operand, aMethodInfo);
+            SetLocalIndex((int)instruction.Operand, method);
             //VariableDefinition xVarDef = instruction.Operand as VariableDefinition;
             //if (xVarDef != null) {
             //    SetLocalIndex(xVarDef.Index, aMethodInfo);
@@ -34,7 +35,7 @@ namespace Indy.IL2CPU.IL.X86
 
         public sealed override void DoAssemble()
         {
-            Ldloc(Assembler, mLocal);
+            Ldloc(Assembler, _local);
         }
     }
 }

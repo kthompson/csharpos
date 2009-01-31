@@ -26,12 +26,13 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var method = instruction.Operand;
+            var method = instruction.Operand as MethodReference;
             ScanOp(method);
         }
 
-        public static void ScanOp(MethodDefinition targetMethod)
+        public static void ScanOp(MethodReference targetMethod)
         {
+
             Engine.QueueMethod(targetMethod);
             foreach (ParameterDefinition param in targetMethod.Parameters)
             {
@@ -107,6 +108,11 @@ namespace Indy.IL2CPU.IL.X86
             }
         }
 
+        private void Initialize(MethodReference method, uint aCurrentILOffset, bool aDebugMode)
+        {
+            Initialize(method.Resolve(), aCurrentILOffset, aDebugMode);
+        }
+
         private void Initialize(MethodDefinition method, uint aCurrentILOffset, bool aDebugMode)
         {
             mIsDebugger_Break = method.ToString() == "System.Void System.Diagnostics.Debugger.Break()";
@@ -125,8 +131,8 @@ namespace Indy.IL2CPU.IL.X86
             Engine.QueueMethod(method);
             bool needsCleanup = false;
             List<uint> xArgumentSizes = new List<uint>();
-            ParameterInfo[] xParams = method.GetParameters();
-            foreach (ParameterInfo xParam in xParams)
+            ParameterDefinitionCollection xParams = method.Parameters;
+            foreach (ParameterDefinition xParam in xParams)
             {
                 xArgumentSizes.Add(Engine.GetFieldStorageSize(xParam.ParameterType));
             }
@@ -157,8 +163,10 @@ namespace Indy.IL2CPU.IL.X86
         public Call(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            MethodDefinition xMethod = instruction.Operand;
             mMethodInfo = aMethodInfo;
+
+            var xMethod = instruction.Operand as MethodReference;
+            
             //not the last instruction
             if (instruction.Next!=null)
             {

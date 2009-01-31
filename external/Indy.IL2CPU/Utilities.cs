@@ -7,33 +7,38 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class Utilities {
-		public static string GetFullName(MethodDefinition aMethod) {
+        
+        public static string GetFullName(MethodReference method)
+        {
+            return GetFullName(method.Resolve());
+        }
+
+        public static string GetFullName(MethodDefinition method) {
 			StringBuilder xBuilder = new StringBuilder();
-			string[] xParts = aMethod.ToString().Split(' ');
+			string[] xParts = method.ToString().Split(' ');
 			string[] xParts2 = xParts.Skip(1).ToArray();
-			MethodInfo xMethodInfo = aMethod as MethodInfo;
-			if (xMethodInfo != null) {
-				xBuilder.Append(xMethodInfo.ReturnType.FullName);
+			
+			if (method != null) {
+				xBuilder.Append(method.ReturnType.ReturnType.FullName);
 			} else {
-				ConstructorInfo xCtor = aMethod as ConstructorInfo;
-				if (xCtor != null) {
+				if (method != null) {
 					xBuilder.Append(typeof(void).FullName);
 				} else {
 					xBuilder.Append(xParts[0]);
 				}
 			}
 			xBuilder.Append("  ");
-			xBuilder.Append(aMethod.DeclaringType.FullName);
+			xBuilder.Append(method.DeclaringType.FullName);
 			xBuilder.Append(".");
-			xBuilder.Append(aMethod.Name);
+			xBuilder.Append(method.Name);
 			xBuilder.Append("(");
-			ParameterInfo[] xParams = aMethod.GetParameters();
-			for (int i = 0; i < xParams.Length; i++) {
+			ParameterDefinitionCollection xParams = method.Parameters;
+			for (int i = 0; i < xParams.Count; i++) {
 				if (xParams[i].Name == "aThis" && i == 0) {
 					continue;
 				}
 				xBuilder.Append(xParams[i].ParameterType.FullName);
-				if (i < (xParams.Length - 1)) {
+				if (i < (xParams.Count - 1)) {
 					xBuilder.Append(", ");
 				}
 			}

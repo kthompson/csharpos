@@ -28,18 +28,14 @@ namespace Indy.IL2CPU.IL.X86
                                   MethodInformation aMethodInfo,
                                   SortedList<string, object> aMethodData)
         {
-            MethodDefinition method = instruction.Operand;
+            var method = instruction.Operand as MethodReference;
             if (method == null)
             {
                 throw new Exception("Unable to determine Method!");
             }
 
             var methodDescription = CPU.Label.GenerateLabelName(method);
-            var xTargetMethodInfo = Engine.GetMethodInfo(method,
-                                                         method,
-                                                         methodDescription,
-                                                         null,
-                                                         aMethodInfo.DebugMode);
+            var xTargetMethodInfo = Engine.GetMethodInfo(method, method, methodDescription, null, aMethodInfo.DebugMode);
             foreach (ParameterDefinition param in method.Parameters)
             {
                 Engine.RegisterType(param.ParameterType);
@@ -57,24 +53,25 @@ namespace Indy.IL2CPU.IL.X86
         {
             mLabelName = GetInstructionLabel(instruction);
             mCurrentMethodInfo = aMethodInfo;
-            var xMethod = instruction.Operand;
-            if (xMethod == null)
+            var methodRef = instruction.Operand as MethodReference;
+            var method = methodRef.Resolve();
+            if (method == null)
             {
                 throw new Exception("Unable to determine Method!");
             }
             
-            mMethodDescription = CPU.Label.GenerateLabelName(xMethod);
-            mTargetMethodInfo = Engine.GetMethodInfo(xMethod,
-                                                     xMethod,
+            mMethodDescription = CPU.Label.GenerateLabelName(method);
+            mTargetMethodInfo = Engine.GetMethodInfo(method,
+                                                     method,
                                                      mMethodDescription,
                                                      null,
                                                      aMethodInfo.DebugMode);
-            if (xMethod.IsStatic || !xMethod.IsVirtual || xMethod.IsFinal)
+            if (method.IsStatic || !method.IsVirtual || method.IsFinal)
             {
-                Engine.QueueMethod(xMethod);
-                mNormalAddress = CPU.Label.GenerateLabelName(xMethod);
+                Engine.QueueMethod(method);
+                mNormalAddress = CPU.Label.GenerateLabelName(method);
             }
-            mMethodIdentifier = Engine.GetMethodIdentifier(xMethod);
+            mMethodIdentifier = Engine.GetMethodIdentifier(method);
             Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
             mArgumentCount = (uint)mTargetMethodInfo.Arguments.Length;
             mReturnSize = mTargetMethodInfo.ReturnSize;

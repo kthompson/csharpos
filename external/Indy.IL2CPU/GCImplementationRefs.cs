@@ -5,26 +5,17 @@ using System.Reflection;
 using System.Text;
 using Mono.Cecil;
 
-namespace Indy.IL2CPU {
-	public static class GCImplementationRefs {
-		public static readonly MethodDefinition AllocNewObjectRef;
+namespace Indy.IL2CPU
+{
+    public static class GCImplementationRefs
+    {
+        public static readonly MethodDefinition AllocNewObjectRef;
         public static readonly MethodDefinition IncRefCountRef;
         public static readonly MethodDefinition DecRefCountRef;
 
-		static GCImplementationRefs() {
-			Type xType = typeof(GCImplementation);
-			if (xType == null) {
-				throw new Exception("GCImplementation type not found!");
-			}
-			foreach (FieldInfo xField in typeof(GCImplementationRefs).GetFields()) {
-				if (xField.Name.EndsWith("Ref")) {
-					MethodDefinition xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
-					if (xTempMethod == null) {
-						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");
-					}
-					xField.SetValue(null, xTempMethod);
-				}
-			}
-		}
-	}
+        static GCImplementationRefs()
+        {
+            RefSetter.SetFields(typeof(GCImplementation), typeof(GCImplementationRefs));
+        }
+    }
 }

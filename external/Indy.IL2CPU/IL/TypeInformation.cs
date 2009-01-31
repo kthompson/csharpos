@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
@@ -30,7 +31,7 @@ namespace Indy.IL2CPU.IL {
 
 		public readonly Dictionary<string, Field> Fields;
 		public readonly uint StorageSize;
-		public readonly Type TypeDef;
+		public readonly TypeDefinition TypeDef;
 		public readonly bool NeedsGC;
 		public TypeInformation(uint aStorageSize, Dictionary<string, Field> aFields, Type aTypeDef, bool aNeedsGC) {
 			Fields = aFields;

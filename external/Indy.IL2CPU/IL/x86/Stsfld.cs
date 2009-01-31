@@ -20,14 +20,14 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = instruction.Operand;
+            var xField = instruction.Operand as FieldDefinition;
             Engine.QueueStaticField(xField);
         }
 
         public Stsfld(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var field = instruction.Operand;
+            var field = instruction.Operand as FieldReference;
             mSize = Engine.GetFieldStorageSize(field.FieldType);
             Engine.QueueStaticField(field, out mDataName);
             mNeedsGC = !field.FieldType.IsValueType;

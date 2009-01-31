@@ -5,6 +5,7 @@ using System.IO;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;	    
 using System.Reflection;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -15,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86
         private TypeInformation.Field mField;
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = instruction.Operand;
+            var xField = instruction.Operand as FieldDefinition;
             if (xField == null)
             {
                 throw new Exception("Field not found!");
@@ -27,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86
         public Ldflda(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var field = instruction.Operand;
+            var field = instruction.Operand as FieldReference;
             if (field == null)
             {
                 throw new Exception("Field not found!");

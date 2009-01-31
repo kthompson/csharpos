@@ -4,6 +4,7 @@ using System.Linq;
 using Indy.IL2CPU.Assembler;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -15,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var typeRef = instruction.Operand;
+            var typeRef = instruction.Operand as TypeReference;
             if (typeRef == null)
             {
                 throw new Exception("Couldn't determine Type!");
@@ -27,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86
         public Box(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var typeRef = instruction.Operand;
+            var typeRef = instruction.Operand as TypeReference;
             if (typeRef == null)
             {
                 throw new Exception("Couldn't determine Type!");

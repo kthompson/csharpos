@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86
         public uint ILOffset;
         public MethodInformation MethodInformation;
 
-        public static void ScanOp(MethodDefinition aCtor)
+        public static void ScanOp(MethodReference aCtor)
         {
             Call.ScanOp(aCtor);
             Call.ScanOp(GCImplementationRefs.AllocNewObjectRef);
@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xCtorDef = instruction.Operand;
+            var xCtorDef = instruction.Operand as MethodReference;
             ScanOp(xCtorDef);
         }
 

@@ -6,6 +6,7 @@ using Indy.IL2CPU.Assembler;
 
 using CPU = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -16,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xFieldDef = instruction.Operand;
+            var xFieldDef = instruction.Operand as FieldDefinition;
             if (xFieldDef != null)
             {
                 if (!xFieldDef.IsStatic)
@@ -37,15 +38,16 @@ namespace Indy.IL2CPU.IL.X86
             : base(instruction, aMethodInfo)
         {
             // todo: add support for type tokens and method tokens
-            var xFieldDef = instruction.Operand;
-            if (xFieldDef != null)
+            var field = instruction.Operand as FieldReference;
+            var fd = field.Resolve();
+            if (fd != null)
             {
-                if (!xFieldDef.IsStatic)
+                if (!fd.IsStatic)
                 {
                     throw new Exception("Nonstatic field-backed tokens not supported yet!");
                 }
-                Engine.QueueStaticField(xFieldDef);
-                mTokenAddress = DataMember.GetStaticFieldName(xFieldDef);
+                Engine.QueueStaticField(fd);
+                mTokenAddress = DataMember.GetStaticFieldName(fd);
                 return;
             }
             var typeRef = instruction.Operand;

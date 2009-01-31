@@ -7,41 +7,36 @@ using Mono.Cecil;
 
 namespace System {
 	public static class Extensions {
-		public static string GetFullName(this MethodDefinition aMethod) {
-			StringBuilder xBuilder = new StringBuilder();
-			string[] xParts = aMethod.ToString().Split(' ');
+		public static string GetFullName(this MethodDefinition method) {
+			StringBuilder builder = new StringBuilder();
+			string[] xParts = method.ToString().Split(' ');
 			string[] xParts2 = xParts.Skip(1).ToArray();
-			MethodInfo xMethodInfo = aMethod as MethodInfo;
-			if (xMethodInfo != null) {
-				xBuilder.Append(xMethodInfo.ReturnType.FullName);
-			} else {
-				ConstructorInfo xCtor = aMethod as ConstructorInfo;
-				if (xCtor != null) {
-					xBuilder.Append(typeof(void).FullName);
-				} else {
-					xBuilder.Append(xParts[0]);
-				}
-			}
-			xBuilder.Append("  ");
-			xBuilder.Append(aMethod.DeclaringType.FullName);
-			xBuilder.Append(".");
-			xBuilder.Append(aMethod.Name);
-			xBuilder.Append("(");
-			ParameterInfo[] xParams = aMethod.GetParameters();
-			for (int i = 0; i < xParams.Length; i++) {
+            
+			if (method.IsConstructor) {
+				builder.Append(xParts[0]);
+			}else{
+                builder.Append(method.ReturnType.ReturnType.FullName);
+            }
+			builder.Append("  ");
+			builder.Append(method.DeclaringType.FullName);
+			builder.Append(".");
+			builder.Append(method.Name);
+			builder.Append("(");
+			ParameterDefinitionCollection xParams = method.Parameters;
+			for (int i = 0; i < xParams.Count; i++) {
 				if (xParams[i].Name == "aThis" && i == 0) {
 					continue;
 				}
-				xBuilder.Append(xParams[i].ParameterType.FullName);
-				if (i < (xParams.Length - 1)) {
-					xBuilder.Append(", ");
+				builder.Append(xParams[i].ParameterType.FullName);
+				if (i < (xParams.Count - 1)) {
+					builder.Append(", ");
 				}
 			}
-			xBuilder.Append(")");
-			return xBuilder.ToString();
+			builder.Append(")");
+			return builder.ToString();
 		}
 
-		public static string GetFullName(this FieldInfo aField) {
+		public static string GetFullName(this FieldReference aField) {
 			return aField.FieldType.FullName + " " + aField.DeclaringType.FullName + "." + aField.Name;
 		}
 	}

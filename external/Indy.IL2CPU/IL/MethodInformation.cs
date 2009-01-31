@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL
     {
         public struct Variable
         {
-            public Variable(int aOffset, int aSize, bool aIsReferenceTypeField, Type aVariableType)
+            public Variable(int aOffset, int aSize, bool aIsReferenceTypeField, TypeReference aVariableType)
             {
                 Offset = aOffset;
                 Size = aSize;
@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL
             public readonly int Offset;
             public readonly int Size;
             public readonly bool IsReferenceType;
-            public readonly Type VariableType;
+            public readonly TypeReference VariableType;
 
             /// <summary>
             /// Gives the list of addresses to access this variable. This field contains multiple entries if the <see cref="Size"/> is larger than 4.
@@ -185,11 +185,7 @@ namespace Indy.IL2CPU.IL
                           select xSize).Sum();
             if (aMethod != null)
             {
-                IsNonDebuggable = aMethod.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                              false).Length != 0 || aMethod.DeclaringType.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                                                                                              false).Length != 0 || aMethod.DeclaringType.Module.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                                                                                                                                                                     false).Length != 0 || aMethod.DeclaringType.Assembly.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                                                                                                                                                                                                                                              false).Length != 0;
+                IsNonDebuggable = GetIsNonDebuggable(aMethod);
             }
             var xRoundedSize = ReturnSize;
             if (xRoundedSize % 4 > 0)
@@ -209,6 +205,37 @@ namespace Indy.IL2CPU.IL
                     Arguments[i].Offset += ExtraStackSize;
                 }
             }
+        }
+
+        private static bool GetIsNonDebuggable(MethodDefinition aMethod)
+        {
+            foreach (var attrib in aMethod.CustomAttributes.Cast<CustomAttribute>())
+            {
+                if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
+                    return true;
+            }
+
+            var declaringType = aMethod.DeclaringType;
+            foreach (var attrib in declaringType.CustomAttributes.Cast<CustomAttribute>())
+            {
+                if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
+                    return true;
+            }
+
+            var module = declaringType.Module;
+            foreach (var attrib in module.CustomAttributes.Cast<CustomAttribute>())
+            {
+                if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
+                    return true;
+            }
+
+            foreach (var attrib in module.Assembly.CustomAttributes.Cast<CustomAttribute>())
+            {
+                if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
+                    return true;
+            }
+
+            return false;
         }
 
         public readonly int ExtraStackSize;

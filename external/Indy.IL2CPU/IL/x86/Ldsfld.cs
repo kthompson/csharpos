@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86
         private bool mNeedsGC;
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var xField = instruction.Operand;
+            var xField = instruction.Operand as FieldDefinition;
             Engine.QueueStaticField(xField);
         }
 

@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86
         public Switch(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            uint[] xCases = instruction.Operand;
+            uint[] xCases = instruction.Operand as uint[];
             mLabels = new string[xCases.Length];
             for (int i = 0; i < xCases.Length; i++)
             {

@@ -466,6 +466,7 @@
     <Compile Include="Plugs\PlugFieldAttribute.cs" />
     <Compile Include="Plugs\PlugMethodAttribute.cs" />
     <Compile Include="ReadOnlyDictionary.cs" />
+    <Compile Include="RefSetter.cs" />
     <Compile Include="TypeResolver.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="VTablesImpl.cs" />

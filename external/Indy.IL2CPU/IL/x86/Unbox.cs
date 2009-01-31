@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86
         public Unbox(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            _type = instruction.Operand;
+            _type = instruction.Operand as TypeReference;
             if (_type == null)
             {
                 throw new Exception("Unable to determine Type!");

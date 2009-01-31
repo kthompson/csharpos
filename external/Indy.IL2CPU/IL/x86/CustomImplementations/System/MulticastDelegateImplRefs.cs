@@ -6,21 +6,15 @@ using System.Text;
 using Mono.Cecil;
 
 
-namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
-	public static class MulticastDelegateImplRefs {
-		public static readonly Assembly RuntimeAssemblyDef;
+namespace Indy.IL2CPU.IL.X86.CustomImplementations.System
+{
+    public static class MulticastDelegateImplRefs
+    {
+        public static readonly Assembly RuntimeAssemblyDef;
 
-		static MulticastDelegateImplRefs() {
-			Type xType = typeof(MulticastDelegateImpl);
-			foreach (FieldInfo xField in typeof(MulticastDelegateImplRefs).GetFields()) {
-				if (xField.Name.EndsWith("Ref")) {
-					MethodDefinition xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
-					if (xTempMethod == null) {
-						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on MulticastDelegateImpl!");
-					}
-					xField.SetValue(null, xTempMethod);
-				}
-			}
-		}
-	}
+        static MulticastDelegateImplRefs()
+        {
+            RefSetter.SetFields(typeof(MulticastDelegateImpl), typeof(MulticastDelegateImplRefs));
+        }
+    }
 }

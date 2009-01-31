@@ -110,25 +110,24 @@ namespace Indy.IL2CPU.IL
                         if (Methods.Contains(ctor) && !ctor.IsAbstract)
                             xEmittedMethods.Add(ctor, false);
 
-                    foreach (TypeReference xIntf in xType.Interfaces)
+                    foreach (TypeReference interfaceRef in xType.Interfaces)
                     {
-                        foreach (var xMethodIntf in xIntf.GetMethods())
+                        var interf = interfaceRef.Resolve();
+                        foreach (MethodDefinition xMethodIntf in interf.Methods)
                         {
-                            var xActualMethod = xType.Methods.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
-                                                                (from xParam in xMethodIntf.GetParameters()
-                                                                 select xParam.ParameterType).ToArray());
+                            var requireParams = (from xParam in xMethodIntf.Parameters.Cast<ParameterDefinition>()
+                                                 select xParam.ParameterType).ToArray();
+                            var xActualMethod = xType.Methods.GetMethod(interf.FullName + "." + xMethodIntf.Name, requireParams);
 
                             if (xActualMethod == null)
                             {
                                 // get private implemenation
-                                xActualMethod = xType.GetMethod(xMethodIntf.Name,
-                                                                (from xParam in xMethodIntf.GetParameters()
-                                                                 select xParam.ParameterType).ToArray());
+                                xActualMethod = xType.Methods.GetMethod(xMethodIntf.Name, requireParams);
                             } if (xActualMethod == null)
                             {
                                 try
                                 {
-                                    var xMap = xType.GetInterfaceMap(xIntf);
+                                    var xMap = xType.GetInterfaceMap(interf);
                                     for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
                                         if (xMap.InterfaceMethods[k] == xMethodIntf)
@@ -234,14 +233,14 @@ namespace Indy.IL2CPU.IL
                             if (xEmittedMethods.Values[j])
                             {
                                 var xNewMethod = xType.Methods.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
-                                                                    (from xParam in xMethod.GetParameters()
+                                                                    (from xParam in xMethod.Parameters.Cast<ParameterDefinition>()
                                                                      select xParam.ParameterType).ToArray());
 
                                 if (xNewMethod == null)
                                 {
                                     // get private implemenation
                                     xNewMethod = xType.Methods.GetMethod(xMethod.Name,
-                                                                    (from xParam in xMethod.GetParameters()
+                                                                    (from xParam in xMethod.Parameters.Cast<ParameterDefinition>()
                                                                      select xParam.ParameterType).ToArray());
                                 }
                                 if (xNewMethod == null)

@@ -5,6 +5,7 @@ using System.IO;
 
 using CPU = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -14,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86
         private uint mTheSize;
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
-            var typeRef = instruction.Operand;
+            var typeRef = instruction.Operand as TypeReference;
             if (typeRef == null)
             {
                 throw new Exception("Type not found!");
@@ -24,7 +25,7 @@ namespace Indy.IL2CPU.IL.X86
         public Sizeof(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var typeRef = instruction.Operand;
+            var typeRef = instruction.Operand as TypeReference;
             if (typeRef == null)
             {
                 throw new Exception("Type not found!");

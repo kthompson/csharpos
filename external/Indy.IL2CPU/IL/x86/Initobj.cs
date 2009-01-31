@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
 
-namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Initobj)]
-	public class Initobj: Op {
-		private uint mObjSize;
+namespace Indy.IL2CPU.IL.X86
+{
+    [OpCode(OpCodeEnum.Initobj)]
+    public class Initobj : Op
+    {
+        private uint mObjSize;
 
-        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+        public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
+        {
             var typeRef = (TypeReference)instruction.Operand;
             if (typeRef == null)
             {
@@ -17,39 +20,48 @@ namespace Indy.IL2CPU.IL.X86 {
             Engine.RegisterType(typeRef);
         }
 
-		public Initobj(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
-			: base(instruction, aMethodInfo) {
-                var xTypeRef = (TypeReference)instruction.Operand;
-			if (xTypeRef == null) {
-				throw new Exception("Type not found!");
-			}
-			mObjSize = 0;
-			if (xTypeRef.IsValueType) {
-				Engine.GetTypeFieldInfo(xTypeRef, out mObjSize);
-			}
-		}
+        public Initobj(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
+            : base(instruction, aMethodInfo)
+        {
+            var xTypeRef = instruction.Operand as MethodDefinition;
+            if (xTypeRef == null)
+            {
+                throw new Exception("Type not found!");
+            }
+            mObjSize = 0;
+            if (xTypeRef.IsValueType)
+            {
+                Engine.GetTypeFieldInfo(xTypeRef, out mObjSize);
+            }
+        }
 
-		public override void DoAssemble() {
-			Assembler.StackContents.Pop();
+        public override void DoAssemble()
+        {
+            Assembler.StackContents.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-			for (int i = 0; i < (mObjSize / 4); i++) {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceValue = 0, Size=32 };
-			}
-			switch (mObjSize % 4) {
-				case 1: {
+            for (int i = 0; i < (mObjSize / 4); i++)
+            {
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceValue = 0, Size = 32 };
+            }
+            switch (mObjSize % 4)
+            {
+                case 1:
+                    {
                         new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)((mObjSize / 4) * 4), SourceValue = 0, Size = 8 };
                         break;
-					}
-				case 2: {
+                    }
+                case 2:
+                    {
                         new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)((mObjSize / 4) * 4), SourceValue = 0, Size = 16 };
                         break;
-					}
-				case 0:
-					break;
-				default: {
-						throw new Exception("Remainder size " + mObjSize % 4 + " not supported yet!");
-					}
-			}
-		}
-	}
+                    }
+                case 0:
+                    break;
+                default:
+                    {
+                        throw new Exception("Remainder size " + mObjSize % 4 + " not supported yet!");
+                    }
+            }
+        }
+    }
 }

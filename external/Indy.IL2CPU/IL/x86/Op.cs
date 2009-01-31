@@ -64,24 +64,24 @@ namespace Indy.IL2CPU.IL.X86
                                     null);
         }
 
-        public Op(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
-            : base(instruction, aMethodInfo)
+        public Op(Mono.Cecil.Cil.Instruction instruction, MethodInformation method)
+            : base(instruction, method)
         {
-            if (aMethodInfo != null && aMethodInfo.CurrentHandler != null)
+            if (method != null && method.CurrentHandler != null)
             {
-                mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerOffset > 0 && aMethodInfo.CurrentHandler.HandlerOffset == instruction.Offset) || ((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == instruction.Offset)) && (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
+                mNeedsExceptionPush = ((method.CurrentHandler.HandlerOffset > 0 && method.CurrentHandler.HandlerOffset == instruction.Offset) || ((method.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && method.CurrentHandler.FilterOffset > 0 && method.CurrentHandler.FilterOffset == instruction.Offset)) && (method.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
                 // todo: add support for exception clear again
                 //mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (instruction.Offset + 1)) || 
                 //    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (instruction.Offset + 1));
-                if (mNeedsExceptionPush && aMethodInfo.CurrentHandler.CatchType != null)
+                if (mNeedsExceptionPush && method.CurrentHandler.CatchType != null)
                 {
-                    mCatchType = aMethodInfo.CurrentHandler.CatchType;
+                    mCatchType = method.CurrentHandler.CatchType;
                 }
             }
             if (mCatchType != null && mCatchType.FullName != "System.Exception")
             {
-                var xHandler = (from item in aMethodInfo.Method.GetMethodBody().ExceptionHandlingClauses
-                                where item.TryOffset == aMethodInfo.CurrentHandler.TryOffset && item.TryLength == aMethodInfo.CurrentHandler.TryLength && item.HandlerOffset == aMethodInfo.CurrentHandler.HandlerOffset && item.Flags == ExceptionHandlingClauseOptions.Clause
+                var xHandler = (from item in method.Method.Body.ExceptionHandlers.Cast<ExceptionHandler>()
+                                where item.TryOffset == method.CurrentHandler.TryOffset && item.TryLength == method.CurrentHandler.TryLength && item.HandlerOffset == method.CurrentHandler.HandlerOffset && item.Flags == ExceptionHandlingClauseOptions.Clause
                                 select item).FirstOrDefault();
                 if (xHandler != null)
                 {
@@ -97,9 +97,9 @@ namespace Indy.IL2CPU.IL.X86
             {
                 mCatchType = null;
             }
-            if (mCatchType != null && aMethodInfo != null && aMethodInfo.CurrentHandler != null && aMethodInfo.CurrentHandler.HandlerOffset > 0)
+            if (mCatchType != null && method != null && method.CurrentHandler != null && method.CurrentHandler.HandlerOffset > 0)
             {
-                mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerOffset == instruction.Next.Offset;
+                mNeedsTypeCheck = method.CurrentHandler.HandlerOffset == instruction.Next.Offset;
             }
         }
 
@@ -350,8 +350,7 @@ namespace Indy.IL2CPU.IL.X86
             aAssembler.StackContents.Pop();
         }
 
-        public static void AddWithOverflow(Assembler.Assembler aAssembler,
-                                           bool signed)
+        public static void AddWithOverflow(Assembler.Assembler aAssembler, bool signed)
         {
             throw new NotImplementedException();
             //Add(aAssembler);
@@ -402,12 +401,12 @@ namespace Indy.IL2CPU.IL.X86
             }
         }
 
-        public static void Ldloc(Assembler.Assembler aAssembler, VariableReference aLocal)
+        public static void Ldloc(Assembler.Assembler aAssembler, MethodInformation.Variable aLocal)
         {
             Ldloc(aAssembler, aLocal, true);
         }
 
-        public static void Ldloc(Assembler.Assembler aAssembler, VariableReference aLocal, bool aAddGCCode)
+        public static void Ldloc(Assembler.Assembler aAssembler, MethodInformation.Variable aLocal, bool aAddGCCode)
         {
             if (aLocal.VirtualAddresses.Length > 1)
             {

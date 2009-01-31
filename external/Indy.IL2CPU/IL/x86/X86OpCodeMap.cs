@@ -124,14 +124,14 @@ namespace Indy.IL2CPU.IL.X86
                     //    Assembler = aAssembler
                     //}.Assemble();
                     Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.CtorRef);
-                    Engine.QueueMethod(aMethod.TypeInfo.TypeDef.GetMethod("Invoke"));
+                    Engine.QueueMethod(aMethod.TypeInfo.TypeDef.Methods.GetMethod("Invoke", new Type[] { }));
                     return;
                 }
                 if (aMethod.Method.Name == "Invoke")
                 {
                     Engine.QueueMethod(InvokeMulticastRef);
-                    Engine.QueueMethod(typeof(MulticastDelegate).GetMethod("GetInvocationList"));
-                    Engine.QueueMethod(typeof(Delegate).GetMethod("GetInvocationList"));
+                    Engine.QueueMethod(TypeResolver.Resolve<MulticastDelegate>().Methods.GetMethod("GetInvocationList", new Type[]{}));
+                    Engine.QueueMethod(TypeResolver.Resolve<Delegate>().Methods.GetMethod("GetInvocationList", new Type[] { }));
                     return;
                 }
             }
@@ -179,7 +179,7 @@ namespace Indy.IL2CPU.IL.X86
 							xOp.Assemble();
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							//
-							var xInvokeMethod = aMethodInfo.TypeInfo.TypeDef.GetMethod("Invoke");
+							var xInvokeMethod = aMethodInfo.TypeInfo.TypeDef.Methods.GetMethod("Invoke", new Type[]{});
 							var xDelegateMethodInfo = Engine.GetMethodInfo(xInvokeMethod, xInvokeMethod, xInvokeMethod.Name, aMethodInfo.TypeInfo, aMethodInfo.DebugMode);
 							uint xArgSize  = 0;
                             foreach (var xArg in xDelegateMethodInfo.Arguments) {
@@ -200,36 +200,36 @@ namespace Indy.IL2CPU.IL.X86
 							}
 							break;
 						}
-						if (aMethodInfo.Method.Name == "Invoke")
-						{
-							// param 0 is instance of eventhandler
-							// param 1 is sender
-							// param 2 is eventargs
-							new Label(".LoadTargetObject");
-							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							//Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
-							//new Label(".LoadMethodParams");
-							//for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
-							//    Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
-							//}
-							//new Label(".LoadMethodPointer");
-							//Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							//Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
-							//new CPUx86.Pop("eax");
-							//new CPUx86.Call(CPUx86.Registers_Old.EAX);
-							//new CPUx86.Add("esp",
-							//               "4");
-							Engine.QueueMethod(InvokeMulticastRef);
+                        if (aMethodInfo.Method.Name == "Invoke")
+                        {
+                            // param 0 is instance of eventhandler
+                            // param 1 is sender
+                            // param 2 is eventargs
+                            new Label(".LoadTargetObject");
+                            Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
+                            //Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
+                            //new Label(".LoadMethodParams");
+                            //for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
+                            //    Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
+                            //}
+                            //new Label(".LoadMethodPointer");
+                            //Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
+                            //Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
+                            //new CPUx86.Pop("eax");
+                            //new CPUx86.Call(CPUx86.Registers_Old.EAX);
+                            //new CPUx86.Add("esp",
+                            //               "4");
+                            Engine.QueueMethod(InvokeMulticastRef);
                             new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(InvokeMulticastRef) };
-							var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
-							Engine.QueueMethod(xGetInvocationListMethod);
-							xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
-							Engine.QueueMethod(xGetInvocationListMethod);
+                            var xGetInvocationListMethod = TypeResolver.Resolve<MulticastDelegate>().Methods.GetMethod("GetInvocationList", new Type[] { });
+                            Engine.QueueMethod(xGetInvocationListMethod);
+                            xGetInvocationListMethod = TypeResolver.Resolve<Delegate>().Methods.GetMethod("GetInvocationList", new Type[] { });
+                            Engine.QueueMethod(xGetInvocationListMethod);
 
-							//							new CPUx86.Pop(CPUx86.Registers_Old.EAX);
-							//new CPUx86.Move("esp", "ebp");
-							break;
-						}
+                            //							new CPUx86.Pop(CPUx86.Registers_Old.EAX);
+                            //new CPUx86.Move("esp", "ebp");
+                            break;
+                        }
 					}
 					base.DoCustomAssembleImplementation(aAssembler, aMethodInfo);
 					break;
@@ -267,10 +267,8 @@ namespace Indy.IL2CPU.IL.X86
             RegisterAllUtilityMethods(Engine.QueueMethod);
             Engine.QueueMethod(EventHandlerImplRefs.CtorRef);
             Engine.QueueMethod(InvokeMulticastRef);
-            var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
-            Engine.QueueMethod(xGetInvocationListMethod);
-            xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
-            Engine.QueueMethod(xGetInvocationListMethod);
+            Engine.QueueMethod<MulticastDelegate>("GetInvocationList");
+            Engine.QueueMethod<Delegate>("GetInvocationList");
         }
 	}
 }

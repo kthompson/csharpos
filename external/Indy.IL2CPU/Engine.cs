@@ -117,7 +117,7 @@ namespace Indy.IL2CPU
         public TraceAssemblies TraceAssemblies { get; set; }
 
         private SortedList<string, MethodDefinition> _plugMethods;
-        private SortedList<Type, Dictionary<string, PlugFieldAttribute>> _plugFields;
+        private SortedList<TypeReference, Dictionary<string, PlugFieldAttribute>> _plugFields;
 
         /// <summary>
         /// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -171,7 +171,7 @@ namespace Indy.IL2CPU
                 if (entryPoint == null)
                     throw new NotSupportedException("No EntryPoint found!");
 
-                var entryPointType = TypeResolver.Resolve(entryPoint.DeclaringType);
+                var entryPointType = entryPoint.DeclaringType;
 
                 entryPoint = entryPointType.Methods.GetMethod("Init", new Type[0]);
                 AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(assemblyPath));
@@ -700,7 +700,7 @@ namespace Indy.IL2CPU
                 {
                     continue;
                 }
-                var currentType = TypeResolver.Resolve(method.DeclaringType);
+                var currentType = method.DeclaringType;
                 if (!checkedTypes.Contains(currentType, mTypesEqualityComparer))
                 {
                     checkedTypes.Add(currentType);
@@ -723,7 +723,7 @@ namespace Indy.IL2CPU
             }
             for (i = 0; i < checkedTypes.Count; i++)
             {
-                Type xCurrentType = checkedTypes[i];
+                var xCurrentType = checkedTypes[i];
                 while (xCurrentType != null)
                 {
                     if (!checkedTypes.Contains(xCurrentType, mTypesEqualityComparer))
@@ -754,9 +754,9 @@ namespace Indy.IL2CPU
                         if (xMethod.IsVirtual && !xMethod.IsConstructor)
                         {
                             Type xCurrentInspectedType = xTD.BaseType;
-                            ParameterInfo[] xParams = xMethod.GetParameters();
-                            Type[] xMethodParams = new Type[xParams.Length];
-                            for (int k = 0; k < xParams.Length; k++)
+                            ParameterDefinitionCollection xParams = xMethod.Parameters;
+                            Type[] xMethodParams = new Type[xParams.Count];
+                            for (int k = 0; k < xParams.Count; k++)
                             {
                                 xMethodParams[k] = xParams[k].ParameterType;
                             }
@@ -798,7 +798,7 @@ namespace Indy.IL2CPU
                     i = -1;
                     while (true)
                     {
-                        Type xImplType;
+                        TypeDefinition xImplType;
                         i++;
                         using (_typesLocker.AcquireReaderLock())
                         {
@@ -806,7 +806,7 @@ namespace Indy.IL2CPU
                             {
                                 break;
                             }
-                            xImplType = _types.ElementAt(i);
+                            xImplType = _types[i];
                         }
                         if (xImplType.IsInterface)
                         {
@@ -816,17 +816,15 @@ namespace Indy.IL2CPU
                         {
                             continue;
                         }
+                        var requiredParams = (from xParam in xMethod.Key.Parameters.Cast<ParameterDefinition>()
+                                              select xParam.ParameterType).ToArray();
 
-                        var xActualMethod = xImplType.GetMethod(xInterface.FullName + "." + xMethod.Key.Name,
-                                                                (from xParam in xMethod.Key.GetParameters()
-                                                                 select xParam.ParameterType).ToArray());
+                        var xActualMethod = xImplType.Methods.GetMethod(xInterface.FullName + "." + xMethod.Key.Name, requiredParams);
 
                         if (xActualMethod == null)
                         {
                             // get private implemenation
-                            xActualMethod = xImplType.GetMethod(xMethod.Key.Name,
-                                                                (from xParam in xMethod.Key.GetParameters()
-                                                                 select xParam.ParameterType).ToArray());
+                            xActualMethod = xImplType.Methods.GetMethod(xMethod.Key.Name, requiredParams);
                         }
                         if (xActualMethod == null)
                         {
@@ -860,26 +858,23 @@ namespace Indy.IL2CPU
                                                         TypeReference aCurrentInspectedType)
         {
             MethodDefinition xBaseMethod = null;
+            var currentType = aCurrentInspectedType.Resolve();
             //try {
             while (true)
             {
-                if (aCurrentInspectedType.BaseType == null)
+                if (currentType.BaseType == null)
                 {
                     break;
                 }
-                aCurrentInspectedType = aCurrentInspectedType.BaseType;
-                MethodDefinition xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
-                                                                          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                                                                          Type.DefaultBinder,
-                                                                          aMethodParams,
-                                                                          new ParameterModifier[0]);
+                currentType = currentType.BaseType.Resolve();
+                MethodDefinition xFoundMethod = currentType.Methods.GetMethod(aMethod.Name, aMethodParams);
                 if (xFoundMethod == null)
                 {
                     break;
                 }
-                ParameterInfo[] xParams = xFoundMethod.GetParameters();
+                ParameterDefinitionCollection xParams = xFoundMethod.Parameters;
                 bool xContinue = true;
-                for (int i = 0; i < xParams.Length; i++)
+                for (int i = 0; i < xParams.Count; i++)
                 {
                     if (xParams[i].ParameterType != aMethodParams[i])
                     {
@@ -941,7 +936,7 @@ namespace Indy.IL2CPU
             MethodDefinition xMethod = null;
             if (xIsArray)
             {
-                Type[] xParams = (from item in aRef.GetParameters()
+                Type[] xParams = (from item in aRef.Parameters.Cast<ParameterDefinition>()
                                   select item.ParameterType).ToArray();
                 if (aRef.Name == "Get")
                 {
@@ -984,14 +979,14 @@ namespace Indy.IL2CPU
                         //}
                         continue;
                     }
-                    ParameterInfo[] xFoundParams = xFoundMethod.GetParameters();
-                    ParameterInfo[] xRefParams = aRef.GetParameters();
-                    if (xFoundParams.Length != xRefParams.Length)
+                    ParameterDefinitionCollection xFoundParams = xFoundMethod.Parameters;
+                    ParameterDefinitionCollection xRefParams = aRef.Parameters;
+                    if (xFoundParams.Count != xRefParams.Count)
                     {
                         continue;
                     }
                     bool xMismatch = false;
-                    for (int i = 0; i < xFoundParams.Length; i++)
+                    for (int i = 0; i < xFoundParams.Count; i++)
                     {
                         if (xFoundParams[i].ParameterType.FullName != xRefParams[i].ParameterType.FullName)
                         {
@@ -1027,12 +1022,7 @@ namespace Indy.IL2CPU
         /// <returns></returns>
         public static uint GetFieldStorageSize(TypeReference typeRef)
         {
-            TypeDefinition type;
-
-            if (typeRef is TypeDefinition)
-                type = typeRef;
-            else
-                type = TypeResolver.Resolve(typeRef);
+            var type = typeRef.Resolve();
 
             if (type.FullName == "System.Void")
             {
@@ -1665,9 +1655,9 @@ namespace Indy.IL2CPU
             xBuilder.Append(".");
             xBuilder.Append(aMethod.Name);
             xBuilder.Append("(");
-            ParameterInfo[] xParams = aMethod.GetParameters();
+            ParameterDefinitionCollection xParams = aMethod.Parameters;
             bool xParamAdded = false;
-            for (int i = 0; i < xParams.Length; i++)
+            for (int i = 0; i < xParams.Count; i++)
             {
                 if (i == 0 && (aRefMethod != null && !aRefMethod.IsStatic))
                 {
@@ -1820,14 +1810,15 @@ namespace Indy.IL2CPU
         /// Searches assembly for methods or fields marked with custom attributes PlugMethodAttribute or PlugFieldAttribute.
         /// Matches found are inserted in SortedLists mPlugMethods and mPlugFields.
         /// </summary>
-        private void LoadPlugAssembly(Assembly aAssemblyDef)
+        private void LoadPlugAssembly(AssemblyDefinition aAssemblyDef)
         {
-            foreach (var xType in (from item in aAssemblyDef.GetTypes()
-                                   let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute),
-                                                                                 false)
-                                   where xCustomAttribs != null && xCustomAttribs.Length > 0
-                                   select new KeyValuePair<Type, PlugAttribute>(item,
-                                                                                (PlugAttribute)xCustomAttribs[0])))
+
+
+            foreach (var xType in (from module in aAssemblyDef.Modules.Cast<ModuleDefinition>()
+                                   from type in module.Types.Cast<TypeDefinition>()
+                                   from attrib in type.CustomAttributes.Cast<CustomAttribute>()
+                                   where attrib.GetType() == typeof(PlugAttribute)                                   
+                                   select new KeyValuePair<TypeDefinition, PlugAttribute>(type,  attrib)))
             {
                 PlugAttribute xPlugAttrib = xType.Value;
                 if (xPlugAttrib.IsMonoOnly && !RunningOnMono)
@@ -1838,10 +1829,11 @@ namespace Indy.IL2CPU
                 {
                     continue;
                 }
-                Type xTypeRef = xPlugAttrib.Target;
-                if (xTypeRef == null)
+
+                var typeDef = TypeResolver.Resolve(xPlugAttrib.Target);
+                if (typeDef == null)
                 {
-                    xTypeRef = Type.GetType(xPlugAttrib.TargetName,
+                    typeDef = Type.GetType(xPlugAttrib.TargetName,
                                             true);
                 }
 
@@ -1850,13 +1842,13 @@ namespace Indy.IL2CPU
                 if (xTypePlugFields != null && xTypePlugFields.Length > 0)
                 {
                     Dictionary<string, PlugFieldAttribute> xPlugFields;
-                    if (_plugFields.ContainsKey(xTypeRef))
+                    if (_plugFields.ContainsKey(typeDef))
                     {
-                        xPlugFields = _plugFields[xTypeRef];
+                        xPlugFields = _plugFields[typeDef];
                     }
                     else
                     {
-                        _plugFields.Add(xTypeRef,
+                        _plugFields.Add(typeDef,
                                         xPlugFields = new Dictionary<string, PlugFieldAttribute>());
                     }
                     foreach (var xPlugField in xTypePlugFields)
@@ -1907,12 +1899,10 @@ namespace Indy.IL2CPU
                             continue;
                         }
                     }
-                    foreach (MethodDefinition xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
+                    foreach (MethodDefinition xOrigMethodDef in typeDef.Methods)
                     {
-                        string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod,
-                                                                                  xOrigMethodDef);
-                        string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef,
-                                                                                      null);
+                        string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod, xOrigMethodDef);
+                        string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef, null);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
                             if (!_plugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
@@ -1922,12 +1912,10 @@ namespace Indy.IL2CPU
                             }
                         }
                     }
-                    foreach (MethodDefinition xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
+                    foreach (MethodDefinition xOrigMethodDef in typeDef.Constructors)
                     {
-                        string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod,
-                                                                                  xOrigMethodDef);
-                        string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef,
-                                                                                      null);
+                        string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod, xOrigMethodDef);
+                        string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef, null);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
                             if (_plugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
@@ -1953,11 +1941,7 @@ namespace Indy.IL2CPU
 
         public static TypeInformation GetTypeInfo(TypeReference typeRef)
         {
-            TypeDefinition type;
-            if (typeRef is TypeDefinition)
-                type = typeRef;
-            else
-                type = TypeResolver.Resolve(typeRef);
+            TypeDefinition type = typeRef.Resolve();
 
             TypeInformation xTypeInfo;
             uint xObjectStorageSize;
@@ -1966,9 +1950,14 @@ namespace Indy.IL2CPU
             return xTypeInfo;
         }
 
-        public static MethodInformation GetMethodInfo(MethodDefinition aCurrentMethodForArguments, MethodDefinition aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo, bool aDebugMode)
+        public static MethodInformation GetMethodInfo(MethodReference aCurrentMethodForArguments, MethodReference aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo, bool aDebugMode)
         {
             return GetMethodInfo(aCurrentMethodForArguments, aCurrentMethodForLocals, aMethodName, aTypeInfo, aDebugMode, null);
+        }
+
+        public static MethodInformation GetMethodInfo(MethodReference aCurrentMethodForArguments, MethodReference aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo, bool aDebugMode, IDictionary<string, object> aMethodData)
+        {
+            return GetMethodInfo(aCurrentMethodForArguments.Resolve(), aCurrentMethodForLocals.Resolve(), aMethodName, aTypeInfo, aDebugMode, aMethodData);
         }
 
         public static MethodInformation GetMethodInfo(MethodDefinition aCurrentMethodForArguments, MethodDefinition aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo, bool aDebugMode, IDictionary<string, object> aMethodData)
@@ -2011,7 +2000,7 @@ namespace Indy.IL2CPU
                     uint xArgSize;
                     for (int i = xArgs.Length - 1; i > 0; i--)
                     {
-                        ParameterInfo xParamDef = xParameters[i - 1];
+                        ParameterDefinition xParamDef = xParameters[i - 1];
                         xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
                         if ((xArgSize % 4) != 0)
                         {
@@ -2048,12 +2037,12 @@ namespace Indy.IL2CPU
                 }
                 else
                 {
-                    ParameterInfo[] xParameters = aCurrentMethodForArguments.GetParameters();
-                    xArgs = new MethodInformation.Argument[xParameters.Length];
+                    ParameterDefinitionCollection xParameters = aCurrentMethodForArguments.Parameters;
+                    xArgs = new MethodInformation.Argument[xParameters.Count];
                     xCurOffset = 0;
                     for (int i = xArgs.Length - 1; i >= 0; i--)
                     {
-                        ParameterInfo xParamDef = xParameters[i]; //xArgs.Length - i - 1];
+                        ParameterDefinition xParamDef = xParameters[i]; //xArgs.Length - i - 1];
                         uint xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
                         if ((xArgSize % 4) != 0)
                         {
@@ -2082,7 +2071,7 @@ namespace Indy.IL2CPU
                 }
                 int xResultSize = 0;
                 //= GetFieldStorageSize(aCurrentMethodForArguments.ReturnType.ReturnType);
-                MethodInfo xMethInfo = aCurrentMethodForArguments as MethodInfo;
+                var xMethInfo = aCurrentMethodForArguments;
                 Type xReturnType = typeof(void);
                 if (xMethInfo != null)
                 {
@@ -2103,7 +2092,7 @@ namespace Indy.IL2CPU
             return xMethodInfo;
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod,
+        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodReference aCurrentMethod,
                                                                                  out uint aObjectStorageSize)
         {
             Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
@@ -2111,11 +2100,13 @@ namespace Indy.IL2CPU
                                     out aObjectStorageSize);
         }
 
-        private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
-                                                 Type aType,
-                                                 ref uint aObjectStorageSize)
+        private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields, TypeReference aType, ref uint aObjectStorageSize)
         {
-            Type xActualType = aType;
+            GetTypeFieldInfoImpl(aTypeFields, aType.Resolve(), ref aObjectStorageSize); 
+        }
+
+        private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields, TypeDefinition aType, ref uint aObjectStorageSize)
+        {
             Dictionary<string, PlugFieldAttribute> xCurrentPlugFieldList = new Dictionary<string, PlugFieldAttribute>();
             do
             {
@@ -2128,7 +2119,7 @@ namespace Indy.IL2CPU
                                                   item.Value);
                     }
                 }
-                foreach (FieldInfo xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (FieldDefinition xField in aType.Fields)
                 {
                     if (xField.IsStatic)
                     {
@@ -2243,7 +2234,7 @@ namespace Indy.IL2CPU
             } while (true);
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out uint aObjectStorageSize)
+        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(TypeReference aType, out uint aObjectStorageSize)
         {
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
@@ -2286,40 +2277,36 @@ namespace Indy.IL2CPU
             return (Op)Activator.CreateInstance(aType, instruction, aMethodInfo);
         }
 
-        public static void QueueStaticField(FieldDefinition aField)
+        public static void QueueStaticField(FieldReference field)
         {
+            var fieldDef = field.Resolve();
             if (_current == null)
             {
                 throw new Exception("ERROR: No Current Engine found!");
             }
             using (_current.mStaticFieldsLocker.AcquireReaderLock())
             {
-                if (_current._staticFields.ContainsKey(aField))
+                if (_current._staticFields.ContainsKey(fieldDef))
                 {
                     return;
                 }
             }
             using (_current.mStaticFieldsLocker.AcquireWriterLock())
             {
-                if (!_current._staticFields.ContainsKey(aField))
+                if (!_current._staticFields.ContainsKey(fieldDef))
                 {
-                    _current._staticFields.Add(aField,
-                                               new QueuedStaticFieldInformation());
+                    _current._staticFields.Add(fieldDef, new QueuedStaticFieldInformation());
                 }
             }
         }
 
-        public static void QueueStaticField(string aAssembly,
-                                            string aType,
-                                            string aField,
-                                            out string aFieldName)
+        public static void QueueStaticField(string aAssembly, string aType, string aField, out string aFieldName)
         {
             if (_current == null)
             {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            Type xTypeDef = GetType(aAssembly,
-                                    aType);
+            Type xTypeDef = GetType(aAssembly, aType);
             var xFieldDef = xTypeDef.GetField(aField);
             if (xFieldDef != null)
             {
@@ -2327,14 +2314,15 @@ namespace Indy.IL2CPU
                 aFieldName = DataMember.GetStaticFieldName(xFieldDef);
                 return;
             }
-            throw new Exception("Field not found!(" + String.Format("{0}/{1}/{2}",
-                                                                    aAssembly,
-                                                                    aType,
-                                                                    aField));
+            throw new Exception("Field not found!(" + String.Format("{0}/{1}/{2}", aAssembly, aType, aField));
         }
 
-        public static void QueueStaticField(FieldDefinition aField,
-                                            out string aDataName)
+        public static void QueueStaticField(FieldReference aField, out string aDataName)
+        {
+            QueueStaticField(aField.Resolve(), out aDataName);
+        }
+
+        public static void QueueStaticField(FieldDefinition aField, out string aDataName)
         {
             if (_current == null)
             {
@@ -2348,37 +2336,57 @@ namespace Indy.IL2CPU
             QueueStaticField(aField);
         }
 
+
+        public static void QueueMethod<T>(string methodName, params Type[] args)
+        {
+            QueueMethod(typeof(T), methodName, args);
+        }
+
+        public static void QueueMethod(Type type, string methodName, params Type[] args)
+        {
+            var method = TypeResolver.Resolve(type).Methods.GetMethod(methodName, args);
+            if (method == null)
+                throw new ArgumentException("Method not found");
+
+            QueueMethod(method);
+        }
+
+        public static void QueueMethod(MethodReference method)
+        {
+            QueueMethod(method.Resolve());
+        }
+
         // MtW: 
         //		Right now, we only support one engine at a time per AppDomain. This might be changed
         //		later. See for example NHibernate does this with the ICurrentSessionContext interface
-        public static void QueueMethod(MethodDefinition aMethod)
+        public static void QueueMethod(MethodDefinition method)
         {
             if (_current == null)
             {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            if (!aMethod.IsStatic)
+            if (!method.IsStatic)
             {
-                RegisterType(aMethod.DeclaringType);
+                RegisterType(method.DeclaringType);
             }
             using (_current._methodsLocker.AcquireReaderLock())
             {
-                if (_current._methods.ContainsKey(aMethod))
+                if (_current._methods.ContainsKey(method))
                 {
                     return;
                 }
             }
             using (_current._methodsLocker.AcquireWriterLock())
             {
-                if (!_current._methods.ContainsKey(aMethod))
+                if (!_current._methods.ContainsKey(method))
                 {
                     if (_current._methods is ReadOnlyDictionary<MethodDefinition, QueuedMethodInformation>)
                     {
-                        EmitDependencyGraphLine(false, aMethod.ToString());
-                        throw new Exception("Cannot queue " + aMethod.ToString());
+                        EmitDependencyGraphLine(false, method.ToString());
+                        throw new Exception("Cannot queue " + method.ToString());
                     }
-                    EmitDependencyGraphLine(false, aMethod.ToString());
-                    _current._methods.Add(aMethod,
+                    EmitDependencyGraphLine(false, method.ToString());
+                    _current._methods.Add(method,
                                           new QueuedMethodInformation()
                                           {
                                               Processed = false,
@@ -2389,7 +2397,7 @@ namespace Indy.IL2CPU
             }
         }
 
-        public static int GetMethodIdentifier(MethodDefinition aMethod)
+        public static int GetMethodIdentifier(MethodReference aMethod)
         {
             QueueMethod(aMethod);
             using (_current._methodsLocker.AcquireReaderLock())
@@ -2416,11 +2424,7 @@ namespace Indy.IL2CPU
         /// <returns></returns>
         public static int RegisterType(TypeReference typeRef)
         {
-            TypeDefinition type;
-            if (typeRef is TypeDefinition)
-                type = typeRef;
-            else
-                type = TypeResolver.Resolve(typeRef);
+            TypeDefinition type = typeRef.Resolve();
 
             if (type == null)
             {
@@ -2447,7 +2451,7 @@ namespace Indy.IL2CPU
             }
             using (_current._typesLocker.AcquireReaderLock())
             {
-                var xItem = _current._types.FirstOrDefault(x => x.FullName.Equals(type.FullName));
+                var xItem = _current._types.Cast<TypeDefinition>().FirstOrDefault(x => x.FullName.Equals(type.FullName));
                 if (xItem != null)
                 {
                     return _current._types.IndexOf(xItem);
@@ -2456,7 +2460,7 @@ namespace Indy.IL2CPU
             Type xFoundItem;
             using (_current._typesLocker.AcquireWriterLock())
             {
-                xFoundItem = _current._types.FirstOrDefault(x => x.FullName.Equals(type.FullName));
+                xFoundItem = _current._types.Cast<TypeDefinition>().FirstOrDefault(x => x.FullName.Equals(type.FullName));
 
                 if (xFoundItem == null)
                 {
@@ -2641,13 +2645,13 @@ namespace Indy.IL2CPU
                 {
                     continue;
                 }
-                ParameterInfo[] xParams = xMethod.GetParameters();
-                if (xParams.Length != paramTypes.Length)
+                ParameterDefinitionCollection xParams = xMethod.Parameters;
+                if (xParams.Count != paramTypes.Length)
                 {
                     continue;
                 }
                 bool errorFound = false;
-                for (int i = 0; i < xParams.Length; i++)
+                for (int i = 0; i < xParams.Count; i++)
                 {
                     if (xParams[i].ParameterType.FullName != paramTypes[i])
                     {
