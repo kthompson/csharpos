@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldarga)]
+	[OpCode(Mono.Cecil.Cil.Code.Ldarga)]
 	public class Ldarga: Op {
 		private int mAddress;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {

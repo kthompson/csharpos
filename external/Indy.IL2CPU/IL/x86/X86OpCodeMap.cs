@@ -51,10 +51,10 @@ namespace Indy.IL2CPU.IL.X86
 			return null;
 		}
 
-		public override IList<Assembly> GetPlugAssemblies()
+		public override IList<AssemblyDefinition> GetPlugAssemblies()
 		{
-			IList<Assembly> xResult = base.GetPlugAssemblies();
-			xResult.Add(typeof(X86OpCodeMap).Assembly);
+            IList<AssemblyDefinition> xResult = base.GetPlugAssemblies();
+			xResult.Add(TypeResolver.Resolve<X86OpCodeMap>().Module.Assembly);
 			return xResult;
 		}
 
@@ -191,7 +191,7 @@ namespace Indy.IL2CPU.IL.X86
 							new CPU.Label(".SetArgSize");
 							aAssembler.StackContents.Push(new StackContent(4));
 							Stfld.Stfld(aAssembler, aMethodInfo.TypeInfo, aMethodInfo.TypeInfo.Fields["$$ArgSize$$"]);
-							if (xDelegateMethodInfo.ReturnType != typeof(void))
+							if (xDelegateMethodInfo.ReturnType != Engine.Void)
 							{
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
                                 new CPUx86.Push { DestinationValue = 1 };

@@ -5,7 +5,7 @@ using System.IO;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldarg)]
+	[OpCode(Mono.Cecil.Cil.Code.Ldarg)]
 	public class Ldarg: Op {
 		private MethodInformation.Argument mArgument;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {

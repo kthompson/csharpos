@@ -8,7 +8,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Newarr)]
+    [OpCode(Mono.Cecil.Cil.Code.Newarr)]
     public class Newarr : Op
     {
         private uint mElementSize;

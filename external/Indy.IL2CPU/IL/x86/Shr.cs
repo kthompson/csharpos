@@ -1,10 +1,11 @@
 using System;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
     // todo: Improve 8byte support
-	[OpCode(OpCodeEnum.Shr)]
+    [OpCode(Code.Shr)]
 	public class Shr: Op {
         private string mLabelName;
 		public Shr(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)

@@ -4,7 +4,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Conv_U4)]
+	[OpCode(Mono.Cecil.Cil.Code.Conv_U4)]
 	public class Conv_U4: Op {
         public Conv_U4(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

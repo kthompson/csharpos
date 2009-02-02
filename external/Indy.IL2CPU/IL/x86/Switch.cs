@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Switch)]
+    [OpCode(Mono.Cecil.Cil.Code.Switch)]
     public class Switch : Op
     {
         private string[] mLabels;

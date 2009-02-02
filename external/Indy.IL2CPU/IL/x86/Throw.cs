@@ -7,7 +7,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Throw)]
+	[OpCode(Mono.Cecil.Cil.Code.Throw)]
 	public class Throw: Op {
 		private MethodInformation mMethodInfo;
 		private int mCurrentILOffset;
@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
             new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef) };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
-			Call.EmitExceptionLogic(aAssembler, (uint)aCurrentILOffset, aMethodInfo, null, false, null);
+			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aMethodInfo, null, false, null);
 			aAssembler.StackContents.Pop();
 		}
 	

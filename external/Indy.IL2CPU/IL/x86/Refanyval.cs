@@ -5,7 +5,7 @@ using System.IO;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Refanyval)]
+	[OpCode(Mono.Cecil.Cil.Code.Refanyval)]
 	public class Refanyval: Op {
 		public Refanyval(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

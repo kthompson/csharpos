@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldelema)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldelema)]
     public class Ldelema : Op
     {
         private uint mElementSize;

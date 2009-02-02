@@ -7,7 +7,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldelem_U2)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldelem_U2)]
     public class Ldelem_U2 : Op
     {
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)

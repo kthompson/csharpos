@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Sizeof)]
+    [OpCode(Mono.Cecil.Cil.Code.Sizeof)]
     public class Sizeof : Op
     {
         private uint mTheSize;

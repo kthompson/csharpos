@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Stind_I)]
+	[OpCode(Mono.Cecil.Cil.Code.Stind_I)]
 	public class Stind_I: Op {
 		public Stind_I(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {

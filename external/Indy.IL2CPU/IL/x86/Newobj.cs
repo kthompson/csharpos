@@ -10,15 +10,16 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Asm = Indy.IL2CPU.Assembler;
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Newobj)]
+    [OpCode(Code.Newobj)]
     public class Newobj : Op
     {
         public MethodDefinition Constructor { get; private set; }
         public string CurrentLabel;
-        public uint ILOffset;
+        public int ILOffset;
         public MethodInformation MethodInformation;
 
         public static void ScanOp(MethodReference aCtor)
@@ -38,7 +39,7 @@ namespace Indy.IL2CPU.IL.X86
         public Newobj(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            Constructor = instruction.Operand;
+            Constructor = (instruction.Operand as MethodReference).Resolve();
             CurrentLabel = GetInstructionLabel(instruction);
             MethodInformation = aMethodInfo;
             ILOffset = instruction.Offset;
@@ -164,7 +165,7 @@ namespace Indy.IL2CPU.IL.X86
                     new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue = (uint)xStackInt.Size };
                 }
                 Call.EmitExceptionLogic(aAssembler,
-                                        (uint)aCurrentILOffset,
+                                        aCurrentILOffset,
                                         aCurrentMethodInformation,
                                         aCurrentLabel + "_NO_ERROR_4",
                                         false,

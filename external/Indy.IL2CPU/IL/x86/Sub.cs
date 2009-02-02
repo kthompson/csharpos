@@ -4,7 +4,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Sub)]
+	[OpCode(Mono.Cecil.Cil.Code.Sub)]
 	public class Sub: Op {
         public Sub(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

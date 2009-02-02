@@ -4,7 +4,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldind_U2)]
+	[OpCode(Mono.Cecil.Cil.Code.Ldind_U2)]
 	public class Ldind_U2: Op {
         public Ldind_U2(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

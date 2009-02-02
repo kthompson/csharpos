@@ -4,10 +4,11 @@ using Indy.IL2CPU.Assembler;
 
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Stloc)]
+    [OpCode(Code.Stloc)]
     public class Stloc : Op
     {
         private bool mNeedsGC = false;

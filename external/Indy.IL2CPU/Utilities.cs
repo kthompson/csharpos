@@ -22,7 +22,7 @@ namespace Indy.IL2CPU {
 				xBuilder.Append(method.ReturnType.ReturnType.FullName);
 			} else {
 				if (method != null) {
-					xBuilder.Append(typeof(void).FullName);
+					xBuilder.Append(Engine.Void.FullName);
 				} else {
 					xBuilder.Append(xParts[0]);
 				}
@@ -45,5 +45,25 @@ namespace Indy.IL2CPU {
 			xBuilder.Append(")");
 			return xBuilder.ToString();
 		}
+
+        public static int GetArrayRank(this TypeDefinition type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static TypeReference GetElementType(this TypeDefinition type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IsArray(this TypeDefinition type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static InterfaceMapping GetInterfaceMap(this TypeDefinition type, TypeReference inter)
+        {
+            throw new NotImplementedException();
+        }
 	}
 }

@@ -8,10 +8,11 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Call)]
+    [OpCode(Mono.Cecil.Cil.Code.Call)]
     public class Call : Op
     {
         private string LabelName;
@@ -22,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86
         private MethodInformation mMethodInfo;
         private MethodInformation mTargetMethodInfo;
         private string mNextLabelName;
-        private uint mCurrentILOffset;
+        private int mCurrentILOffset;
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {
@@ -58,32 +59,26 @@ namespace Indy.IL2CPU.IL.X86
         {
         }
 
-        public static void EmitExceptionLogic(Assembler.Assembler aAssembler, uint aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup)
+        public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup)
         {
             string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
             if (aMethodInfo != null && aMethodInfo.CurrentHandler != null)
             {
                 // todo add support for nested handlers, see comment in Engine.cs
                 //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
-                new CPU.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpOffset, aMethodInfo.CurrentHandler.HandlerOffset));
-                if (aMethodInfo.CurrentHandler.HandlerOffset > aCurrentOpOffset)
+                new CPU.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpOffset, aMethodInfo.CurrentHandler.HandlerStart.Offset));
+                if (aMethodInfo.CurrentHandler.HandlerStart.Offset > aCurrentOpOffset)
                 {
-                    switch (aMethodInfo.CurrentHandler.Flags)
+                    switch (aMethodInfo.CurrentHandler.Type)
                     {
-                        case ExceptionHandlingClauseOptions.Clause:
-                            {
-                                xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
-                                break;
-                            }
-                        case ExceptionHandlingClauseOptions.Finally:
-                            {
-                                xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
-                                break;
-                            }
+                        case ExceptionHandlerType.Catch:
+                            xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerStart.Offset);
+                            break;
+                        case ExceptionHandlerType.Finally:
+                            xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerStart.Offset);
+                            break;
                         default:
-                            {
-                                throw new Exception("ExceptionHandlerType '" + aMethodInfo.CurrentHandler.Flags.ToString() + "' not supported yet!");
-                            }
+                            throw new Exception("ExceptionHandlerType '" + aMethodInfo.CurrentHandler.Type.ToString() + "' not supported yet!");
                     }
                 }
             }
@@ -166,9 +161,9 @@ namespace Indy.IL2CPU.IL.X86
             mMethodInfo = aMethodInfo;
 
             var xMethod = instruction.Operand as MethodReference;
-            
+
             //not the last instruction
-            if (instruction.Next!=null)
+            if (instruction.Next != null)
             {
                 mNextLabelName = GetInstructionLabel(instruction.Next.Offset);
             }

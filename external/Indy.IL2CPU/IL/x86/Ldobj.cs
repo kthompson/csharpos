@@ -6,7 +6,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldobj)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldobj)]
     public class Ldobj : Op
     {
         private TypeReference _type;

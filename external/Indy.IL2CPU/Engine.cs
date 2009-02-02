@@ -48,10 +48,17 @@ namespace Indy.IL2CPU
         #endregion
     }
 
+    public class TypeReferenceComparer : IComparer<TypeReference>
+    {
+        public int Compare(TypeReference x, TypeReference y)
+        {
+            return x.FullName.CompareTo(y.FullName);
+        }
+    }
+
     public class TypeComparer : IComparer<Type>
     {
-        public int Compare(Type x,
-                           Type y)
+        public int Compare(Type x, Type y)
         {
             return x.AssemblyQualifiedName.CompareTo(y.AssemblyQualifiedName);
         }
@@ -70,17 +77,16 @@ namespace Indy.IL2CPU
         }
     }
 
-    public class AssemblyEqualityComparer : IEqualityComparer<Assembly>
+    public class AssemblyEqualityComparer : IEqualityComparer<AssemblyDefinition>
     {
-        public bool Equals(Assembly x,
-                           Assembly y)
+        public bool Equals(AssemblyDefinition x, AssemblyDefinition y)
         {
-            return x.GetName().FullName.Equals(y.GetName().FullName);
+            return x.Name.FullName.Equals(y.Name.FullName);
         }
 
-        public int GetHashCode(Assembly obj)
+        public int GetHashCode(AssemblyDefinition obj)
         {
-            return obj.GetName().FullName.GetHashCode();
+            return obj.Name.FullName.GetHashCode();
         }
     }
 
@@ -265,7 +271,7 @@ namespace Indy.IL2CPU
                                         entryPointOp.Call(method);
                         }
                         entryPointOp.Call(entryPoint);
-                        if (entryPoint.ReturnType.ReturnType.Name == TypeResolver.Resolve(typeof(void)).FullName)
+                        if (entryPoint.ReturnType.ReturnType.Name == TypeResolver.Resolve(Void).FullName)
                         {
                             entryPointOp.Push(0);
                         }
@@ -278,7 +284,7 @@ namespace Indy.IL2CPU
                         }
                         using (mStaticFieldsLocker.AcquireWriterLock())
                         {
-                            _staticFields = new ReadOnlyDictionary<FieldInfo, QueuedStaticFieldInformation>(_staticFields);
+                            _staticFields = new ReadOnlyDictionary<FieldDefinition, QueuedStaticFieldInformation>(_staticFields);
                         }
                         ProcessAllMethods();
                         _map.PostProcess(_assembler);
@@ -622,7 +628,7 @@ namespace Indy.IL2CPU
                                                          false,
                                                          null,
                                                          null,
-                                                         typeof(void),
+                                                         TypeResolver.Resolve(Void),
                                                          aDebugMode,
                                                          new Dictionary<string, object>()));
             xOp.Assembler = _assembler;
@@ -631,7 +637,7 @@ namespace Indy.IL2CPU
                                                                                         null,
                                                                                         null);
             xInitVmtOp.Assembler = _assembler;
-            xInitVmtOp.Types = _types;
+            xInitVmtOp.Types = new List<TypeReference>(_types.Cast<TypeReference>());            
             xInitVmtOp.SetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
             xInitVmtOp.SetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
             xInitVmtOp.LoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
@@ -673,7 +679,7 @@ namespace Indy.IL2CPU
                                                       false,
                                                       null,
                                                       null,
-                                                      typeof(void),
+                                                      TypeResolver.Resolve(Void),
                                                       aDebugMode,
                                                       new Dictionary<string, object>()));
             xOp.Assembler = _assembler;
@@ -738,12 +744,12 @@ namespace Indy.IL2CPU
                     {
                         break;
                     }
-                    xCurrentType = xCurrentType.BaseType;
+                    xCurrentType = xCurrentType.BaseType.Resolve();
                 }
             }
-            foreach (Type xTD in checkedTypes)
+            foreach (TypeDefinition xTD in checkedTypes)
             {
-                foreach (MethodDefinition xMethod in xTD.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (MethodDefinition xMethod in xTD.Methods)
                 {
                     if (!xMethod.IsStatic)
                     {
@@ -753,9 +759,9 @@ namespace Indy.IL2CPU
                         }
                         if (xMethod.IsVirtual && !xMethod.IsConstructor)
                         {
-                            Type xCurrentInspectedType = xTD.BaseType;
+                            var xCurrentInspectedType = xTD.BaseType;
                             ParameterDefinitionCollection xParams = xMethod.Parameters;
-                            Type[] xMethodParams = new Type[xParams.Count];
+                            TypeReference[] xMethodParams = new TypeReference[xParams.Count];
                             for (int k = 0; k < xParams.Count; k++)
                             {
                                 xMethodParams[k] = xParams[k].ParameterType;
@@ -892,15 +898,15 @@ namespace Indy.IL2CPU
 
                     if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false)
                     {
-                        var xFoundMethInfo = xFoundMethod as MethodInfo;
-                        var xBaseMethInfo = xBaseMethod as MethodInfo;
+                        var xFoundMethInfo = xFoundMethod;
+                        var xBaseMethInfo = xBaseMethod;
                         if (xFoundMethInfo == null && xBaseMethInfo == null)
                         {
                             xBaseMethod = xFoundMethod;
                         }
                         if (xFoundMethInfo != null && xBaseMethInfo != null)
                         {
-                            if (xFoundMethInfo.ReturnType.AssemblyQualifiedName.Equals(xBaseMethInfo.ReturnType.AssemblyQualifiedName))
+                            if (xFoundMethInfo.ReturnType.ReturnType.DeclaringType.Module.Assembly.Name.Equals(xBaseMethInfo.ReturnType.ReturnType.DeclaringType.Module.Assembly.Name))
                             {
                                 xBaseMethod = xFoundMethod;
                             }
@@ -922,11 +928,11 @@ namespace Indy.IL2CPU
         //todo: remove?
         public static MethodDefinition GetDefinitionFromMethodDefinition2(MethodDefinition aRef)
         {
-            Type xTypeDef;
+            TypeDefinition xTypeDef;
             bool xIsArray = false;
             if (aRef.DeclaringType.FullName.Contains("[]") || aRef.DeclaringType.FullName.Contains("[,]") || aRef.DeclaringType.FullName.Contains("[,,]"))
             {
-                xTypeDef = typeof(Array);
+                xTypeDef = TypeResolver.Resolve<Array>();
                 xIsArray = true;
             }
             else
@@ -936,22 +942,19 @@ namespace Indy.IL2CPU
             MethodDefinition xMethod = null;
             if (xIsArray)
             {
-                Type[] xParams = (from item in aRef.Parameters.Cast<ParameterDefinition>()
-                                  select item.ParameterType).ToArray();
+                var xParams = (from item in aRef.Parameters.Cast<ParameterDefinition>() 
+                               select item.ParameterType).ToArray();
+
                 if (aRef.Name == "Get")
-                {
-                    xMethod = xTypeDef.GetMethod("GetValue",
-                                                 xParams);
-                }
+                    xMethod = xTypeDef.Methods.GetMethod("GetValue", xParams);
+
                 if (aRef.Name == "Set")
-                {
-                    xMethod = xTypeDef.GetMethod("SetValue",
-                                                 xParams);
-                }
+                    xMethod = xTypeDef.Methods.GetMethod("SetValue", xParams);
+
             }
             if (xMethod == null)
             {
-                foreach (MethodDefinition xFoundMethod in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+                foreach (MethodDefinition xFoundMethod in xTypeDef.Methods)
                 {
                     if (xFoundMethod.Name != aRef.Name)
                     {
@@ -1015,14 +1018,25 @@ namespace Indy.IL2CPU
         }
 
         /// <summary>
+        /// Gets the size of the field storage.
+        /// </summary>
+        /// <param name="typeRef">The type ref.</param>
+        /// <returns></returns>
+        public static uint GetFieldStorageSize(TypeReference type)
+        {
+            return GetFieldStorageSize(type.Resolve());
+
+        }
+
+        /// <summary>
         /// Gives the size to store an instance of the <paramref name="aType"/> for use in a field.
         /// </summary>
         /// <remarks>For classes, this is the pointer size.</remarks>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static uint GetFieldStorageSize(TypeReference typeRef)
+        public static uint GetFieldStorageSize(TypeDefinition type)
         {
-            var type = typeRef.Resolve();
+            
 
             if (type.FullName == "System.Void")
             {
@@ -1248,10 +1262,10 @@ namespace Indy.IL2CPU
                         RegisterType(currentField.FieldType);
                         uint xTheSize;
                         //string theType = "db";
-                        Type xFieldTypeDef = currentField.FieldType;
+                        var xFieldTypeDef = currentField.FieldType.Resolve();
                         if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
                         {
-                            xTheSize = GetFieldStorageSize(currentField.FieldType);
+                            xTheSize = GetFieldStorageSize(xFieldTypeDef);
                         }
                         else
                         {
@@ -1445,61 +1459,61 @@ namespace Indy.IL2CPU
 
                                 while (xReader.Read())
                                 {
-                                    ExceptionHandlingClause xCurrentHandler = null;
+                                    ExceptionHandler xCurrentHandler = null;
 
                                     #region Exception handling support code
                                     // todo: add support for nested handlers using a stack or so..
-                                    foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
+                                    foreach (ExceptionHandler handler in xBody.ExceptionHandlers)
                                     {
-                                        if (xHandler.TryOffset > 0)
+                                        if (handler.TryStart.Offset > 0)
                                         {
-                                            if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
+                                            if (handler.TryStart.Offset <= xReader.NextPosition && (handler.TryEnd.Offset) > xReader.NextPosition)
                                             {
                                                 if (xCurrentHandler == null)
                                                 {
-                                                    xCurrentHandler = xHandler;
+                                                    xCurrentHandler = handler;
                                                     continue;
                                                 }
-                                                else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
+                                                else if (handler.TryStart.Offset > xCurrentHandler.TryStart.Offset && (handler.TryEnd.Offset < xCurrentHandler.TryEnd.Offset))
                                                 {
                                                     // only replace if the current found handler is narrower
-                                                    xCurrentHandler = xHandler;
+                                                    xCurrentHandler = handler;
                                                     continue;
                                                 }
                                             }
                                         }
-                                        if (xHandler.HandlerOffset > 0)
+                                        if (handler.HandlerStart.Offset > 0)
                                         {
-                                            if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition)
+                                            if (handler.HandlerStart.Offset <= xReader.NextPosition && (handler.HandlerEnd.Offset) > xReader.NextPosition)
                                             {
                                                 if (xCurrentHandler == null)
                                                 {
-                                                    xCurrentHandler = xHandler;
+                                                    xCurrentHandler = handler;
                                                     continue;
                                                 }
-                                                else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
+                                                else if (handler.HandlerStart.Offset > xCurrentHandler.HandlerStart.Offset && (handler.HandlerEnd.Offset) < (xCurrentHandler.HandlerEnd.Offset))
                                                 {
                                                     // only replace if the current found handler is narrower
-                                                    xCurrentHandler = xHandler;
+                                                    xCurrentHandler = handler;
                                                     continue;
                                                 }
                                             }
                                         }
-                                        if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
+                                        if (handler.Type == ExceptionHandlerType.Filter)
                                         {
-                                            if (xHandler.FilterOffset > 0)
+                                            if (handler.FilterStart.Offset > 0)
                                             {
-                                                if (xHandler.FilterOffset <= xReader.NextPosition)
+                                                if (handler.FilterStart.Offset <= xReader.NextPosition)
                                                 {
                                                     if (xCurrentHandler == null)
                                                     {
-                                                        xCurrentHandler = xHandler;
+                                                        xCurrentHandler = handler;
                                                         continue;
                                                     }
-                                                    else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                                    else if (handler.FilterStart.Offset > xCurrentHandler.FilterStart.Offset)
                                                     {
                                                         // only replace if the current found handler is narrower
-                                                        xCurrentHandler = xHandler;
+                                                        xCurrentHandler = handler;
                                                         continue;
                                                     }
                                                 }
@@ -1617,10 +1631,10 @@ namespace Indy.IL2CPU
                 handler(i, xCount);
         }
 
-        private IList<Assembly> GetPlugAssemblies()
+        private IList<AssemblyDefinition> GetPlugAssemblies()
         {
             var xResult = this._map.GetPlugAssemblies();
-            xResult.Add(typeof(Engine).Assembly);
+            xResult.Add(TypeResolver.Resolve<Engine>().Module.Assembly);
             return xResult;
         }
 
@@ -1629,22 +1643,21 @@ namespace Indy.IL2CPU
         /// </summary>
         /// <param name="aMethod"></param>
         /// <returns></returns>
-        private static string GetStrippedMethodDefinitionFullName(MethodDefinition aMethod,
-                                                            MethodDefinition aRefMethod)
+        private static string GetStrippedMethodDefinitionFullName(MethodDefinition aMethod, MethodDefinition aRefMethod)
         {
             StringBuilder xBuilder = new StringBuilder();
             string[] xParts = aMethod.ToString().Split(' ');
             string[] xParts2 = xParts.Skip(1).ToArray();
-            MethodInfo xMethodInfo = aMethod as MethodInfo;
+            var xMethodInfo = aMethod;
             if (xMethodInfo != null)
             {
-                xBuilder.Append(xMethodInfo.ReturnType.FullName);
+                xBuilder.Append(xMethodInfo.ReturnType.ReturnType.FullName);
             }
             else
             {
                 if (aMethod is ConstructorInfo)
                 {
-                    xBuilder.Append(typeof(void).FullName);
+                    xBuilder.Append(Void.FullName);
                 }
                 else
                 {
@@ -1663,7 +1676,7 @@ namespace Indy.IL2CPU
                 {
                     continue;
                 }
-                if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true))
+                if (xParams[i].CustomAttributes.Cast<Attribute>().Where(attrib => attrib.GetType() == typeof(FieldAccessAttribute)).FirstOrDefault() as FieldAccessAttribute != null)
                 {
                     continue;
                 }
@@ -1690,7 +1703,7 @@ namespace Indy.IL2CPU
             }
 
             _plugMethods = new SortedList<string, MethodDefinition>();
-            _plugFields = new SortedList<Type, Dictionary<string, PlugFieldAttribute>>(new TypeComparer());
+            _plugFields = new SortedList<TypeReference, Dictionary<string, PlugFieldAttribute>>((new TypeReferenceComparer()));
 
             AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
@@ -1698,37 +1711,32 @@ namespace Indy.IL2CPU
             {
                 CheckAssemblyForPlugAssemblies(xAsm);
             }
-            List<Assembly> xPlugs = new List<Assembly>();
+            List<AssemblyDefinition> xPlugs = new List<AssemblyDefinition>();
             var xComparer = new AssemblyEqualityComparer();
 
             foreach (string s in aPlugs)
             {
-                Assembly a = Assembly.LoadFrom(s);
-                a.GetTypes();
-                if (!xPlugs.Contains(a,
-                                     xComparer))
-                {
+                var a = AssemblyFactory.GetAssembly(s);
+                
+                if (!xPlugs.Contains(a, xComparer))
                     xPlugs.Add(a);
-                }
             }
 
             foreach (var item in GetPlugAssemblies())
             {
-                if (!xPlugs.Contains(item,
-                                     xComparer))
+                if (!xPlugs.Contains(item, xComparer))
                 {
                     xPlugs.Add(item);
                 }
             }
 
-            foreach (Assembly xAssemblyDef in xPlugs)
+            foreach (AssemblyDefinition xAssemblyDef in xPlugs)
             {
                 LoadPlugAssembly(xAssemblyDef);
             }
         }
 
-        private Assembly CurrentDomain_AssemblyResolve(object sender,
-                                                       ResolveEventArgs args)
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             if (File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                          args.Name + ".dll")))
@@ -1761,7 +1769,7 @@ namespace Indy.IL2CPU
             if (System.IO.File.Exists(configFile))
             {
                 //Load and parse all PlugAssemblies referred to in the .config file
-                foreach (Assembly xAssembly in GetAssembliesFromConfigFile(configFile))
+                foreach (var xAssembly in GetAssembliesFromConfigFile(configFile))
                 {
                     LoadPlugAssembly(xAssembly);
                 }
@@ -1772,7 +1780,7 @@ namespace Indy.IL2CPU
         /// Retrieves a list of plug assemblies from the given .config file.
         /// </summary>
         /// <param name="configFile"></param>
-        private IEnumerable<Assembly> GetAssembliesFromConfigFile(string configFile)
+        private IEnumerable<AssemblyDefinition> GetAssembliesFromConfigFile(string configFile)
         {
             //Parse XML and get all the PlugAssembly names
             XmlDocument xml = new XmlDocument();
@@ -1791,18 +1799,15 @@ namespace Indy.IL2CPU
             foreach (XmlNode assemblyName in xml.GetElementsByTagName("plug-assembly"))
             {
                 string xName = assemblyName.InnerText;
-                if (xName.EndsWith(".dll",
-                                   StringComparison.InvariantCultureIgnoreCase) || xName.EndsWith(".exe",
-                                                                                                  StringComparison.InvariantCultureIgnoreCase))
+                if (xName.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase) || xName.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase))
                 {
                     if (!String.IsNullOrEmpty(xHintPath))
                     {
-                        yield return Assembly.LoadFile(Path.Combine(xHintPath,
-                                                                    xName));
+                        yield return AssemblyFactory.GetAssembly(Path.Combine(xHintPath, xName));
                         continue;
                     }
                 }
-                yield return Assembly.Load(assemblyName.InnerText);
+                yield return AssemblyFactory.GetAssembly(assemblyName.InnerText);
             }
         }
 
@@ -1817,8 +1822,8 @@ namespace Indy.IL2CPU
             foreach (var xType in (from module in aAssemblyDef.Modules.Cast<ModuleDefinition>()
                                    from type in module.Types.Cast<TypeDefinition>()
                                    from attrib in type.CustomAttributes.Cast<CustomAttribute>()
-                                   where attrib.GetType() == typeof(PlugAttribute)                                   
-                                   select new KeyValuePair<TypeDefinition, PlugAttribute>(type,  attrib)))
+                                   where attrib.GetType() == typeof(PlugAttribute)
+                                   select new KeyValuePair<TypeDefinition, PlugAttribute>(type, (PlugAttribute)attrib)))
             {
                 PlugAttribute xPlugAttrib = xType.Value;
                 if (xPlugAttrib.IsMonoOnly && !RunningOnMono)
@@ -1833,8 +1838,7 @@ namespace Indy.IL2CPU
                 var typeDef = TypeResolver.Resolve(xPlugAttrib.Target);
                 if (typeDef == null)
                 {
-                    typeDef = Type.GetType(xPlugAttrib.TargetName,
-                                            true);
+                    typeDef = TypeResolver.Resolve(Type.GetType(xPlugAttrib.TargetName, true));
                 }
 
                 PlugFieldAttribute[] xTypePlugFields = xType.Key.GetCustomAttributes(typeof(PlugFieldAttribute),
@@ -1871,8 +1875,9 @@ namespace Indy.IL2CPU
 
                 foreach (MethodDefinition xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static))
                 {
-                    PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute),
-                                                                                        true).Cast<PlugMethodAttribute>().FirstOrDefault();
+                    PlugMethodAttribute xPlugMethodAttrib = (from attrib in xMethod.CustomAttributes.Cast<CustomAttribute>()
+                                                                where attrib.GetType() == typeof(PlugMethodAttribute)
+                                                                select attrib).FirstOrDefault() as PlugMethodAttribute;
                     string xSignature = String.Empty;
                     if (xPlugMethodAttrib != null)
                     {
@@ -2072,11 +2077,11 @@ namespace Indy.IL2CPU
                 int xResultSize = 0;
                 //= GetFieldStorageSize(aCurrentMethodForArguments.ReturnType.ReturnType);
                 var xMethInfo = aCurrentMethodForArguments;
-                Type xReturnType = typeof(void);
+                var xReturnType = TypeResolver.Resolve(Void);
                 if (xMethInfo != null)
                 {
-                    xResultSize = (int)GetFieldStorageSize(xMethInfo.ReturnType);
-                    xReturnType = xMethInfo.ReturnType;
+                    xReturnType = xMethInfo.ReturnType.ReturnType;
+                    xResultSize = (int)GetFieldStorageSize(xReturnType);                    
                 }
                 xMethodInfo = new MethodInformation(aMethodName,
                                                     xVars,
@@ -2092,10 +2097,12 @@ namespace Indy.IL2CPU
             return xMethodInfo;
         }
 
+        internal static readonly Type Void = typeof(void);
+        
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodReference aCurrentMethod,
                                                                                  out uint aObjectStorageSize)
         {
-            Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
+            var xCurrentInspectedType = aCurrentMethod.DeclaringType;
             return GetTypeFieldInfo(xCurrentInspectedType,
                                     out aObjectStorageSize);
         }
@@ -2135,12 +2142,12 @@ namespace Indy.IL2CPU
                         xPlugFieldAttr = xCurrentPlugFieldList[xField.GetFullName()];
                         xCurrentPlugFieldList.Remove(xField.GetFullName());
                     }
-                    Type xFieldType = null;
+                    TypeDefinition xFieldType = null;
                     int xFieldSize;
                     string xFieldId;
                     if (xPlugFieldAttr != null)
                     {
-                        xFieldType = xPlugFieldAttr.FieldType;
+                        xFieldType = TypeResolver.Resolve(xPlugFieldAttr.FieldType);
                         xFieldId = xPlugFieldAttr.FieldId;
                     }
                     else
@@ -2149,7 +2156,7 @@ namespace Indy.IL2CPU
                     }
                     if (xFieldType == null)
                     {
-                        xFieldType = xField.FieldType;
+                        xFieldType = xField.FieldType.Resolve();
                     }
                     //if ((!xFieldType.IsValueType && aGCObjects && xFieldType.IsClass) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
                     //    continue;
@@ -2170,8 +2177,9 @@ namespace Indy.IL2CPU
                         continue;
                     }
                     int xOffset = (int)aObjectStorageSize;
-                    FieldOffsetAttribute xOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute),
-                                                                                    true).FirstOrDefault() as FieldOffsetAttribute;
+                    FieldOffsetAttribute xOffsetAttrib = (from attrib in xField.CustomAttributes.Cast<CustomAttribute>()
+                                                         where attrib.GetType() == typeof(FieldOffsetAttribute)
+                                                         select attrib).FirstOrDefault() as FieldOffsetAttribute;
                     if (xOffsetAttrib != null)
                     {
                         xOffset = xOffsetAttrib.Value;
@@ -2195,16 +2203,16 @@ namespace Indy.IL2CPU
                 {
                     var xItem = xCurrentPlugFieldList.Values.First();
                     xCurrentPlugFieldList.Remove(xItem.FieldId);
-                    Type xFieldType = xItem.FieldType;
+                    var xFieldType = TypeResolver.Resolve(xItem.FieldType);
                     int xFieldSize;
                     string xFieldId = xItem.FieldId;
                     if (xFieldType == null)
                     {
-                        xFieldType = xItem.FieldType;
+                        xFieldType = TypeResolver.Resolve(xItem.FieldType);
                     }
                     if (xFieldType == null)
                     {
-                        Engine._current.OnDebugLog(LogSeverityEnum.Error, "Plugged field {0} not found! (On Type {1})", xItem.FieldId, aType.AssemblyQualifiedName);
+                        Engine._current.OnDebugLog(LogSeverityEnum.Error, "Plugged field {0} not found! (On Type {1})", xItem.FieldId, aType.Module.Assembly.Name);
                     }
                     if (xItem.IsExternalValue || (xFieldType.IsClass && !xFieldType.IsValueType))
                     {
@@ -2225,7 +2233,7 @@ namespace Indy.IL2CPU
                 }
                 if (aType.FullName != "System.Object" && aType.BaseType != null)
                 {
-                    aType = aType.BaseType;
+                    aType = aType.BaseType.Resolve();
                 }
                 else
                 {
@@ -2306,8 +2314,8 @@ namespace Indy.IL2CPU
             {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            Type xTypeDef = GetType(aAssembly, aType);
-            var xFieldDef = xTypeDef.GetField(aField);
+            var xTypeDef = GetType(aAssembly, aType);
+            var xFieldDef = xTypeDef.Fields.GetField(aField);
             if (xFieldDef != null)
             {
                 QueueStaticField(xFieldDef);
@@ -2399,6 +2407,11 @@ namespace Indy.IL2CPU
 
         public static int GetMethodIdentifier(MethodReference aMethod)
         {
+            return GetMethodIdentifier(aMethod.Resolve());
+        }
+
+        public static int GetMethodIdentifier(MethodDefinition aMethod)
+        {
             QueueMethod(aMethod);
             using (_current._methodsLocker.AcquireReaderLock())
             {
@@ -2434,13 +2447,14 @@ namespace Indy.IL2CPU
             {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            if (type.IsArray || type.IsPointer)
+            
+            if (type.IsArray() || type.IsPointer)
             {
-                if (type.IsArray && type.GetArrayRank() != 1)
+                if (type.IsArray() && type.GetArrayRank() != 1)
                 {
                     throw new Exception("Multidimensional arrays are not yet supported!");
                 }
-                if (type.IsArray)
+                if (type.IsArray())
                 {
                     type = typeof(Array);
                 }
@@ -2457,7 +2471,7 @@ namespace Indy.IL2CPU
                     return _current._types.IndexOf(xItem);
                 }
             }
-            Type xFoundItem;
+            TypeDefinition xFoundItem;
             using (_current._typesLocker.AcquireWriterLock())
             {
                 xFoundItem = _current._types.Cast<TypeDefinition>().FirstOrDefault(x => x.FullName.Equals(type.FullName));
@@ -2467,8 +2481,7 @@ namespace Indy.IL2CPU
                     _current._types.Add(type);
                     if (type.FullName != "System.Object" && type.BaseType != null)
                     {
-                        Type xCurInspectedType = type.BaseType;
-                        RegisterType(xCurInspectedType);
+                        RegisterType(type.BaseType);
                     }
                     return RegisterType(type);
                 }
@@ -2479,7 +2492,7 @@ namespace Indy.IL2CPU
             }
         }
 
-        public static Assembly GetCrawledAssembly()
+        public static AssemblyDefinition GetCrawledAssembly()
         {
             if (_current == null)
             {
@@ -2504,12 +2517,11 @@ namespace Indy.IL2CPU
                                         string aMethod,
                                         out MethodDefinition aMethodDef)
         {
-            Type xTypeDef = GetType(aAssembly,
-                                    aType);
+            var xTypeDef = GetType(aAssembly, aType);
             // todo: find a way to specify one overload of a method
             int xCount = 0;
             aMethodDef = null;
-            foreach (MethodDefinition xMethodDef in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (MethodDefinition xMethodDef in xTypeDef.Methods)
             {
                 if (xMethodDef.Name == aMethod)
                 {
@@ -2521,7 +2533,7 @@ namespace Indy.IL2CPU
                     xCount++;
                 }
             }
-            foreach (MethodDefinition xMethodDef in xTypeDef.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (MethodDefinition xMethodDef in xTypeDef.Constructors)
             {
                 if (xMethodDef.Name == aMethod)
                 {
@@ -2666,7 +2678,7 @@ namespace Indy.IL2CPU
             }
             throw new Exception("Method not found!");
         }
-        public static IEnumerable<Assembly> GetAllAssemblies()
+        public static IEnumerable<AssemblyDefinition> GetAllAssemblies()
         {
             using (_current._methodsLocker.AcquireReaderLock())
             {

@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldnull)]
+	[OpCode(Mono.Cecil.Cil.Code.Ldnull)]
 	public class Ldnull: Op {
 		public Ldnull(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {

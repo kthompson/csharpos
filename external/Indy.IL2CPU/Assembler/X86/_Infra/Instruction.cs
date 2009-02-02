@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.Assembler.X86
 {

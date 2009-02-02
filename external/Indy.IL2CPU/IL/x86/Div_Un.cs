@@ -4,7 +4,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Div_Un)]
+	[OpCode(Mono.Cecil.Cil.Code.Div_Un)]
 	public class Div_Un: Op {
         public Div_Un(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

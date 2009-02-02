@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.Assembler
             {
                 if (method.IsConstructor)
                 {
-                    builder.Append(typeof(void).FullName);
+                    builder.Append(Engine.Void.FullName);
                 }
                 else
                 {

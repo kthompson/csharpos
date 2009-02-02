@@ -5,7 +5,7 @@ using System.IO;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Calli)]
+	[OpCode(Mono.Cecil.Cil.Code.Calli)]
 	public class Calli: Op {
 		public Calli(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {

@@ -10,7 +10,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldtoken)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldtoken)]
     public class Ldtoken : Op
     {
         private string mTokenAddress;

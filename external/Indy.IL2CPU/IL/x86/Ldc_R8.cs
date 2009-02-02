@@ -5,7 +5,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldc_R8)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldc_R8)]
 	public class Ldc_R8: Op {
 		private readonly Double mValue;
 		public Ldc_R8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)

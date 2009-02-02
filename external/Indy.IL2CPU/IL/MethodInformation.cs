@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL
 {
@@ -46,17 +47,17 @@ namespace Indy.IL2CPU.IL
                 Out
             }
 
-            public Argument(uint aSize,
-                            int aOffset,
-                            KindEnum aKind,
-                            bool aIsReferenceType,
-                TypeInformation aTypeInfo,
-                            Type aArgumentType)
+            public Argument(uint aSize, int aOffset, KindEnum aKind, bool aIsReferenceType, TypeInformation aTypeInfo, TypeReference aArgumentType)
+                : this(aSize, aOffset, aKind, aIsReferenceType, aTypeInfo, aArgumentType.Resolve())
+            {
+            }
+
+            public Argument(uint aSize, int aOffset, KindEnum aKind, bool aIsReferenceType, TypeInformation aTypeInfo, TypeDefinition aArgumentType)
             {
                 mSize = aSize;
                 mVirtualAddresses = new int[mSize / 4];
                 mKind = aKind;
-                mArgumentType = aArgumentType;
+                ArgumentType = aArgumentType;
                 mIsReferenceType = aIsReferenceType;
                 mOffset = -1;
                 TypeInfo = aTypeInfo;
@@ -140,32 +141,13 @@ namespace Indy.IL2CPU.IL
                 }
             }
 
-            private Type mArgumentType;
-
-            public Type ArgumentType
-            {
-                get
-                {
-                    return mArgumentType;
-                }
-                internal set
-                {
-                    mArgumentType = value;
-                }
-            }
+            public TypeDefinition ArgumentType { get; internal set; }
 
             public readonly TypeInformation TypeInfo;
         }
 
-        public MethodInformation(string aLabelName,
-                                 Variable[] aLocals,
-                                 Argument[] aArguments,
-                                 uint aReturnSize,
-                                 bool aIsInstanceMethod,
-                                 TypeInformation aTypeInfo,
-                                 MethodDefinition aMethod,
-                                 Type aReturnType,
-                                 bool debugMode,
+        public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, uint aReturnSize, bool aIsInstanceMethod, 
+                                 TypeInformation aTypeInfo, MethodDefinition aMethod, TypeDefinition aReturnType, bool debugMode,
                                  IDictionary<string, object> aMethodData)
         {
             Locals = aLocals;
@@ -244,14 +226,14 @@ namespace Indy.IL2CPU.IL
         /// <summary>
         /// This variable is only updated when the MethodInformation instance is supplied by the Engine.ProcessAllMethods method
         /// </summary>
-        public ExceptionHandlingClause CurrentHandler;
+        public ExceptionHandler CurrentHandler;
 
         public readonly MethodDefinition Method;
         public readonly string LabelName;
         public readonly Variable[] Locals;
         public readonly Argument[] Arguments;
         public readonly uint ReturnSize;
-        public readonly Type ReturnType;
+        public readonly TypeDefinition ReturnType;
         public readonly bool IsInstanceMethod;
         public readonly TypeInformation TypeInfo;
         public readonly int LocalsSize;

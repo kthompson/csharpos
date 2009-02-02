@@ -5,7 +5,7 @@ using System.IO;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Cpblk)]
+    [OpCode(Mono.Cecil.Cil.Code.Cpblk)]
 	public class Cpblk: Op {
 		public Cpblk(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {

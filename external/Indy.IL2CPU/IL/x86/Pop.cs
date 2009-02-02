@@ -4,7 +4,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Pop)]
+    [OpCode(Mono.Cecil.Cil.Code.Pop)]
 	public class Pop: Op {
         public Pop(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

@@ -5,7 +5,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Stelem)]
+    [OpCode(Mono.Cecil.Cil.Code.Stelem_Any)]
     public class Stelem : Op
     {
         private uint mElementSize;

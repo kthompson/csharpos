@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.IL
             MethodInfo = aMethodInfo;
         }
 
-        public MethodDefinition ProxiedMethod { get; private set; }
+        public MethodDefinition ProxiedMethod { get; set; }
 
         protected abstract void Ldarg(int aIndex);
         protected abstract void Ldflda(TypeInformation aType, TypeInformation.Field aField);

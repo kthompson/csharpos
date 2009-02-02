@@ -8,7 +8,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Box)]
+    [OpCode(Mono.Cecil.Cil.Code.Box)]
     public class Box : Op
     {
         private uint mTheSize;

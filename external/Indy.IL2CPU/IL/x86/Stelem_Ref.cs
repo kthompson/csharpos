@@ -5,7 +5,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Stelem_Ref)]
+	[OpCode(Mono.Cecil.Cil.Code.Stelem_Ref)]
 	public class Stelem_Ref: Op {
 		public Stelem_Ref(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

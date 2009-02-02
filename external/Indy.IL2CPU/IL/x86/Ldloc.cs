@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldloc)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldloc)]
     public class Ldloc : Op
     {
         private MethodInformation.Variable _local;

@@ -7,13 +7,14 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL;
 using Indy.IL2CPU.Plugs;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL
 {
     public abstract class OpCodeMap
     {
-        protected readonly SortedList<OpCodeEnum, Type> mMap = new SortedList<OpCodeEnum, Type>();
-        protected readonly SortedList<OpCodeEnum, Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>> mScanMethods = new SortedList<OpCodeEnum, Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>>();
+        protected readonly SortedList<Code, Type> mMap = new SortedList<Code, Type>();
+        protected readonly SortedList<Code, Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>> _scanMethods = new SortedList<Code, Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>>();
 
         protected OpCodeMap()
         {
@@ -39,12 +40,8 @@ namespace Indy.IL2CPU.IL
 
         public void ScanILCode(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethod, SortedList<string, object> aMethodData)
         {
-            if (mScanMethods.ContainsKey(instruction.OpCode))
-            {
-                mScanMethods[instruction.OpCode](instruction,
-                                             aMethod,
-                                             aMethodData);
-            }
+            if (_scanMethods.ContainsKey(instruction.OpCode.Code))
+                _scanMethods[instruction.OpCode.Code](instruction, aMethod, aMethodData);
         }
 
         public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aApplicationAssemblies)
@@ -65,7 +62,7 @@ namespace Indy.IL2CPU.IL
                                          new Type[] { typeof(Mono.Cecil.Cil.Instruction), typeof(MethodInformation), typeof(SortedList<string, object>) });
                     if (xMethod != null)
                     {
-                        mScanMethods.Add(xItem.OpCode,
+                        _scanMethods.Add(xItem.OpCode,
                                          (Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>)Delegate.CreateDelegate(typeof(Action<Mono.Cecil.Cil.Instruction, MethodInformation, SortedList<string, object>>),
                                                                                                                                   xMethod));
                     }
@@ -78,7 +75,7 @@ namespace Indy.IL2CPU.IL
             }
         }
 
-        public Type GetOpForOpCode(OpCodeEnum code)
+        public Type GetOpForOpCode(Code code)
         {
             if (!mMap.ContainsKey(code))
             {
@@ -99,11 +96,11 @@ namespace Indy.IL2CPU.IL
             return null;
         }
 
-        public virtual IList<Assembly> GetPlugAssemblies()
+        public virtual IList<AssemblyDefinition> GetPlugAssemblies()
         {
-            var xResult = new List<Assembly> {
-			                                     typeof(OpCodeMap).Assembly,
-			                                     Assembly.Load("Indy.IL2CPU")
+            var xResult = new List<AssemblyDefinition> {
+			                                     TypeResolver.Resolve<OpCodeMap>().Module.Assembly,
+			                                     AssemblyFactory.GetAssembly("Indy.IL2CPU")
 			                                 };
             return xResult;
         }
@@ -117,7 +114,7 @@ namespace Indy.IL2CPU.IL
         {
             PlugMethodAttribute xResult = (from attrib in aMethod.Method.CustomAttributes.Cast<CustomAttribute>()
                                            where attrib.GetType() == typeof(PlugMethodAttribute)
-                                           select attrib).FirstOrDefault();
+                                           select attrib).FirstOrDefault() as PlugMethodAttribute;
             if (xResult != null)
             {
                 return xResult.Assembler != null;
@@ -134,7 +131,7 @@ namespace Indy.IL2CPU.IL
 
             PlugMethodAttribute xAttrib = (from attrib in aMethodInfo.Method.CustomAttributes.Cast<CustomAttribute>()
                                            where attrib.GetType() == typeof(PlugMethodAttribute)
-                                           select attrib).FirstOrDefault();
+                                           select attrib).FirstOrDefault() as PlugMethodAttribute;
             if (xAttrib != null)
             {
                 Type xAssemblerType = xAttrib.Assembler;

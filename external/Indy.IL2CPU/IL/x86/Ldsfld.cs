@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldsfld)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldsfld)]
     public class Ldsfld : Op
     {
         private string mDataName;

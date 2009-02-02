@@ -7,7 +7,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Blt)]
+    [OpCode(Mono.Cecil.Cil.Code.Blt)]
 	public class Blt: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;

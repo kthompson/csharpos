@@ -6,7 +6,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ceq)]
+	[OpCode(Mono.Cecil.Cil.Code.Ceq)]
 	public class Ceq: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;

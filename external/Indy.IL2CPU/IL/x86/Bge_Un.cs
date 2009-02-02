@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Bge_Un)]
+    [OpCode(Mono.Cecil.Cil.Code.Bge_Un)]
     public class Bge_Un : Op
     {
         public readonly string TargetLabel;

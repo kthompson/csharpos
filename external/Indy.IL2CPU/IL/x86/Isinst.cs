@@ -6,10 +6,11 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Isinst)]
+    [OpCode(Code.Isinst)]
     public class Isinst : Op
     {
         private int mTypeId;

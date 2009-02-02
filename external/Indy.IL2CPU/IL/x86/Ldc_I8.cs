@@ -5,7 +5,7 @@ using Indy.IL2CPU.Assembler;
 using System.Diagnostics;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldc_I8)]
+	[OpCode(Mono.Cecil.Cil.Code.Ldc_I8)]
 	public class Ldc_I8: Op {
 		private readonly long mValue;
 		public Ldc_I8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)

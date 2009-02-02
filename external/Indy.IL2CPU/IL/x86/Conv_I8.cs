@@ -2,9 +2,10 @@ using System;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Conv_I8)]
+    [OpCode(Code.Conv_I8)]
 	public class Conv_I8: Op {
         public Conv_I8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

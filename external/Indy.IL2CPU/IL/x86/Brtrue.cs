@@ -5,7 +5,7 @@ using System.IO;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Brtrue)]
+	[OpCode(Mono.Cecil.Cil.Code.Brtrue)]
 	public class Brtrue: Op {
 		public readonly string TargetLabel;
 		public Brtrue(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)

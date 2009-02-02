@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86
     public abstract class Op : IL.Op
     {
         private bool mNeedsExceptionPush;
-        private Type mCatchType;
+        private TypeReference mCatchType;
         private string mNextInstructionLabel;
         private bool mNeedsTypeCheck = false;
 
@@ -57,7 +57,7 @@ namespace Indy.IL2CPU.IL.X86
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
             aEmitCleanupMethod();
             Call.EmitExceptionLogic(aAssembler,
-                                    (uint)aCurrentILOffset,
+                                    aCurrentILOffset,
                                     aMethodInfo,
                                     aNextLabel,
                                     false,
@@ -69,7 +69,8 @@ namespace Indy.IL2CPU.IL.X86
         {
             if (method != null && method.CurrentHandler != null)
             {
-                mNeedsExceptionPush = ((method.CurrentHandler.HandlerOffset > 0 && method.CurrentHandler.HandlerOffset == instruction.Offset) || ((method.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && method.CurrentHandler.FilterOffset > 0 && method.CurrentHandler.FilterOffset == instruction.Offset)) && (method.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
+                mNeedsExceptionPush = ((method.CurrentHandler.HandlerStart.Offset > 0 && method.CurrentHandler.HandlerStart.Offset == instruction.Offset) ||  ((method.CurrentHandler.Type == ExceptionHandlerType.Filter) && method.CurrentHandler.FilterStart.Offset > 0 && method.CurrentHandler.FilterStart.Offset == instruction.Offset)) && 
+                                       (method.CurrentHandler.Type == ExceptionHandlerType.Catch);
                 // todo: add support for exception clear again
                 //mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (instruction.Offset + 1)) || 
                 //    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (instruction.Offset + 1));
@@ -81,11 +82,14 @@ namespace Indy.IL2CPU.IL.X86
             if (mCatchType != null && mCatchType.FullName != "System.Exception")
             {
                 var xHandler = (from item in method.Method.Body.ExceptionHandlers.Cast<ExceptionHandler>()
-                                where item.TryOffset == method.CurrentHandler.TryOffset && item.TryLength == method.CurrentHandler.TryLength && item.HandlerOffset == method.CurrentHandler.HandlerOffset && item.Flags == ExceptionHandlingClauseOptions.Clause
+                                where item.TryStart.Offset == method.CurrentHandler.TryStart.Offset && 
+                                      item.TryEnd.Offset == method.CurrentHandler.TryEnd.Offset && 
+                                      item.HandlerStart.Offset == method.CurrentHandler.HandlerStart.Offset && 
+                                      item.Type == ExceptionHandlerType.Catch
                                 select item).FirstOrDefault();
                 if (xHandler != null)
                 {
-                    mNextInstructionLabel = GetInstructionLabel(xHandler.HandlerOffset);
+                    mNextInstructionLabel = GetInstructionLabel(xHandler.HandlerStart.Offset);
                 }
                 else
                 {
@@ -97,9 +101,9 @@ namespace Indy.IL2CPU.IL.X86
             {
                 mCatchType = null;
             }
-            if (mCatchType != null && method != null && method.CurrentHandler != null && method.CurrentHandler.HandlerOffset > 0)
+            if (mCatchType != null && method != null && method.CurrentHandler != null && method.CurrentHandler.HandlerStart.Offset > 0)
             {
-                mNeedsTypeCheck = method.CurrentHandler.HandlerOffset == instruction.Next.Offset;
+                mNeedsTypeCheck = method.CurrentHandler.HandlerStart.Offset == instruction.Next.Offset;
             }
         }
 

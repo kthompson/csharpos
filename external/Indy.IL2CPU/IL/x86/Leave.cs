@@ -7,7 +7,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Leave)]
+    [OpCode(Mono.Cecil.Cil.Code.Leave)]
     public class Leave : Op
     {
         public readonly string TargetLabel;

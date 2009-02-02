@@ -7,7 +7,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Bge)]
+    [OpCode(Mono.Cecil.Cil.Code.Bge)]
 	public class Bge: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;

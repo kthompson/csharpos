@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Stsfld)]
+    [OpCode(Mono.Cecil.Cil.Code.Stsfld)]
     public class Stsfld : Op
     {
         private string mDataName;

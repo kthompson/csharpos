@@ -7,7 +7,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Beq)]
+	[OpCode(Mono.Cecil.Cil.Code.Beq)]
 	public class Beq: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;

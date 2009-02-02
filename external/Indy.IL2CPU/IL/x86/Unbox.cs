@@ -10,7 +10,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Unbox)]
+    [OpCode(Mono.Cecil.Cil.Code.Unbox)]
     public class Unbox : Op
     {
         private int mTypeId;
@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.IL.X86
         private string mNextOpLabel;
         private TypeReference _type;
         private uint mTypeSize;
-        private int mCurrentILOffset;
+        private uint mCurrentILOffset;
         private bool mDebugMode;
         public Unbox(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

@@ -10,7 +10,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Stfld)]
+    [OpCode(Mono.Cecil.Cil.Code.Stfld)]
     public class Stfld : Op
     {
         private readonly TypeInformation.Field mField;

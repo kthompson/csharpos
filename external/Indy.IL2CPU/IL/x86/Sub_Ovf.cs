@@ -5,7 +5,7 @@ using System.IO;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Sub_Ovf)]
+	[OpCode(Mono.Cecil.Cil.Code.Sub_Ovf)]
 	public class Sub_Ovf: Op {
 		public Sub_Ovf(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
 			: base(instruction, aMethodInfo) {

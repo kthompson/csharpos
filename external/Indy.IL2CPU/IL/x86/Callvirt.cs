@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Callvirt)]
+    [OpCode(Mono.Cecil.Cil.Code.Callvirt)]
     public class Callvirt : Op
     {
         private readonly int mMethodIdentifier;
@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86
         private readonly string mLabelName;
         private readonly MethodInformation mCurrentMethodInfo;
         private readonly MethodInformation mTargetMethodInfo;
-        private readonly uint mCurrentILOffset;
+        private readonly int mCurrentILOffset;
         private readonly int mExtraStackSpace;
 
         public static void ScanOp(Mono.Cecil.Cil.Instruction instruction,
@@ -149,12 +149,7 @@ namespace Indy.IL2CPU.IL.X86
                  * 
                  * EAX contains the method to call
                  */
-                Call.EmitExceptionLogic(Assembler,
-                                        mCurrentILOffset,
-                                        mCurrentMethodInfo,
-                                        mLabelName + "_AfterAddressCheck",
-                                        true,
-                                        xEmitCleanup);
+                Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true, xEmitCleanup);
                 new CPU.Label(mLabelName + "_AfterAddressCheck");
                 if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object))
                 {
@@ -217,11 +212,7 @@ namespace Indy.IL2CPU.IL.X86
                 new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
             }
-            Call.EmitExceptionLogic(Assembler,
-                               mCurrentILOffset,
-                               mCurrentMethodInfo,
-                               mLabelName + "__NO_EXCEPTION_AFTER_CALL",
-                               true,
+            Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mCurrentMethodInfo, mLabelName + "__NO_EXCEPTION_AFTER_CALL", true,
                                delegate()
                                {
                                    var xResultSize = mTargetMethodInfo.ReturnSize;

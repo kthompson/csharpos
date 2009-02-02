@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Localloc)]
+	[OpCode(Mono.Cecil.Cil.Code.Localloc)]
 	public class Localloc: Op {
         public const string LocAllocCountMethodDataEntry = "LocAllocCount";
         public const string LocAllicItemMethodDataEntryTemplate = "LocAllocItem_L{0}";

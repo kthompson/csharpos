@@ -2,9 +2,10 @@ using System;
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldind_R8)]
+    [OpCode(Code.Ldind_R8)]
 	public class Ldind_R8: Op {
         public Ldind_R8(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)

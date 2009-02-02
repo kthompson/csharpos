@@ -8,7 +8,7 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Cgt)]
+	[OpCode(Mono.Cecil.Cil.Code.Cgt)]
 	public class Cgt: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;

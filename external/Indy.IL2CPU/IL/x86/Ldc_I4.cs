@@ -5,7 +5,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 using System.Collections.Generic;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldc_I4)]
+	[OpCode(Mono.Cecil.Cil.Code.Ldc_I4)]
 	public class Ldc_I4: Op {
 		private int mValue;
 		protected void SetValue(int aValue) {

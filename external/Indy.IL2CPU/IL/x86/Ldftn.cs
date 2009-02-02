@@ -11,7 +11,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Ldftn)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldftn)]
     public class Ldftn : Op
     {
         private string mFunctionLabel;

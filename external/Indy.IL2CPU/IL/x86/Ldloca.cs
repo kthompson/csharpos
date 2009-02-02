@@ -5,7 +5,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldloca)]
+    [OpCode(Mono.Cecil.Cil.Code.Ldloca)]
 	public class Ldloca: Op {
 		private int mAddress;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {

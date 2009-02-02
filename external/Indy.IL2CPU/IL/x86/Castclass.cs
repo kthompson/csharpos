@@ -11,7 +11,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Castclass)]
+    [OpCode(Mono.Cecil.Cil.Code.Castclass)]
     public class Castclass : Op
     {
         private int mTypeId;
@@ -74,7 +74,7 @@ namespace Indy.IL2CPU.IL.X86
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
             Newobj.Assemble(Assembler, TypeResolver.GetConstructor<InvalidCastException>(), Engine.RegisterType<InvalidCastException>(), mThisLabel, mMethodInfo, mCurrentILOffset, mThisLabel + "_After_NewException");
             new CPU.Label(mThisLabel + "_After_NewException");
-            Call.EmitExceptionLogic(Assembler, (uint)mCurrentILOffset, mMethodInfo, mNextOpLabel, false, null);
+            Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextOpLabel, false, null);
         }
     }
 }

@@ -5,7 +5,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86
 {
-    [OpCode(OpCodeEnum.Initobj)]
+    [OpCode(Mono.Cecil.Cil.Code.Initobj)]
     public class Initobj : Op
     {
         private uint mObjSize;
@@ -23,11 +23,8 @@ namespace Indy.IL2CPU.IL.X86
         public Initobj(Mono.Cecil.Cil.Instruction instruction, MethodInformation aMethodInfo)
             : base(instruction, aMethodInfo)
         {
-            var xTypeRef = instruction.Operand as MethodDefinition;
-            if (xTypeRef == null)
-            {
-                throw new Exception("Type not found!");
-            }
+            var xTypeRef = instruction.Operand as TypeReference;
+
             mObjSize = 0;
             if (xTypeRef.IsValueType)
             {
