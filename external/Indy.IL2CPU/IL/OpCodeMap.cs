@@ -114,7 +114,7 @@ namespace Indy.IL2CPU.IL
         {
             PlugMethodAttribute xResult = (from attrib in aMethod.Method.CustomAttributes.Cast<CustomAttribute>()
                                            where attrib.GetType() == typeof(PlugMethodAttribute)
-                                           select attrib).FirstOrDefault() as PlugMethodAttribute;
+                                           select attrib).Cast<PlugMethodAttribute>().FirstOrDefault();
             if (xResult != null)
             {
                 return xResult.Assembler != null;
@@ -131,7 +131,7 @@ namespace Indy.IL2CPU.IL
 
             PlugMethodAttribute xAttrib = (from attrib in aMethodInfo.Method.CustomAttributes.Cast<CustomAttribute>()
                                            where attrib.GetType() == typeof(PlugMethodAttribute)
-                                           select attrib).FirstOrDefault() as PlugMethodAttribute;
+                                           select attrib).Cast<PlugMethodAttribute>().FirstOrDefault();
             if (xAttrib != null)
             {
                 Type xAssemblerType = xAttrib.Assembler;

@@ -115,7 +115,7 @@ namespace Indy.IL2CPU.IL.X86
             {
                 return;
             }
-            mCurrentILOffset = aCurrentILOffset;
+            mCurrentILOffset = (int)aCurrentILOffset;
             mTargetMethodInfo = Engine.GetMethodInfo(method, method, Label.GenerateLabelName(method), Engine.GetTypeInfo(method.DeclaringType), aDebugMode);
             mResultSize = 0;
             if (mTargetMethodInfo != null)
@@ -209,8 +209,7 @@ namespace Indy.IL2CPU.IL.X86
                 return;
             }
 
-            Assembler.StackContents.Push(new StackContent((int)mResultSize,
-                                                          ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
+            Assembler.StackContents.Push(new StackContent((int)mResultSize, mTargetMethodInfo.Method.ReturnType));
         }
 
         protected virtual void HandleDebuggerBreak()

@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86
             mTypeId = Engine.RegisterType(_type);
             mThisLabel = GetInstructionLabel(instruction);
             mNextOpLabel = GetInstructionLabel(instruction.Next);
-            mCurrentILOffset = instruction.Offset;
+            mCurrentILOffset = (uint)instruction.Offset;
             mDebugMode = aMethodInfo.DebugMode;
         }
         public override void DoAssemble()

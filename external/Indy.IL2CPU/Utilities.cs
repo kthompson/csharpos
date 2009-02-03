@@ -22,7 +22,7 @@ namespace Indy.IL2CPU {
 				xBuilder.Append(method.ReturnType.ReturnType.FullName);
 			} else {
 				if (method != null) {
-					xBuilder.Append(Engine.Void.FullName);
+					xBuilder.Append(TypeResolver.Void.FullName);
 				} else {
 					xBuilder.Append(xParts[0]);
 				}
@@ -66,4 +66,24 @@ namespace Indy.IL2CPU {
             throw new NotImplementedException();
         }
 	}
+
+    
+    public struct InterfaceMapping
+    {
+        // Summary:
+        //     Shows the methods that are defined on the interface.
+        public MethodInfo[] InterfaceMethods;
+        //
+        // Summary:
+        //     Shows the type that represents the interface.
+        public TypeReference InterfaceType;
+        //
+        // Summary:
+        //     Shows the methods that implement the interface.
+        public MethodInfo[] TargetMethods;
+        //
+        // Summary:
+        //     Represents the type that was used to create the interface mapping.
+        public TypeReference TargetType;
+    }
 }

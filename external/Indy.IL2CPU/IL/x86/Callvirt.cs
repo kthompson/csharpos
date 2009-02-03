@@ -151,7 +151,7 @@ namespace Indy.IL2CPU.IL.X86
                  */
                 Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true, xEmitCleanup);
                 new CPU.Label(mLabelName + "_AfterAddressCheck");
-                if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object))
+                if (mTargetMethodInfo.Arguments[0].ArgumentType == TypeResolver.ObjectDef)
                 {
                     /*
                      * On the stack now:

@@ -113,38 +113,39 @@ namespace Indy.IL2CPU.IL
                     foreach (TypeReference interfaceRef in xType.Interfaces)
                     {
                         var interf = interfaceRef.Resolve();
-                        foreach (MethodDefinition xMethodIntf in interf.Methods)
+                        foreach (MethodDefinition interfaceMethod in interf.Methods)
                         {
-                            var requireParams = (from xParam in xMethodIntf.Parameters.Cast<ParameterDefinition>()
+                            var requireParams = (from xParam in interfaceMethod.Parameters.Cast<ParameterDefinition>()
                                                  select xParam.ParameterType).ToArray();
-                            var xActualMethod = xType.Methods.GetMethod(interf.FullName + "." + xMethodIntf.Name, requireParams);
+                            var interfaceMethodImplementation = xType.Methods.GetMethod(interf.FullName + "." + interfaceMethod.Name, requireParams);
 
-                            if (xActualMethod == null)
+                            if (interfaceMethodImplementation == null)
                             {
                                 // get private implemenation
-                                xActualMethod = xType.Methods.GetMethod(xMethodIntf.Name, requireParams);
-                            } if (xActualMethod == null)
+                                interfaceMethodImplementation = xType.Methods.GetMethod(interfaceMethod.Name, requireParams);
+                            } 
+                            
+                            if (interfaceMethodImplementation == null)
                             {
                                 try
                                 {
                                     var xMap = xType.GetInterfaceMap(interf);
                                     for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
-                                        if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                        if (xMap.InterfaceMethods[k] == interfaceMethod)
                                         {
-                                            xActualMethod = xMap.TargetMethods[k];
+                                            interfaceMethodImplementation = xMap.TargetMethods[k];
                                             break;
                                         }
                                     }
                                 }
                                 catch { }
                             }
-                            if (Methods.Contains(xMethodIntf))
+                            if (Methods.Contains(interfaceMethod))
                             {
-                                if (!xEmittedMethods.ContainsKey(xMethodIntf))
+                                if (!xEmittedMethods.ContainsKey(interfaceMethod))
                                 {
-                                    xEmittedMethods.Add(xMethodIntf,
-                                                        true);
+                                    xEmittedMethods.Add(interfaceMethod, true);
                                 }
                             }
 

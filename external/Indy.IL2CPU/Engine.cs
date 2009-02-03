@@ -271,7 +271,7 @@ namespace Indy.IL2CPU
                                         entryPointOp.Call(method);
                         }
                         entryPointOp.Call(entryPoint);
-                        if (entryPoint.ReturnType.ReturnType.Name == TypeResolver.Resolve(Void).FullName)
+                        if (entryPoint.ReturnType.ReturnType.Name == TypeResolver.VoidDef.FullName)
                         {
                             entryPointOp.Push(0);
                         }
@@ -448,16 +448,15 @@ namespace Indy.IL2CPU
                         {
                             mInstructionsToSkip = 0;
                             _assembler.StackContents.Clear();
-                            ILReader xReader = new ILReader(currentMethod);
                             var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-                            while (xReader.Read())
+                            foreach (Mono.Cecil.Cil.Instruction instruction in currentMethod.Body.Instructions)
                             {
                                 SortedList<string, object> xInfo = null;
                                 using (_methodsLocker.AcquireReaderLock())
                                 {
                                     xInfo = _methods[currentMethod].Info;
                                 }
-                                _map.ScanILCode(xReader, xMethodInfo, xInfo);
+                                _map.ScanILCode(instruction, xMethodInfo, xInfo);
                             }
                         }
                     }
@@ -628,7 +627,7 @@ namespace Indy.IL2CPU
                                                          false,
                                                          null,
                                                          null,
-                                                         TypeResolver.Resolve(Void),
+                                                         TypeResolver.VoidDef,
                                                          aDebugMode,
                                                          new Dictionary<string, object>()));
             xOp.Assembler = _assembler;
@@ -679,7 +678,7 @@ namespace Indy.IL2CPU
                                                       false,
                                                       null,
                                                       null,
-                                                      TypeResolver.Resolve(Void),
+                                                      TypeResolver.VoidDef,
                                                       aDebugMode,
                                                       new Dictionary<string, object>()));
             xOp.Assembler = _assembler;
@@ -1455,9 +1454,7 @@ namespace Indy.IL2CPU
                                 //}
 
                                 // Scan each IL op in the method
-                                currentMethod.Accept(new AbstractReflectionVisitor { });
-
-                                while (xReader.Read())
+                                foreach (Mono.Cecil.Cil.Instruction instruction in currentMethod.Body.Instructions)
                                 {
                                     ExceptionHandler xCurrentHandler = null;
 
@@ -1467,7 +1464,7 @@ namespace Indy.IL2CPU
                                     {
                                         if (handler.TryStart.Offset > 0)
                                         {
-                                            if (handler.TryStart.Offset <= xReader.NextPosition && (handler.TryEnd.Offset) > xReader.NextPosition)
+                                            if (handler.TryStart.Offset <= instruction.Next.Offset && (handler.TryEnd.Offset) > instruction.Next.Offset)
                                             {
                                                 if (xCurrentHandler == null)
                                                 {
@@ -1484,7 +1481,7 @@ namespace Indy.IL2CPU
                                         }
                                         if (handler.HandlerStart.Offset > 0)
                                         {
-                                            if (handler.HandlerStart.Offset <= xReader.NextPosition && (handler.HandlerEnd.Offset) > xReader.NextPosition)
+                                            if (handler.HandlerStart.Offset <= instruction.Next.Offset && (handler.HandlerEnd.Offset) > instruction.Next.Offset)
                                             {
                                                 if (xCurrentHandler == null)
                                                 {
@@ -1503,7 +1500,7 @@ namespace Indy.IL2CPU
                                         {
                                             if (handler.FilterStart.Offset > 0)
                                             {
-                                                if (handler.FilterStart.Offset <= xReader.NextPosition)
+                                                if (handler.FilterStart.Offset <= instruction.Next.Offset)
                                                 {
                                                     if (xCurrentHandler == null)
                                                     {
@@ -1523,7 +1520,7 @@ namespace Indy.IL2CPU
                                     #endregion
 
                                     xMethodInfo.CurrentHandler = xCurrentHandler;
-                                    xOp = GetOpFromType(_map.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
+                                    xOp = GetOpFromType(_map.GetOpForOpCode(instruction.OpCode.Code), instruction, xMethodInfo);
 
                                     xOp.Assembler = _assembler;
                                     new Comment("StackItems = " + _assembler.StackContents.Count);
@@ -1533,7 +1530,7 @@ namespace Indy.IL2CPU
                                     }
 
                                     // Create label for current point
-                                    string xLabel = Op.GetInstructionLabel(xReader);
+                                    string xLabel = Op.GetInstructionLabel(instruction);
                                     if (xLabel.StartsWith("."))
                                     {
                                         xLabel = DataMember.FilterStringForIncorrectChars(
@@ -1541,7 +1538,7 @@ namespace Indy.IL2CPU
                                     }
 
                                     // Possibly emit Tracer call
-                                    EmitTracer(xOp, currentMethod.DeclaringType.Namespace, (int)xReader.Position,
+                                    EmitTracer(xOp, currentMethod.DeclaringType.Namespace, (int)instruction.Offset,
                                         xCodeOffsets, xLabel);
 
                                     using (mSymbolsLocker.AcquireWriterLock())
@@ -1559,7 +1556,7 @@ namespace Indy.IL2CPU
                                             xMLSymbol.AssemblyFile = currentMethod.DeclaringType.Module.Image.FileInformation.FullName;
                                             xMLSymbol.MethodToken = currentMethod.MetadataToken;
                                             xMLSymbol.TypeToken = currentMethod.DeclaringType.MetadataToken;
-                                            xMLSymbol.ILOffset = (int)xReader.Position;
+                                            xMLSymbol.ILOffset = (int)instruction.Offset;
                                             mSymbols.Add(xMLSymbol);
                                         }
                                     }
@@ -1657,7 +1654,7 @@ namespace Indy.IL2CPU
             {
                 if (aMethod is ConstructorInfo)
                 {
-                    xBuilder.Append(Void.FullName);
+                    xBuilder.Append(TypeResolver.Void.FullName);
                 }
                 else
                 {
@@ -2077,10 +2074,10 @@ namespace Indy.IL2CPU
                 int xResultSize = 0;
                 //= GetFieldStorageSize(aCurrentMethodForArguments.ReturnType.ReturnType);
                 var xMethInfo = aCurrentMethodForArguments;
-                var xReturnType = TypeResolver.Resolve(Void);
+                var xReturnType = TypeResolver.VoidDef;
                 if (xMethInfo != null)
                 {
-                    xReturnType = xMethInfo.ReturnType.ReturnType;
+                    xReturnType = xMethInfo.ReturnType.ReturnType.Resolve();
                     xResultSize = (int)GetFieldStorageSize(xReturnType);                    
                 }
                 xMethodInfo = new MethodInformation(aMethodName,
@@ -2097,8 +2094,6 @@ namespace Indy.IL2CPU
             return xMethodInfo;
         }
 
-        internal static readonly Type Void = typeof(void);
-        
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodReference aCurrentMethod,
                                                                                  out uint aObjectStorageSize)
         {
@@ -2244,11 +2239,14 @@ namespace Indy.IL2CPU
 
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(TypeReference aType, out uint aObjectStorageSize)
         {
+            return GetTypeFieldInfo(aType.Resolve(), out aObjectStorageSize);
+        }
+
+        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out uint aObjectStorageSize)
+        {
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
-            GetTypeFieldInfoImpl(xTypeFields,
-                                 aType,
-                                 ref aObjectStorageSize);
+            GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize);
             if (aType.IsExplicitLayout)
             {
                 var xStructLayout = aType.StructLayoutAttribute;
@@ -2347,16 +2345,12 @@ namespace Indy.IL2CPU
 
         public static void QueueMethod<T>(string methodName, params Type[] args)
         {
-            QueueMethod(typeof(T), methodName, args);
+            QueueMethod(TypeResolver.GetMethod<T>(methodName, args));            
         }
 
         public static void QueueMethod(Type type, string methodName, params Type[] args)
         {
-            var method = TypeResolver.Resolve(type).Methods.GetMethod(methodName, args);
-            if (method == null)
-                throw new ArgumentException("Method not found");
-
-            QueueMethod(method);
+            QueueMethod(TypeResolver.GetMethod(type, methodName, args));
         }
 
         public static void QueueMethod(MethodReference method)
@@ -2456,11 +2450,11 @@ namespace Indy.IL2CPU
                 }
                 if (type.IsArray())
                 {
-                    type = typeof(Array);
+                    type = TypeResolver.Resolve<Array>();
                 }
                 else
                 {
-                    type = type.GetElementType();
+                    type = type.GetElementType().Resolve();
                 }
             }
             using (_current._typesLocker.AcquireReaderLock())
@@ -2556,66 +2550,47 @@ namespace Indy.IL2CPU
                 handler(aSeverity, String.Format(aMessage, args));
         }
 
-        private SortedList<string, Assembly> mAssemblyDefCache = new SortedList<string, Assembly>();
+        private SortedList<string, AssemblyDefinition> mAssemblyDefCache = new SortedList<string, AssemblyDefinition>();
 
         public static TypeDefinition GetType(string aAssembly, string aType)
         {
-            Assembly xAssemblyDef;
+            AssemblyDefinition xAssemblyDef;
             if (_current.mAssemblyDefCache.ContainsKey(aAssembly))
             {
                 xAssemblyDef = _current.mAssemblyDefCache[aAssembly];
             }
             else
             {
-                //
-                //				Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
-                //									  where item.FullName == aAssembly || item.GetName().Name == aAssembly
-                //									  select item).FirstOrDefault();
-                //				if (xAssembly == null) {
-                //					if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
-                //						xAssembly = typeof(Engine).Assembly;
-                //					}
-                //				}
-                //				if (xAssembly != null) {
-                //					if (aAssembly.StartsWith("mscorlib"))
-                //						throw new Exception("Shouldn't be used!");
-                //					Console.WriteLine("Using AssemblyFactory for '{0}'", aAssembly);
-                //					xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
-                //				} else {
-                //					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
-                //				}
-                //				mCurrent.mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
+               
                 if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName)
                 {
                     aAssembly = typeof(Engine).Assembly.FullName;
                 }
-                xAssemblyDef = Assembly.Load(aAssembly);
+                xAssemblyDef = AssemblyFactory.GetAssembly(aAssembly);
             }
-            return GetType(xAssemblyDef,
-                           aType);
+            return GetType(xAssemblyDef, aType);
         }
 
-        public static Type GetType(Assembly aAssembly,
-                                   string aType)
+        public static TypeDefinition GetType(AssemblyDefinition aAssembly, string typeName)
         {
             if (_current == null)
             {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            string xActualTypeName = aType;
-            if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">"))
+            if (typeName.Contains("<") && typeName.Contains(">"))
             {
-                xActualTypeName = xActualTypeName.Substring(0,
-                                                            xActualTypeName.IndexOf("<"));
+                typeName = typeName.Substring(0, typeName.IndexOf("<"));
             }
-            Type xResult = aAssembly.GetType(aType,
-                                             false);
-            if (xResult != null)
+            foreach(TypeDefinition type in aAssembly.MainModule.Types)
             {
-                RegisterType(xResult);
-                return xResult;
+                if (type.FullName == typeName)
+                {
+                    RegisterType(type);
+                    return type;
+                }
             }
-            throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
+
+            throw new Exception("Type '" + typeName + "' not found in assembly '" + aAssembly + "'!");
         }
 
         [Obsolete("Please use MethodDefinition GetMethodDefinition(TypeDefinition type, string aMethod, params string[] paramTypes)")]

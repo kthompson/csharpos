@@ -109,7 +109,7 @@ namespace Indy.IL2CPU.IL.X86
 			}
 		}
 
-		private static readonly MethodDefinition InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
+		private static readonly MethodDefinition InvokeMulticastRef = TypeResolver.GetMethod<MulticastDelegateImpl>("InvokeMulticast");
         public override void ScanCustomAssembleImplementation(MethodInformation aMethod)
         {
             base.ScanCustomAssembleImplementation(aMethod);
@@ -130,8 +130,8 @@ namespace Indy.IL2CPU.IL.X86
                 if (aMethod.Method.Name == "Invoke")
                 {
                     Engine.QueueMethod(InvokeMulticastRef);
-                    Engine.QueueMethod(TypeResolver.Resolve<MulticastDelegate>().Methods.GetMethod("GetInvocationList", new Type[]{}));
-                    Engine.QueueMethod(TypeResolver.Resolve<Delegate>().Methods.GetMethod("GetInvocationList", new Type[] { }));
+                    Engine.QueueMethod<MulticastDelegate>("GetInvocationList");
+                    Engine.QueueMethod<Delegate>("GetInvocationList");
                     return;
                 }
             }
@@ -191,7 +191,7 @@ namespace Indy.IL2CPU.IL.X86
 							new CPU.Label(".SetArgSize");
 							aAssembler.StackContents.Push(new StackContent(4));
 							Stfld.Stfld(aAssembler, aMethodInfo.TypeInfo, aMethodInfo.TypeInfo.Fields["$$ArgSize$$"]);
-							if (xDelegateMethodInfo.ReturnType != Engine.Void)
+                            if (xDelegateMethodInfo.ReturnType != TypeResolver.VoidDef)
 							{
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
                                 new CPUx86.Push { DestinationValue = 1 };
@@ -221,10 +221,8 @@ namespace Indy.IL2CPU.IL.X86
                             //               "4");
                             Engine.QueueMethod(InvokeMulticastRef);
                             new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(InvokeMulticastRef) };
-                            var xGetInvocationListMethod = TypeResolver.Resolve<MulticastDelegate>().Methods.GetMethod("GetInvocationList", new Type[] { });
-                            Engine.QueueMethod(xGetInvocationListMethod);
-                            xGetInvocationListMethod = TypeResolver.Resolve<Delegate>().Methods.GetMethod("GetInvocationList", new Type[] { });
-                            Engine.QueueMethod(xGetInvocationListMethod);
+                            Engine.QueueMethod<MulticastDelegate>("GetInvocationList");                            
+                            Engine.QueueMethod<Delegate>("GetInvocationList");
 
                             //							new CPUx86.Pop(CPUx86.Registers_Old.EAX);
                             //new CPUx86.Move("esp", "ebp");

@@ -56,8 +56,8 @@ namespace Indy.IL2CPU.IL
             {
                 mSize = aSize;
                 mVirtualAddresses = new int[mSize / 4];
-                mKind = aKind;
-                ArgumentType = aArgumentType;
+                _kind = aKind;
+                _argumentType = aArgumentType;
                 mIsReferenceType = aIsReferenceType;
                 mOffset = -1;
                 TypeInfo = aTypeInfo;
@@ -127,21 +127,30 @@ namespace Indy.IL2CPU.IL
                 }
             }
 
-            private KindEnum mKind;
-
+            private KindEnum _kind;
             public KindEnum Kind
             {
                 get
                 {
-                    return mKind;
+                    return _kind;
                 }
                 internal set
                 {
-                    mKind = value;
+                    _kind = value;
                 }
             }
 
-            public TypeDefinition ArgumentType { get; internal set; }
+            private TypeDefinition _argumentType;
+            public TypeDefinition ArgumentType {
+                get
+                {
+                    return _argumentType;
+                }
+                internal set
+                {
+                    _argumentType = value;
+                }
+            }
 
             public readonly TypeInformation TypeInfo;
         }

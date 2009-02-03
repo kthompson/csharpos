@@ -34,7 +34,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
             //#warning reenable interupts when issue is fixed!!!
 			new CPU.Comment("move address of delgate to eax");
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };
-			var xGetInvocationListMethod = TypeResolver.Resolve<MulticastDelegate>().Methods.GetMethod("GetInvocationList")[0];
+            var xGetInvocationListMethod = TypeResolver.GetMethod<MulticastDelegate>("GetInvocationList");
 			new CPU.Comment("push address of delgate to stack");
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };//addrof this
             new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(xGetInvocationListMethod) };
