@@ -817,6 +817,7 @@ namespace Indy.IL2CPU
                         {
                             continue;
                         }
+                        
                         if (!xInterface.IsAssignableFrom(xImplType))
                         {
                             continue;
@@ -831,24 +832,25 @@ namespace Indy.IL2CPU
                             // get private implemenation
                             xActualMethod = xImplType.Methods.GetMethod(xMethod.Key.Name, requiredParams);
                         }
-                        if (xActualMethod == null)
-                        {
-                            try
-                            {
-                                var xMap = xImplType.GetInterfaceMap(xInterface);
-                                for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                {
-                                    if (xMap.InterfaceMethods[k] == xMethod.Key)
-                                    {
-                                        xActualMethod = xMap.TargetMethods[k];
-                                        break;
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                            }
-                        }
+#warning NEED TO HANDLE InterfaceMapping Below
+                        //if (xActualMethod == null)
+                        //{
+                        //    try
+                        //    {
+                        //        var xMap = xImplType.GetInterfaceMap(xInterface);
+                        //        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                        //        {
+                        //            if (xMap.InterfaceMethods[k] == xMethod.Key)
+                        //            {
+                        //                xActualMethod = xMap.TargetMethods[k];
+                        //                break;
+                        //            }
+                        //        }
+                        //    }
+                        //    catch
+                        //    {
+                        //    }
+                        //}
                         if (xActualMethod != null)
                         {
                             QueueMethod(xActualMethod);
@@ -1094,7 +1096,7 @@ namespace Indy.IL2CPU
             }
             if (type.IsValueType)
             {
-                StructLayoutAttribute xSLA = type.StructLayoutAttribute;
+                var xSLA = type.CustomAttributes.Cast<Attribute>().Where(attrib => attrib.GetType() == typeof(StructLayoutAttribute)).Cast<StructLayoutAttribute>().FirstOrDefault();
                 if (xSLA != null)
                 {
                     if (xSLA.Size > 0)
@@ -1211,7 +1213,7 @@ namespace Indy.IL2CPU
                 xFieldName = DataMember.GetStaticFieldName(currentField);
                 if (_assembler.DataMembers.Count(x => x.Name == xFieldName) == 0)
                 {
-                    var xItem = (from item in currentField.CustomAttributes.Cast<CustomAttribute>()
+                    var xItem = (from item in currentField.CustomAttributes.Cast<Attribute>()
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
                                  select item).FirstOrDefault();
                     string xManifestResourceName = null;
@@ -1273,25 +1275,25 @@ namespace Indy.IL2CPU
                         byte[] xData = new byte[xTheSize];
                         try
                         {
-                            object xValue = currentField.GetValue(null);
-                            if (xValue != null)
-                            {
-                                try
-                                {
-                                    xData = new byte[xTheSize];
-                                    if (xValue.GetType().IsValueType)
-                                    {
-                                        for (int x = 0; x < xTheSize; x++)
-                                        {
-                                            xData[x] = Marshal.ReadByte(xValue,
-                                                                        x);
-                                        }
-                                    }
-                                }
-                                catch
-                                {
-                                }
-                            }
+#warning the BELOW was commented to get this to compile
+                            //object xValue = currentField.GetValue(null);
+                            //if (xValue != null)
+                            //{
+                            //    try
+                            //    {
+                            //        xData = new byte[xTheSize];
+                            //        if (xValue.GetType().IsValueType)
+                            //        {
+                            //            for (int x = 0; x < xTheSize; x++)
+                            //            {
+                            //                xData[x] = Marshal.ReadByte(xValue, x);
+                            //            }
+                            //        }
+                            //    }
+                            //    catch
+                            //    {
+                            //    }
+                            //}
                         }
                         catch
                         {
@@ -1818,7 +1820,7 @@ namespace Indy.IL2CPU
 
             foreach (var xType in (from module in aAssemblyDef.Modules.Cast<ModuleDefinition>()
                                    from type in module.Types.Cast<TypeDefinition>()
-                                   from attrib in type.CustomAttributes.Cast<CustomAttribute>()
+                                   from attrib in type.CustomAttributes.Cast<Attribute>()
                                    where attrib.GetType() == typeof(PlugAttribute)
                                    select new KeyValuePair<TypeDefinition, PlugAttribute>(type, (PlugAttribute)attrib)))
             {
@@ -1838,8 +1840,7 @@ namespace Indy.IL2CPU
                     typeDef = TypeResolver.Resolve(Type.GetType(xPlugAttrib.TargetName, true));
                 }
 
-                PlugFieldAttribute[] xTypePlugFields = xType.Key.GetCustomAttributes(typeof(PlugFieldAttribute),
-                                                                                     false) as PlugFieldAttribute[];
+                var xTypePlugFields = xType.Key.CustomAttributes.Cast<Attribute>().Where(attrib => attrib.GetType() == typeof(PlugFieldAttribute)) as PlugFieldAttribute[];
                 if (xTypePlugFields != null && xTypePlugFields.Length > 0)
                 {
                     Dictionary<string, PlugFieldAttribute> xPlugFields;
@@ -1870,9 +1871,9 @@ namespace Indy.IL2CPU
                     }
                 }
 
-                foreach (MethodDefinition xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                foreach (MethodDefinition xMethod in xType.Key.Methods)
                 {
-                    PlugMethodAttribute xPlugMethodAttrib = (from attrib in xMethod.CustomAttributes.Cast<CustomAttribute>()
+                    PlugMethodAttribute xPlugMethodAttrib = (from attrib in xMethod.CustomAttributes.Cast<Attribute>()
                                                                 where attrib.GetType() == typeof(PlugMethodAttribute)
                                                                 select attrib).FirstOrDefault() as PlugMethodAttribute;
                     string xSignature = String.Empty;
@@ -2172,7 +2173,7 @@ namespace Indy.IL2CPU
                         continue;
                     }
                     int xOffset = (int)aObjectStorageSize;
-                    FieldOffsetAttribute xOffsetAttrib = (from attrib in xField.CustomAttributes.Cast<CustomAttribute>()
+                    FieldOffsetAttribute xOffsetAttrib = (from attrib in xField.CustomAttributes.Cast<Attribute>()
                                                          where attrib.GetType() == typeof(FieldOffsetAttribute)
                                                          select attrib).FirstOrDefault() as FieldOffsetAttribute;
                     if (xOffsetAttrib != null)
@@ -2249,7 +2250,7 @@ namespace Indy.IL2CPU
             GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize);
             if (aType.IsExplicitLayout)
             {
-                var xStructLayout = aType.StructLayoutAttribute;
+                var xStructLayout = aType.CustomAttributes.Cast<CustomAttribute>().Where(attrib => attrib.GetType() == typeof(StructLayoutAttribute)).Cast<StructLayoutAttribute>().FirstOrDefault();
                 if (xStructLayout.Size == 0)
                 {
                     aObjectStorageSize = (uint)((from item in xTypeFields
@@ -2442,7 +2443,7 @@ namespace Indy.IL2CPU
                 throw new Exception("ERROR: No Current Engine found!");
             }
             
-            if (type.IsArray() || type.IsPointer)
+            if (type.IsArray() || type.IsPointer())
             {
                 if (type.IsArray() && type.GetArrayRank() != 1)
                 {

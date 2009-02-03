@@ -209,7 +209,7 @@ namespace Indy.IL2CPU.IL.X86
                 return;
             }
 
-            Assembler.StackContents.Push(new StackContent((int)mResultSize, mTargetMethodInfo.Method.ReturnType));
+            Assembler.StackContents.Push(new StackContent((int)mResultSize, mTargetMethodInfo.Method.ReturnType.ReturnType));
         }
 
         protected virtual void HandleDebuggerBreak()

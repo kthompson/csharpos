@@ -200,27 +200,27 @@ namespace Indy.IL2CPU.IL
 
         private static bool GetIsNonDebuggable(MethodDefinition aMethod)
         {
-            foreach (var attrib in aMethod.CustomAttributes.Cast<CustomAttribute>())
+            foreach (var attrib in aMethod.CustomAttributes.Cast<Attribute>())
             {
                 if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
                     return true;
             }
 
             var declaringType = aMethod.DeclaringType;
-            foreach (var attrib in declaringType.CustomAttributes.Cast<CustomAttribute>())
+            foreach (var attrib in declaringType.CustomAttributes.Cast<Attribute>())
             {
                 if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
                     return true;
             }
 
             var module = declaringType.Module;
-            foreach (var attrib in module.CustomAttributes.Cast<CustomAttribute>())
+            foreach (var attrib in module.CustomAttributes.Cast<Attribute>())
             {
                 if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
                     return true;
             }
 
-            foreach (var attrib in module.Assembly.CustomAttributes.Cast<CustomAttribute>())
+            foreach (var attrib in module.Assembly.CustomAttributes.Cast<Attribute>())
             {
                 if (attrib.GetType() == typeof(DebuggerStepThroughAttribute))
                     return true;

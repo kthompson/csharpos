@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using System.Reflection;
 
 namespace Indy.IL2CPU
 {
@@ -16,7 +17,7 @@ namespace Indy.IL2CPU
         public static void SetFields(Type source, Type dest)
         {
             var type = TypeResolver.Resolve(dest);
-            foreach (FieldDefinition field in TypeResolver.Resolve(source).Fields)
+            foreach (FieldInfo field in source.GetFields())
             {
                 if (field.Name.EndsWith("Ref"))
                 {

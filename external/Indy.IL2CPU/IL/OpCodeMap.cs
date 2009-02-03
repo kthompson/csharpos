@@ -112,7 +112,7 @@ namespace Indy.IL2CPU.IL
 
         public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod)
         {
-            PlugMethodAttribute xResult = (from attrib in aMethod.Method.CustomAttributes.Cast<CustomAttribute>()
+            PlugMethodAttribute xResult = (from attrib in aMethod.Method.CustomAttributes.Cast<Attribute>()
                                            where attrib.GetType() == typeof(PlugMethodAttribute)
                                            select attrib).Cast<PlugMethodAttribute>().FirstOrDefault();
             if (xResult != null)

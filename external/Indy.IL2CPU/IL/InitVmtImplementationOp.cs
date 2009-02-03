@@ -123,24 +123,25 @@ namespace Indy.IL2CPU.IL
                             {
                                 // get private implemenation
                                 interfaceMethodImplementation = xType.Methods.GetMethod(interfaceMethod.Name, requireParams);
-                            } 
-                            
-                            if (interfaceMethodImplementation == null)
-                            {
-                                try
-                                {
-                                    var xMap = xType.GetInterfaceMap(interf);
-                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                    {
-                                        if (xMap.InterfaceMethods[k] == interfaceMethod)
-                                        {
-                                            interfaceMethodImplementation = xMap.TargetMethods[k];
-                                            break;
-                                        }
-                                    }
-                                }
-                                catch { }
                             }
+
+#warning NEED TO HANDLE InterfaceMapping Below
+                            //if (interfaceMethodImplementation == null)
+                            //{
+                            //    try
+                            //    {
+                            //        var xMap = xType.GetInterfaceMap(interf);
+                            //        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                            //        {
+                            //            if (xMap.InterfaceMethods[k] == interfaceMethod)
+                            //            {
+                            //                interfaceMethodImplementation = xMap.TargetMethods[k];
+                            //                break;
+                            //            }
+                            //        }
+                            //    }
+                            //    catch { }
+                            //}
                             if (Methods.Contains(interfaceMethod))
                             {
                                 if (!xEmittedMethods.ContainsKey(interfaceMethod))
@@ -244,22 +245,23 @@ namespace Indy.IL2CPU.IL
                                                                     (from xParam in xMethod.Parameters.Cast<ParameterDefinition>()
                                                                      select xParam.ParameterType).ToArray());
                                 }
-                                if (xNewMethod == null)
-                                {
-                                    try
-                                    {
-                                        var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
-                                        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                        {
-                                            if (xMap.InterfaceMethods[k] == xMethod)
-                                            {
-                                                xNewMethod = xMap.TargetMethods[k];
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    catch { }
-                                }
+#warning NEED TO HANDLE InterfaceMap below
+                                //if (xNewMethod == null)
+                                //{
+                                //    try
+                                //    {
+                                //        var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                                //        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                //        {
+                                //            if (xMap.InterfaceMethods[k] == xMethod)
+                                //            {
+                                //                xNewMethod = xMap.TargetMethods[k];
+                                //                break;
+                                //            }
+                                //        }
+                                //    }
+                                //    catch { }
+                                //}
                                 if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
                                 xMethod = xNewMethod;
                             }

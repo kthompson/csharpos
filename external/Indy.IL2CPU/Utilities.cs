@@ -65,6 +65,16 @@ namespace Indy.IL2CPU {
         {
             throw new NotImplementedException();
         }
+
+        public static bool IsAssignableFrom(this TypeDefinition type, TypeDefinition type2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IsPointer(this TypeDefinition type)
+        {
+            throw new NotImplementedException();
+        }
 	}
 
     
