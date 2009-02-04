@@ -98,10 +98,7 @@ namespace Indy.IL2CPU.IL
 
         public virtual IList<AssemblyDefinition> GetPlugAssemblies()
         {
-            var xResult = new List<AssemblyDefinition> {
-			                                     TypeResolver.Resolve<OpCodeMap>().Module.Assembly,
-			                                     AssemblyFactory.GetAssembly("Indy.IL2CPU")
-			                                 };
+            var xResult = new List<AssemblyDefinition> { TypeResolver.Resolve<OpCodeMap>().Module.Assembly };
             return xResult;
         }
 

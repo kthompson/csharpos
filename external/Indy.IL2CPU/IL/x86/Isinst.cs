@@ -29,10 +29,7 @@ namespace Indy.IL2CPU.IL.X86
                 throw new Exception("Unable to determine Type!");
             }
             Engine.RegisterType(type);
-            Call.ScanOp(Engine.GetMethodDefinition(TypeResolver.Resolve(typeof(VTablesImpl)),
-                                             "IsInstance",
-                                             "System.Int32",
-                                             "System.Int32"));
+            Call.ScanOp(TypeResolver.GetMethod(typeof(VTablesImpl),"IsInstance", typeof(Int32), typeof(Int32)));
             Newobj.ScanOp(TypeResolver.GetConstructor<InvalidCastException>());
         }
 

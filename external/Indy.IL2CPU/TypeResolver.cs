@@ -8,11 +8,27 @@ namespace Indy.IL2CPU
 {
     public static class TypeResolver
     {
-        public static readonly Type Void = typeof(void);
-        public static readonly TypeDefinition VoidDef = Resolve(Void);
-        public static readonly TypeDefinition ObjectDef = Resolve(Object);
-        public static Type Object = typeof(object);
+        public static readonly Type Void;
+        public static readonly Type Object;
+        public static readonly TypeDefinition VoidDef;
+        public static readonly TypeDefinition ObjectDef;
 
+        private static readonly IAssemblyResolver Resolver;
+        private static readonly Dictionary<Type, TypeDefinition> Types;
+
+        static TypeResolver()
+        {
+            Resolver = new DefaultAssemblyResolver();
+            Types = new Dictionary<Type, TypeDefinition>();
+            
+            Void = typeof(void);
+            Object = typeof(object);
+            
+            VoidDef = Resolve(Void);
+            ObjectDef = Resolve(Object);
+        }
+
+        [Obsolete("Please use  Resolve<T>()")]
         public static TypeDefinition Resolve<T>()
         {
             return Resolve(typeof(T));
@@ -21,7 +37,26 @@ namespace Indy.IL2CPU
         [Obsolete("Please use  Resolve<T>()")]
         public static TypeDefinition Resolve(Type t)
         {
-            throw new NotImplementedException();
+            if (Types.ContainsKey(t))
+                return Types[t];
+
+            var asm = Resolver.Resolve(t.Assembly.FullName);
+            if (asm == null)
+                throw new Exception("Assembly not found.");
+
+            foreach (ModuleDefinition module in asm.Modules)
+            {
+                foreach (TypeDefinition type in module.Types)
+                {
+                    if (type.FullName == t.FullName)
+                    {
+                        Types.Add(t, type);
+                        return type;
+                    }
+                }
+            }
+
+            throw new Exception("Type not found.");
         }
 
         public static MethodDefinition GetConstructor<T>()

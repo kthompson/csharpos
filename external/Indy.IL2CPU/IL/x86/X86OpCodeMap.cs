@@ -109,7 +109,7 @@ namespace Indy.IL2CPU.IL.X86
 			}
 		}
 
-		private static readonly MethodDefinition InvokeMulticastRef = TypeResolver.GetMethod<MulticastDelegateImpl>("InvokeMulticast");
+        private static readonly MethodDefinition InvokeMulticastRef = TypeResolver.GetMethod<MulticastDelegateImpl>("InvokeMulticast", typeof(MulticastDelegate));
         public override void ScanCustomAssembleImplementation(MethodInformation aMethod)
         {
             base.ScanCustomAssembleImplementation(aMethod);
