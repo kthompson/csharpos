@@ -1,5 +1,5 @@
 bin
 obj
-*.pidb
-*.suo
+_ReSharper.*
 *.user
+*.suo

@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslatorTester", "TranslatorTester\TranslatorTester.csproj", "{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Translator", "Translator\Translator.csproj", "{457965B7-FD67-493E-B46A-EEFE59486A4C}"
@@ -9,17 +9,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel.Tests", "Kernel.Tests\Kernel.Tests.csproj", "{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU", "external\Indy.IL2CPU\Indy.IL2CPU.csproj", "{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Tests", "external\Indy.IL2CPU.Tests\Indy.IL2CPU.Tests.csproj", "{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualExecutionSystem", "VirtualExecutionSystem\VirtualExecutionSystem.csproj", "{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualExecutionSystem.Tests", "VirtualExecutionSystem.Tests\VirtualExecutionSystem.Tests.csproj", "{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil", "external\cecil\Mono.Cecil.csproj", "{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime", "Runtime\Runtime.csproj", "{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10192631-7936-4503-A431-922246262815}"
+	ProjectSection(SolutionItems) = preProject
+		Translator.vsmdi = Translator.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime.Tests", "Runtime.Tests\Runtime.Tests.csproj", "{3672C9AD-B76F-457E-B70F-6EB493173949}"
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Translator.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -41,14 +49,6 @@ Global
 		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,6 +61,14 @@ Global
 		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3672C9AD-B76F-457E-B70F-6EB493173949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3672C9AD-B76F-457E-B70F-6EB493173949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3672C9AD-B76F-457E-B70F-6EB493173949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3672C9AD-B76F-457E-B70F-6EB493173949}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

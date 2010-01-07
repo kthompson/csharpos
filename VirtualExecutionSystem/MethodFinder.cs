@@ -202,8 +202,11 @@ namespace VirtualExecutionSystem
 
         public void VisitTypeDefinitionCollection(TypeDefinitionCollection types)
         {
-            for (int i = 0; i < types.Count; i++)
-                VisitTypeDefinition(types[i]);
+            foreach (var item in types.Values)
+            {
+                VisitTypeDefinition(item);
+            }
+                
         }
 
         public void VisitTypeReference(TypeReference type)

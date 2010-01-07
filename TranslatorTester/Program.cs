@@ -6,7 +6,6 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Reflection;
 using Kernel;
-using Indy.IL2CPU;
 using System.IO;
 
 namespace TranslatorTester
@@ -15,7 +14,7 @@ namespace TranslatorTester
     {
         static void Main(string[] args)
         {
-            var engine = new Engine { DebugMode = DebugMode.None, OutputDirectory = @"C:\Program Files\Cosmos User Kit\Tools\asm\" };
+            //var engine = new Engine { DebugMode = DebugMode.None, OutputDirectory = @"C:\Program Files\Cosmos User Kit\Tools\asm\" };
             var location = Assembly.GetExecutingAssembly().Location;
             var plugs = new string[] {
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll",
@@ -23,7 +22,7 @@ namespace TranslatorTester
                 @"C:\Program Files\Cosmos User Kit\Tools\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.dll"
             };
             
-            engine.Execute(location, null, plugs, false, false);
+            //engine.Execute(location, null, plugs, false, false);
         }
 
         public static void Init()
