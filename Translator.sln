@@ -1,9 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslatorTester", "TranslatorTester\TranslatorTester.csproj", "{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Translator", "Translator\Translator.csproj", "{457965B7-FD67-493E-B46A-EEFE59486A4C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Translator\Compiler.csproj", "{457965B7-FD67-493E-B46A-EEFE59486A4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kernel", "Kernel\Kernel.csproj", "{35CA875B-70E6-420F-B8A3-7D568F0161BA}"
 EndProject
@@ -17,26 +15,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil", "external\ceci
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime", "Runtime\Runtime.csproj", "{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10192631-7936-4503-A431-922246262815}"
-	ProjectSection(SolutionItems) = preProject
-		Translator.vsmdi = Translator.vsmdi
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime.Tests", "Runtime.Tests\Runtime.Tests.csproj", "{3672C9AD-B76F-457E-B70F-6EB493173949}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{DBF6D3D6-6CFE-43FD-B7CB-82611F812C3A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OS", "OS", "{98AC23DB-538D-4A18-AAC6-1675DBF4C984}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler.Tests", "Compiler.Tests\Compiler.Tests.csproj", "{12AD4042-9721-4383-897D-B50F37FD70F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Assemblies", "Test Assemblies", "{C1969BDD-59F9-421E-9A23-6FEE4D293AB9}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Translator.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0184B43A-A8D1-439C-B2D0-42D4D6704A5F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{457965B7-FD67-493E-B46A-EEFE59486A4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{457965B7-FD67-493E-B46A-EEFE59486A4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{457965B7-FD67-493E-B46A-EEFE59486A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,9 +63,22 @@ Global
 		{3672C9AD-B76F-457E-B70F-6EB493173949}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3672C9AD-B76F-457E-B70F-6EB493173949}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3672C9AD-B76F-457E-B70F-6EB493173949}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12AD4042-9721-4383-897D-B50F37FD70F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12AD4042-9721-4383-897D-B50F37FD70F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12AD4042-9721-4383-897D-B50F37FD70F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12AD4042-9721-4383-897D-B50F37FD70F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{457965B7-FD67-493E-B46A-EEFE59486A4C} = {DBF6D3D6-6CFE-43FD-B7CB-82611F812C3A}
+		{12AD4042-9721-4383-897D-B50F37FD70F7} = {DBF6D3D6-6CFE-43FD-B7CB-82611F812C3A}
+		{C1969BDD-59F9-421E-9A23-6FEE4D293AB9} = {DBF6D3D6-6CFE-43FD-B7CB-82611F812C3A}
+		{59C64DBE-9061-49B9-BE6D-5EE5B0AAE3AA} = {98AC23DB-538D-4A18-AAC6-1675DBF4C984}
+		{8DB20BEE-FE23-44D8-92CC-90EE038EDB7F} = {98AC23DB-538D-4A18-AAC6-1675DBF4C984}
+		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4} = {98AC23DB-538D-4A18-AAC6-1675DBF4C984}
+		{35CA875B-70E6-420F-B8A3-7D568F0161BA} = {98AC23DB-538D-4A18-AAC6-1675DBF4C984}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		name = Translator

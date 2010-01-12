@@ -11,8 +11,8 @@ namespace VirtualExecutionSystem
         public MethodDefinition EntryPoint { get; private set; }
 
         public Engine(AssemblyDefinition assembly)
+            : this(assembly.EntryPoint)
         {
-            this.EntryPoint = assembly.EntryPoint;
         }
 
         public Engine(MethodDefinition entryPoint)
