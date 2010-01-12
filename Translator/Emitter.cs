@@ -42,49 +42,83 @@ namespace Translator
                 this.VisitInstruction(instruction);
         }
 
-        public void VisitInstruction(Instruction instr)
+        public void VisitPrimitiveInstruction(Instruction instr)
         {
             switch (instr.OpCode.Code)
             {
-                case Code.Ldc_I4_0:
-                    Emit("movl ${0}, %eax", 0);
-                    break;
-                case Code.Ldc_I4_1:
-                    Emit("movl ${0}, %eax", 1);
-                    break;
-                case Code.Ldc_I4_2:
-                    Emit("movl ${0}, %eax", 2);
-                    break;
-                case Code.Ldc_I4_3:
-                    Emit("movl ${0}, %eax", 3);
-                    break;
-                case Code.Ldc_I4_4:
-                    Emit("movl ${0}, %eax", 4);
-                    break;
-                case Code.Ldc_I4_5:
-                    Emit("movl ${0}, %eax", 5);
-                    break;
-                case Code.Ldc_I4_6:
-                    Emit("movl ${0}, %eax", 6);
-                    break;
-                case Code.Ldc_I4_7:
-                    Emit("movl ${0}, %eax", 7);
-                    break;
-                case Code.Ldc_I4_8:
-                    Emit("movl ${0}, %eax", 8);
-                    break;
+               
                 case Code.Ldc_I4:
-                    Emit("movl ${0}, %eax", instr.Operand);
+                    EmitLoadConstant((int)instr.Operand);
                     break;
 
                 case Code.Ret:
                     Emit("ret");
                     break;
-                
+
                 default:
                     Assert.Break();
                     break;
             }
+        }
+
+        private void EmitLoadConstant(int value)
+        {
+            Emit("movl ${0}, %eax", value);
+        }
+
+        public void VisitMacroInstruction(Instruction instr)
+        {
+            switch (instr.OpCode.Code)
+            {
+                case Code.Ldc_I4_0:
+                    EmitLoadConstant(0);
+                    break;
+                case Code.Ldc_I4_1:
+                    EmitLoadConstant(1);
+                    break;
+                case Code.Ldc_I4_2:
+                    EmitLoadConstant(2);
+                    break;
+                case Code.Ldc_I4_3:
+                    EmitLoadConstant(3);
+                    break;
+                case Code.Ldc_I4_4:
+                    EmitLoadConstant(4);
+                    break;
+                case Code.Ldc_I4_5:
+                    EmitLoadConstant(5);
+                    break;
+                case Code.Ldc_I4_6:
+                    EmitLoadConstant(6);
+                    break;
+                case Code.Ldc_I4_7:
+                    EmitLoadConstant(7);
+                    break;
+                case Code.Ldc_I4_8:
+                    EmitLoadConstant(8);
+                    break;
+            }
+        }
+
+        public void VisitInstruction(Instruction instr)
+        {
+            switch(instr.OpCode.OpCodeType)
+            {
+                case OpCodeType.Annotation:
+                
+                case OpCodeType.Nternal:
+                case OpCodeType.Objmodel:
+                case OpCodeType.Prefix:
+                    Assert.Break();
+                    break;
+                case OpCodeType.Macro:
+                    this.VisitMacroInstruction(instr);
+                    break;
+                case OpCodeType.Primitive:
+                    this.VisitPrimitiveInstruction(instr);
+                    break;
+            }
+            
         }
 
         public void VisitExceptionHandlerCollection(ExceptionHandlerCollection seh)

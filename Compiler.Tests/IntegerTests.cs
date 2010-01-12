@@ -12,7 +12,7 @@ using Assert = NUnit.Framework.Assert;
 namespace Compiler.Tests
 {
     [TestFixture]
-    public class Phase1Tests : CompilerTest
+    public class IntegerTests : CompilerTest
     {
         [Test]
         public void IntegerDelegateTest()
@@ -36,7 +36,7 @@ namespace Compiler.Tests
             Assert.AreEqual("0\r\n", CompileAndRunMethod(il =>
                                                              {
                                                                  il.Emit(OpCodes.Ldc_I4_0);
-                                                                 il.Emit(OpCodes.Ret);
+                                                                 il.Emit(OpCodes.Ret);  
                                                              }));
 
             Assert.AreEqual("1\r\n", CompileAndRunMethod(il =>

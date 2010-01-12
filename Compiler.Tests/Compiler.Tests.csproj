@@ -81,7 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompilerTest.cs" />
-    <Compile Include="Phase1Tests.cs" />
+    <Compile Include="ImmediateConstants.cs" />
+    <Compile Include="IntegerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
