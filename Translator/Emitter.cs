@@ -73,7 +73,10 @@ namespace Translator
                 case Code.Ldc_I4_8:
                     Emit("movl ${0}, %eax", 8);
                     break;
-                
+                case Code.Ldc_I4:
+                    Emit("movl ${0}, %eax", instr.Operand);
+                    break;
+
                 case Code.Ret:
                     Emit("ret");
                     break;
