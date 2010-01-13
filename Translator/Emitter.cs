@@ -50,7 +50,15 @@ namespace Translator
                 case Code.Ldc_I4:
                     EmitLoadConstant((int)instr.Operand);
                     break;
-
+                case Code.Ldc_I8:
+                    EmitLoadConstant((long)instr.Operand);
+                    break;
+                case Code.Ldc_R4:
+                    EmitLoadConstant((float)instr.Operand);
+                    break;
+                case Code.Ldc_R8:
+                    EmitLoadConstant((double)instr.Operand);
+                    break;
                 case Code.Ret:
                     Emit("ret");
                     break;
@@ -66,10 +74,61 @@ namespace Translator
             Emit("movl ${0}, %eax", value);
         }
 
+        private void EmitLoadConstant(long value)
+        {
+            //split into upper 8 and lower 8
+            long upper = (value) >> 32;
+            long lower = (value) & 0xffffffff;
+            Emit("movl ${0}, %eax", upper);
+            Emit("movl ${0}, %edx", lower);
+            throw new NotImplementedException();
+        }
+
+        private void EmitLoadConstant(float value)
+        {
+            /*
+              	.section .rdata,"dr"
+	            .align 4
+            LC0:
+	            .long	1078523331   (3.14)
+            	.text
+            .globl _scheme_entry
+	            .def	_scheme_entry;	.scl	2;	.type	32;	.endef
+            _scheme_entry:
+	            flds	LC0
+	            ret
+             */
+            throw new NotImplementedException();
+            //Emit("movl ${0}, %eax", value);
+        }
+
+        private void EmitLoadConstant(double value)
+        {
+            /*
+            	.section .rdata,"dr"
+            	.align 8
+            LC0:
+            	.long	1374389535
+            	.long	1074339512
+            	.text
+            	.p2align 4,,15
+            .globl _scheme_entry
+            	.def	_scheme_entry;	.scl	2;	.type	32;	.endef
+            _scheme_entry:
+            	fldl	LC0
+            	ret
+             */
+            throw new NotImplementedException();
+            //Emit("movl ${0}, %eax", value);
+        }
+
         public void VisitMacroInstruction(Instruction instr)
         {
             switch (instr.OpCode.Code)
             {
+                case Code.Ldc_I4_M1:
+                    EmitLoadConstant(-1);
+                    break;
                 case Code.Ldc_I4_0:
                     EmitLoadConstant(0);
                     break;
