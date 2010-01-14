@@ -11,19 +11,41 @@ namespace Translator
     {
         private TextWriter _out;
 
-        public Emitter(TextWriter writer)
-        {
-            this._out = writer;
-        }
-
         public Emitter()
             : this(new StringWriter())
         {
         }
 
-        private void Emit(string format, params object[] args) 
+        public Emitter(TextWriter writer)
         {
-            _out.WriteLine(format, args);
+            _out = writer;
+        }
+
+        private Dictionary<SectionType, Section> _sections = new Dictionary<SectionType, Section>();
+        protected Section Section(SectionType type)
+        {
+            if(!_sections.ContainsKey(type))
+            {
+                _sections.Add(type, new Section(type));
+            }
+
+            return _sections[type];
+        }
+
+        protected Section Text
+        {
+            get
+            {
+                return Section(SectionType.Text);
+            }
+        }
+
+        protected Section ROData
+        {
+            get
+            {
+                return Section(SectionType.ReadOnlyData);
+            }
         }
 
         #region ICodeVisitor Members
@@ -31,9 +53,9 @@ namespace Translator
         public void VisitMethodBody(MethodBody body)
         {
             var name = body.Method.Name;
-            Emit(".globl _{0}", name);
-            Emit("  .def	_{0};	.scl	2;	.type	32;	.endef", name);
-            Emit("_{0}:", name);
+            this.Text.Emit(".globl _{0}", name);
+            this.Text.Emit("\t.def\t_{0};\t.scl\t2;\t.type\t32;\t.endef", name);
+            this.Text.Emit("_{0}:", name);
         }
 
         public void VisitInstructionCollection(InstructionCollection instructions)
@@ -48,19 +70,19 @@ namespace Translator
             {
                
                 case Code.Ldc_I4:
-                    EmitLoadConstant((int)instr.Operand);
+                    EmitLoadConstantI4((int)instr.Operand);
                     break;
                 case Code.Ldc_I8:
-                    EmitLoadConstant((long)instr.Operand);
+                    EmitLoadConstantI8((long)instr.Operand);
                     break;
                 case Code.Ldc_R4:
-                    EmitLoadConstant((float)instr.Operand);
+                    EmitLoadConstantR4((float)instr.Operand);
                     break;
                 case Code.Ldc_R8:
-                    EmitLoadConstant((double)instr.Operand);
+                    EmitLoadConstantR8((double)instr.Operand);
                     break;
                 case Code.Ret:
-                    Emit("ret");
+                    this.Text.EmitReturn();
                     break;
 
                 default:
@@ -69,28 +91,28 @@ namespace Translator
             }
         }
 
-        private void EmitLoadConstant(int value)
+        private void EmitLoadConstantI4(int value)
         {
-            Emit("movl ${0}, %eax", value);
+            this.Text.EmitMoveImmediate(value.ToString(), "eax");
         }
 
-        private void EmitLoadConstant(long value)
+        private void EmitLoadConstantI8(long value)
         {
             //split into upper 8 and lower 8
             long upper = (value) >> 32;
             long lower = (value) & 0xffffffff;
-            Emit("movl ${0}, %eax", upper);
-            Emit("movl ${0}, %edx", lower);
+            this.Text.EmitMoveImmediate(upper.ToString(), "eax");
+            this.Text.EmitMoveImmediate(lower.ToString(), "edx");
             throw new NotImplementedException();
         }
 
-        private void EmitLoadConstant(float value)
+        private void EmitLoadConstantR4(float value)
         {
             /*
               	.section .rdata,"dr"
 	            .align 4
             LC0:
-	            .long	1078523331   (3.14)
+	            .long	1078523331 
             	.text
             .globl _scheme_entry
 	            .def	_scheme_entry;	.scl	2;	.type	32;	.endef
@@ -98,11 +120,11 @@ namespace Translator
 	            flds	LC0
 	            ret
              */
-            throw new NotImplementedException();
-            //Emit("movl ${0}, %eax", value);
+            var label = this.ROData.Label(section => section.EmitLong(value.ToIEEE754()));
+            this.Text.Emit("\tflds\t{0}", label);
         }
 
-        private void EmitLoadConstant(double value)
+        private void EmitLoadConstantR8(double value)
         {
             /*
             	.section .rdata,"dr"
@@ -127,34 +149,34 @@ namespace Translator
             switch (instr.OpCode.Code)
             {
                 case Code.Ldc_I4_M1:
-                    EmitLoadConstant(-1);
+                    EmitLoadConstantI4(-1);
                     break;
                 case Code.Ldc_I4_0:
-                    EmitLoadConstant(0);
+                    EmitLoadConstantI4(0);
                     break;
                 case Code.Ldc_I4_1:
-                    EmitLoadConstant(1);
+                    EmitLoadConstantI4(1);
                     break;
                 case Code.Ldc_I4_2:
-                    EmitLoadConstant(2);
+                    EmitLoadConstantI4(2);
                     break;
                 case Code.Ldc_I4_3:
-                    EmitLoadConstant(3);
+                    EmitLoadConstantI4(3);
                     break;
                 case Code.Ldc_I4_4:
-                    EmitLoadConstant(4);
+                    EmitLoadConstantI4(4);
                     break;
                 case Code.Ldc_I4_5:
-                    EmitLoadConstant(5);
+                    EmitLoadConstantI4(5);
                     break;
                 case Code.Ldc_I4_6:
-                    EmitLoadConstant(6);
+                    EmitLoadConstantI4(6);
                     break;
                 case Code.Ldc_I4_7:
-                    EmitLoadConstant(7);
+                    EmitLoadConstantI4(7);
                     break;
                 case Code.Ldc_I4_8:
-                    EmitLoadConstant(8);
+                    EmitLoadConstantI4(8);
                     break;
             }
         }
@@ -177,7 +199,6 @@ namespace Translator
                     this.VisitPrimitiveInstruction(instr);
                     break;
             }
-            
         }
 
         public void VisitExceptionHandlerCollection(ExceptionHandlerCollection seh)
@@ -212,7 +233,11 @@ namespace Translator
 
         public void TerminateMethodBody(MethodBody body)
         {
-            
+            if (this._sections.ContainsKey(SectionType.ReadOnlyData))
+                this._sections[SectionType.ReadOnlyData].Flush(_out);
+
+            if (this._sections.ContainsKey(SectionType.Text))
+                this._sections[SectionType.Text].Flush(_out);
         }
 
         #endregion

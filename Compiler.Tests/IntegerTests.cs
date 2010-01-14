@@ -34,61 +34,61 @@ namespace Compiler.Tests
         public void Integers()
         {
 
-            Assert.AreEqual("0\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("0\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4_0);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("1\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("1\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4_1);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("-1\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("-1\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, -1);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("-1\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("-1\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4_M1);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("10\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("10\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, 10);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("-10\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("-10\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, -10);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("2736\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("2736\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, 2736);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("-2736\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("-2736\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, -2736);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("536870911\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("536870911\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, 536870911);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("-536870912\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("-536870912\r\n", CompileAndRunMethod<int>(il =>
             {
                 il.Emit(OpCodes.Ldc_I4, -536870912);
                 il.Emit(OpCodes.Ret);
@@ -98,44 +98,59 @@ namespace Compiler.Tests
         [Test]
         public void Longs()
         {
-            Assert.AreEqual("-5368709121234\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("-5368709121234\r\n", CompileAndRunMethod<long>(il =>
             {
                 il.Emit(OpCodes.Ldc_I8, -5368709121234L);
                 il.Emit(OpCodes.Ret);
             }));
 
-            Assert.AreEqual("429496121113456735\r\n", CompileAndRunMethod(il =>
+            Assert.AreEqual("429496121113456735\r\n", CompileAndRunMethod<long>(il =>
             {
                 il.Emit(OpCodes.Ldc_I8, 429496121113456735L);
                 il.Emit(OpCodes.Ret);
             }));
         }
 
-        private string CompileAndRunMethod(Action<CilWorker> action)
+        [Test]
+        public void Floats()
         {
-            return CompileAndRunMethod(GenerateMethod(action));
+            Assert.AreEqual("3.140\r\n", CompileAndRunMethod<float>(il =>
+            {
+                il.Emit(OpCodes.Ldc_R4, 3.14f);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("-3.140\r\n", CompileAndRunMethod<float>(il =>
+            {
+                il.Emit(OpCodes.Ldc_R4, -3.14f);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("-9.750\r\n", CompileAndRunMethod<float>(il =>
+            {
+                il.Emit(OpCodes.Ldc_R4, -9.75f);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("9.750\r\n", CompileAndRunMethod<float>(il =>
+            {
+                il.Emit(OpCodes.Ldc_R4, 9.75f);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("0.141\r\n", CompileAndRunMethod<float>(il =>
+            {
+                il.Emit(OpCodes.Ldc_R4, 0.141234f);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("1233.114\r\n", CompileAndRunMethod<float>(il =>
+            {
+                il.Emit(OpCodes.Ldc_R4, 1233.114f);
+                il.Emit(OpCodes.Ret);
+            }));
         }
 
-        private string CompileAndRunMethod<T>(Func<T> action)
-        {
-            return CompileAndRunMethod(GenerateMethod(action));
-        }
-
-        private MethodDefinition GenerateMethod(Action<CilWorker> action)
-        {
-            var type = GenerateType();
-            var method = new MethodDefinition(RandomString("TestMethod"), MethodAttributes.Static | MethodAttributes.Public, GetCorlibType<int>());
-            action(method.Body.CilWorker);
-            type.Methods.Add(method);
-            return method;
-        }
-
-        private MethodDefinition GenerateMethod<T>(Func<T> action)
-        {
-            var method = this.Assembly.MainModule.Import(action.Method).Resolve();
-            method.Name = RandomString("TestMethod");
-            method.Body.Simplify();
-            return method;
-        }
+        
     }
 }

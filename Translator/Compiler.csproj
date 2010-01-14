@@ -68,6 +68,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -103,6 +104,7 @@
   <ItemGroup>
     <Compile Include="AssemblyCompiler.cs" />
     <Compile Include="Assert.cs" />
+    <Compile Include="DuplicateLabelException.cs" />
     <Compile Include="Emitter.cs" />
     <Compile Include="IAssemblyCompiler.cs" />
     <Compile Include="ICompiler.cs" />
@@ -110,10 +112,14 @@
     <Compile Include="IMethodCompiler.cs" />
     <Compile Include="ITranslator.cs" />
     <Compile Include="ITypeCompiler.cs" />
+    <Compile Include="MathExtensions.cs" />
     <Compile Include="MethodCompiler.cs" />
     <Compile Include="MethodDependencies.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IMethod.cs" />
+    <Compile Include="Section.cs" />
+    <Compile Include="SectionLabel.cs" />
+    <Compile Include="SectionType.cs" />
     <Compile Include="X86\AddressingMethod.cs" />
     <Compile Include="X86\Instruction.cs" />
     <Compile Include="X86\Operand.cs" />

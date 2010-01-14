@@ -83,6 +83,7 @@
     <Compile Include="CompilerTest.cs" />
     <Compile Include="ImmediateConstants.cs" />
     <Compile Include="IntegerTests.cs" />
+    <Compile Include="MathExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

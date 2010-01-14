@@ -5,12 +5,40 @@ using System.Text;
 using Mono.Cecil;
 using System.IO;
 using System.Diagnostics;
+using Mono.Cecil.Cil;
 using Translator;
 
 namespace Compiler.Tests
 {
     public abstract class CompilerTest
     {
+        protected string CompileAndRunMethod<TReturn>(Action<CilWorker> action)
+        {
+            return CompileAndRunMethod(GenerateMethod<TReturn>(action));
+        }
+
+        protected string CompileAndRunMethod<T>(Func<T> action)
+        {
+            return CompileAndRunMethod(GenerateMethod(action));
+        }
+
+        protected MethodDefinition GenerateMethod<TReturn>(Action<CilWorker> action)
+        {
+            var type = GenerateType();
+            var method = new MethodDefinition(RandomString("TestMethod"), MethodAttributes.Static | MethodAttributes.Public, GetCorlibType<TReturn>());
+            action(method.Body.CilWorker);
+            type.Methods.Add(method);
+            return method;
+        }
+
+        protected MethodDefinition GenerateMethod<T>(Func<T> action)
+        {
+            var method = this.Assembly.MainModule.Import(action.Method).Resolve();
+            method.Name = RandomString("TestMethod");
+            method.Body.Simplify();
+            return method;
+        }
+
         protected string CompileAndRunMethod(MethodDefinition method)
         {
             try
@@ -90,11 +118,32 @@ namespace Compiler.Tests
 
         protected virtual void GenerateRuntime(TextWriter runtime, MethodDefinition method)
         {
+            string printf;
+            string returnType;
+            switch (method.ReturnType.ReturnType.Name.ToLower())
+            {
+                case "single":
+                    printf = "%.3f";
+                    returnType = "float";
+                    break;
+                case "int32":
+                    printf = "%d";
+                    returnType = "long";
+                    break;
+                default:
+                    printf = "%d";
+                    returnType = "long";
+                    Debugger.Break();
+                    break;
+            }
+
             runtime.WriteLine("#include <stdio.h>");
+            runtime.WriteLine();
+            runtime.WriteLine(string.Format("{0} {1}();", returnType, method.Name));
             runtime.WriteLine();
             runtime.WriteLine("int main(int argc, char** argv)");
             runtime.WriteLine("{");
-            runtime.WriteLine(string.Format("	printf(\"%d\\n\", {0}());", method.Name));
+            runtime.WriteLine(string.Format("	printf(\"{0}\\n\", {1}());", printf, method.Name));
             runtime.WriteLine("	return 0;");
             runtime.WriteLine("}");
         }
