@@ -119,6 +119,7 @@ namespace Compiler.Tests
         protected virtual void GenerateRuntime(TextWriter runtime, MethodDefinition method)
         {
             string printf;
+            string function = method.Name + "()";
             string returnType;
             switch (method.ReturnType.ReturnType.Name.ToLower())
             {
@@ -130,20 +131,27 @@ namespace Compiler.Tests
                     printf = "%d";
                     returnType = "long";
                     break;
+                case "boolean":
+                    printf = "%s";
+                    returnType = "bool";
+                    function += " ? \"True\" : \"False\"";
+                    break;
                 default:
                     printf = "%d";
                     returnType = "long";
-                    Debugger.Break();
+                    if(Debugger.IsAttached)
+                        Debugger.Break();
                     break;
             }
 
             runtime.WriteLine("#include <stdio.h>");
+            runtime.WriteLine("#include <stdbool.h>");
             runtime.WriteLine();
             runtime.WriteLine(string.Format("{0} {1}();", returnType, method.Name));
             runtime.WriteLine();
             runtime.WriteLine("int main(int argc, char** argv)");
             runtime.WriteLine("{");
-            runtime.WriteLine(string.Format("	printf(\"{0}\\n\", {1}());", printf, method.Name));
+            runtime.WriteLine(string.Format("	printf(\"{0}\\n\", {1});", printf, function));
             runtime.WriteLine("	return 0;");
             runtime.WriteLine("}");
         }
@@ -211,7 +219,7 @@ namespace Compiler.Tests
             outputTmp.Remove(outputTmp.Length - 2, 2);
             errorTmp.Remove(errorTmp.Length - 2, 2);
 
-            output = outputTmp.ToString();
+            output = outputTmp.ToString().Trim();
             error = errorTmp.ToString();
 
             return proc.ExitCode;
