@@ -68,7 +68,6 @@ namespace Translator
         {
             switch (instr.OpCode.Code)
             {
-               
                 case Code.Ldc_I4:
                     EmitLoadConstantI4((int)instr.Operand);
                     break;
@@ -86,8 +85,7 @@ namespace Translator
                     break;
 
                 default:
-                    Assert.Break();
-                    break;
+                    throw new NotImplementedException();
             }
         }
 
@@ -178,6 +176,11 @@ namespace Translator
                 case Code.Ldc_I4_8:
                     EmitLoadConstantI4(8);
                     break;
+                case Code.Ldc_I4_S:
+                    EmitLoadConstantI4(Convert.ToInt16((sbyte)instr.Operand));
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -185,19 +188,14 @@ namespace Translator
         {
             switch(instr.OpCode.OpCodeType)
             {
-                case OpCodeType.Annotation:
-                
-                case OpCodeType.Nternal:
-                case OpCodeType.Objmodel:
-                case OpCodeType.Prefix:
-                    Assert.Break();
-                    break;
                 case OpCodeType.Macro:
                     this.VisitMacroInstruction(instr);
                     break;
                 case OpCodeType.Primitive:
                     this.VisitPrimitiveInstruction(instr);
                     break;
+                default:
+                    throw new NotImplementedException();
             }
         }
 

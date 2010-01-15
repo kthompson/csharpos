@@ -127,6 +127,83 @@ namespace Compiler.Tests
             }));
         }
 
+
+        [Test]
+        public void Characters()
+        {
+            Assert.AreEqual("a", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)'a');
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("b", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x62);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("c", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x63);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("d", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x64);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("e", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x65);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("f", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x66);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("0", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x30);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("1", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x31);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("2", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x32);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("3", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x33);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("4", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x34);
+                il.Emit(OpCodes.Ret);
+            }));
+
+            Assert.AreEqual("5", CompileAndRunMethod<char>(il =>
+            {
+                il.Emit(OpCodes.Ldc_I4_S, (sbyte)0x35);
+                il.Emit(OpCodes.Ret);
+            }));
+        }
+
         [Test]
         public void Floats()
         {

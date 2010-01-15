@@ -136,6 +136,10 @@ namespace Compiler.Tests
                     returnType = "bool";
                     function += " ? \"True\" : \"False\"";
                     break;
+                case "char":
+                    printf = "%c";
+                    returnType = "char";
+                    break;
                 default:
                     printf = "%d";
                     returnType = "long";
