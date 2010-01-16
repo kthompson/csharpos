@@ -1,26 +1,19 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Translator;
 
-namespace Translator.X86
+namespace Compiler.X86
 {
     public class Translator : ITranslator
     {
 
         #region ITranslator Members
 
-        public IMethod TranslateMethod(MethodDefinition method)
-        {
-			throw new NotImplementedException();
-        }
-
         public List<MethodReference> CollectMethodReferences(MethodDefinition method)
         {
             var list = new List<MethodReference>();
-            foreach (Mono.Cecil.Cil.Instruction instruction in method.Body.Instructions)
+            foreach (Instruction instruction in method.Body.Instructions)
             {
                 var reference = instruction.Operand as MethodReference;
                 if (reference == null)
@@ -34,3 +27,5 @@ namespace Translator.X86
         #endregion
     }
 }
+
+

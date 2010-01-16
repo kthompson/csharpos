@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
-namespace Translator
+namespace Compiler
 {
     /// <summary>
     /// Provides static methods for common code debugging tools
     /// </summary>
-    public static class Assert
+    public static class Helper
     {
         #region Public Methods
 
@@ -224,3 +221,5 @@ namespace Translator
 
     }
 }
+
+

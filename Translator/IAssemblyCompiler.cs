@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Mono.Cecil;
+﻿using Mono.Cecil;
+using Translator;
 
-namespace Translator
+namespace Compiler
 {
     public interface IAssemblyCompiler : ICompiler
     {
         AssemblyDefinition Assembly { get; }
     }
 }
+
+

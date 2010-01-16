@@ -183,7 +183,7 @@ namespace Compiler.Tests
             if (Execute("gcc -Wall test.s runtime.c -o test.exe", out error, out output) == 0) 
                 return;
 
-            Assert.Break();
+            Helper.Break();
         }
 
         private static void CompileMethod(MethodDefinition method)

@@ -8,8 +8,8 @@
     <ProjectGuid>{457965B7-FD67-493E-B46A-EEFE59486A4C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Translator</RootNamespace>
-    <AssemblyName>Translator</AssemblyName>
+    <RootNamespace>Compiler</RootNamespace>
+    <AssemblyName>Compiler</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -43,6 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -108,6 +109,7 @@
     <Compile Include="DuplicateLabelException.cs" />
     <Compile Include="Emitter.cs" />
     <Compile Include="IAssemblyCompiler.cs" />
+    <Compile Include="ICodeVisitor.cs" />
     <Compile Include="ICompiler.cs" />
     <Compile Include="IEmitter.cs" />
     <Compile Include="IMethodCompiler.cs" />
@@ -115,14 +117,18 @@
     <Compile Include="ITypeCompiler.cs" />
     <Compile Include="MathExtensions.cs" />
     <Compile Include="MethodCompiler.cs" />
+    <Compile Include="MethodContext.cs" />
     <Compile Include="MethodDependencies.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IMethod.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="SectionLabel.cs" />
     <Compile Include="SectionType.cs" />
     <Compile Include="X86\AddressingMethod.cs" />
-    <Compile Include="X86\Instruction.cs" />
+    <Compile Include="X86\Code.cs" />
+    <Compile Include="X86\CilToX86CodeVisitor.cs" />
+    <Compile Include="X86\X86Instruction.cs" />
+    <Compile Include="X86\OpCode.cs" />
+    <Compile Include="X86\OpCodes.cs" />
     <Compile Include="X86\Operand.cs" />
     <Compile Include="X86\OperandType.cs" />
     <Compile Include="X86\Translator.cs" />

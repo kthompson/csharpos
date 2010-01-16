@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Translator;
-using Assert = NUnit.Framework.Assert;
 
 namespace Compiler.Tests
 {

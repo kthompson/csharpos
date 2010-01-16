@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Translator.X86
+﻿namespace Compiler.X86
 {
     public class Operand
     {
@@ -17,3 +12,5 @@ namespace Translator.X86
         }
     }
 }
+
+

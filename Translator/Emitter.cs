@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using Mono.Cecil.Cil;
+using Translator;
 
-namespace Translator
+namespace Compiler
 {
-    public class Emitter : IEmitter
+    public class Emitter : BaseCodeVisitor, IEmitter
     {
         private TextWriter _out;
 
@@ -50,7 +49,7 @@ namespace Translator
 
         #region ICodeVisitor Members
 
-        public void VisitMethodBody(MethodBody body)
+        public override void VisitMethodBody(MethodBody body)
         {
             var name = body.Method.Name;
             this.Text.Emit(".globl _{0}", name);
@@ -58,7 +57,7 @@ namespace Translator
             this.Text.Emit("_{0}:", name);
         }
 
-        public void VisitInstructionCollection(InstructionCollection instructions)
+        public override void VisitInstructionCollection(InstructionCollection instructions)
         {
             foreach (var instruction in instructions)
                 this.VisitInstruction(instruction);
@@ -142,94 +141,19 @@ namespace Translator
             //Emit("movl ${0}, %eax", value);
         }
 
-        public void VisitMacroInstruction(Instruction instr)
+        public override void VisitInstruction(IInstruction instr)
         {
-            switch (instr.OpCode.Code)
+            var instruction = instr as Instruction;
+            if (instruction != null)
             {
-                case Code.Ldc_I4_M1:
-                    EmitLoadConstantI4(-1);
-                    break;
-                case Code.Ldc_I4_0:
-                    EmitLoadConstantI4(0);
-                    break;
-                case Code.Ldc_I4_1:
-                    EmitLoadConstantI4(1);
-                    break;
-                case Code.Ldc_I4_2:
-                    EmitLoadConstantI4(2);
-                    break;
-                case Code.Ldc_I4_3:
-                    EmitLoadConstantI4(3);
-                    break;
-                case Code.Ldc_I4_4:
-                    EmitLoadConstantI4(4);
-                    break;
-                case Code.Ldc_I4_5:
-                    EmitLoadConstantI4(5);
-                    break;
-                case Code.Ldc_I4_6:
-                    EmitLoadConstantI4(6);
-                    break;
-                case Code.Ldc_I4_7:
-                    EmitLoadConstantI4(7);
-                    break;
-                case Code.Ldc_I4_8:
-                    EmitLoadConstantI4(8);
-                    break;
-                case Code.Ldc_I4_S:
-                    EmitLoadConstantI4(Convert.ToInt16((sbyte)instr.Operand));
-                    break;
-                default:
-                    throw new NotImplementedException();
+                Helper.Break();
+                return;
             }
+
+            this.Text.Emit(instr.ToString());
         }
 
-        public void VisitInstruction(Instruction instr)
-        {
-            switch(instr.OpCode.OpCodeType)
-            {
-                case OpCodeType.Macro:
-                    this.VisitMacroInstruction(instr);
-                    break;
-                case OpCodeType.Primitive:
-                    this.VisitPrimitiveInstruction(instr);
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public void VisitExceptionHandlerCollection(ExceptionHandlerCollection seh)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void VisitExceptionHandler(ExceptionHandler eh)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void VisitVariableDefinitionCollection(VariableDefinitionCollection variables)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void VisitVariableDefinition(VariableDefinition var)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void VisitScopeCollection(ScopeCollection scopes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void VisitScope(Scope scope)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TerminateMethodBody(MethodBody body)
+        public override void TerminateMethodBody(MethodBody body)
         {
             if (this._sections.ContainsKey(SectionType.ReadOnlyData))
                 this._sections[SectionType.ReadOnlyData].Flush(_out);
@@ -241,3 +165,5 @@ namespace Translator
         #endregion
     }
 }
+
+

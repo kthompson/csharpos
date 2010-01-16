@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Compiler.X86;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
+using Translator;
 
-namespace Translator
+namespace Compiler
 {
     public class MethodCompiler : IMethodCompiler
     {
@@ -14,12 +11,7 @@ namespace Translator
         private MethodDefinition _methodDefinition;
         public MethodDefinition MethodDefinition
         {
-            get
-            {
-                if (_methodDefinition == null)
-                    _methodDefinition = this.Method.Resolve();
-                return _methodDefinition;
-            }
+            get { return _methodDefinition ?? (_methodDefinition = this.Method.Resolve()); }
         }
 
         #region IMethodCompiler Members
@@ -37,8 +29,8 @@ namespace Translator
 
         public MethodCompiler(MethodReference method, IEmitter emitter, IAssemblyCompiler ac)
         {
-            Assert.IsNotNull(method);
-            Assert.IsNotNull(emitter);
+            Helper.IsNotNull(method);
+            Helper.IsNotNull(emitter);
 
             this.AssemblyCompiler = ac;
             this.Method = method;
@@ -49,13 +41,12 @@ namespace Translator
 
         public void Compile()
         {
+            this.MethodDefinition.Body.Accept(new CilToX86CodeVisitor());
             this.MethodDefinition.Body.Accept(this.Emitter);
         }
 
         #endregion
-
-        protected void Emit(string asm)
-        {
-        }
     }
 }
+
+

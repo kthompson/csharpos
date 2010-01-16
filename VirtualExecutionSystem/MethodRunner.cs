@@ -53,7 +53,7 @@ namespace VirtualExecutionSystem
             }
         }
 
-        public override void VisitInstruction(Instruction instr)
+        public override void VisitInstruction(IInstruction instr)
         {
             switch (instr.OpCode.Code)
             {

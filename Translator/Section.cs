@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using Translator;
 
-namespace Translator
+namespace Compiler
 {
     public class Section
     {
@@ -32,6 +31,9 @@ namespace Translator
 
         protected SectionLabel Label(string name, Action<Section> action)
         {
+            Helper.IsNotNull(name, "name");
+            Helper.IsNotNull(action, "action");
+
             if (_labels.Contains(name))
                 throw new DuplicateLabelException(name);
 
@@ -90,3 +92,5 @@ namespace Translator
         }
     }
 }
+
+

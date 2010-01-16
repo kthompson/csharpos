@@ -9,7 +9,6 @@ namespace Translator
 {
     public interface ITranslator
     {
-        IMethod TranslateMethod(MethodDefinition method);
         List<MethodReference> CollectMethodReferences(MethodDefinition method);
     }
 }
