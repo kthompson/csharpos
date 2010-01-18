@@ -6,7 +6,6 @@ using Mono.Cecil;
 using System.IO;
 using System.Diagnostics;
 using Mono.Cecil.Cil;
-using Translator;
 
 namespace Compiler.Tests
 {

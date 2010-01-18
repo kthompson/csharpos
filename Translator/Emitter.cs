@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Mono.Cecil.Cil;
-using Translator;
 
 namespace Compiler
 {

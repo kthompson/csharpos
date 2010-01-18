@@ -1,5 +1,4 @@
 ﻿using Mono.Cecil;
-using Translator;
 
 namespace Compiler
 {

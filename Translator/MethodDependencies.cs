@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Translator
+namespace Compiler
 {
     public class MethodDependencies : BaseReflectionVisitor
     {
@@ -27,7 +25,7 @@ namespace Translator
 
             var resolver = asm.Resolver;
             foreach (AssemblyNameReference reference in module.AssemblyReferences)
-		        this.Assemblies.Add(resolver.Resolve(reference));
+                this.Assemblies.Add(resolver.Resolve(reference));
         }
 
         private MethodDefinition[] ResolveMemberReference(MemberReference member)
@@ -119,3 +117,5 @@ namespace Translator
         }
     }
 }
+
+

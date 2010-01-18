@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Translator;
 using System.IO;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;

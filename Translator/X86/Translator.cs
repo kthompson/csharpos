@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Translator;
 
 namespace Compiler.X86
 {

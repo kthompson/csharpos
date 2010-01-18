@@ -1,6 +1,5 @@
 ﻿using Compiler.X86;
 using Mono.Cecil;
-using Translator;
 
 namespace Compiler
 {
