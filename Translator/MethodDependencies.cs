@@ -25,7 +25,7 @@ namespace Compiler
 
             var resolver = asm.Resolver;
             foreach (AssemblyNameReference reference in module.AssemblyReferences)
-                this.Assemblies.Add(resolver.Resolve(reference));
+		        this.Assemblies.Add(resolver.Resolve(reference));
         }
 
         private MethodDefinition[] ResolveMemberReference(MemberReference member)
@@ -48,18 +48,10 @@ namespace Compiler
         private MethodDefinition ResolveMethodReference(MethodReference method)
         {
             var typeName = method.DeclaringType.FullName;
-            foreach (var asm in this.Assemblies)
-            {
-                foreach (ModuleDefinition module in asm.Modules)
-                {
-                    var type = module.Types[typeName];
-                    if (type == null)
-                        continue;
-
-                    return type.Methods.GetMethod(method.Name, method.Parameters);
-                }
-            }
-            return null;
+            return (from asm in this.Assemblies
+                    from type in asm.Modules.Select(module => module.Types[typeName])
+                    where type != null
+                    select type.Methods.GetMethod(method.Name, method.Parameters)).FirstOrDefault();
         }
 
         public override void VisitMethodDefinition(MethodDefinition method)
@@ -71,12 +63,12 @@ namespace Compiler
   
             this.Dependencies.Add(method);
 
-            if (method.HasBody)
-            {
+            if (!method.HasBody) return;
+
                 foreach (Instruction instruction in method.Body.Instructions)
                 {
-                    if (instruction.Operand != null)
-                    {
+                if (instruction.Operand == null) continue;
+
                         switch (instruction.OpCode.Code)
                         {
                             case Code.Call:
@@ -104,8 +96,6 @@ namespace Compiler
                         }
                     }
                 }
-            }
-        }
 
 
 

@@ -202,6 +202,14 @@ namespace Compiler
                 Throw(() => new ArgumentOutOfRangeException(argName));
         }
 
+
+        [DebuggerHidden]
+        public static void NotSupported(string message = "")
+        {
+            Break();
+            throw new NotSupportedException(message);
+        }
+
         #endregion
 
         #region Internal Methods
@@ -218,7 +226,6 @@ namespace Compiler
         }
 
         #endregion
-
     }
 }
 

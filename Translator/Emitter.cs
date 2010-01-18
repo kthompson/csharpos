@@ -20,12 +20,10 @@ namespace Compiler
         }
 
         private Dictionary<SectionType, Section> _sections = new Dictionary<SectionType, Section>();
-        protected Section Section(SectionType type)
+        public Section Section(SectionType type)
         {
             if(!_sections.ContainsKey(type))
-            {
                 _sections.Add(type, new Section(type));
-            }
 
             return _sections[type];
         }
@@ -62,90 +60,22 @@ namespace Compiler
                 this.VisitInstruction(instruction);
         }
 
-        public void VisitPrimitiveInstruction(Instruction instr)
-        {
-            switch (instr.OpCode.Code)
-            {
-                case Code.Ldc_I4:
-                    EmitLoadConstantI4((int)instr.Operand);
-                    break;
-                case Code.Ldc_I8:
-                    EmitLoadConstantI8((long)instr.Operand);
-                    break;
-                case Code.Ldc_R4:
-                    EmitLoadConstantR4((float)instr.Operand);
-                    break;
-                case Code.Ldc_R8:
-                    EmitLoadConstantR8((double)instr.Operand);
-                    break;
-                case Code.Ret:
-                    this.Text.EmitReturn();
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        private void EmitLoadConstantI4(int value)
-        {
-            this.Text.EmitMoveImmediate(value.ToString(), "eax");
-        }
-
-        private void EmitLoadConstantI8(long value)
-        {
-            //split into upper 8 and lower 8
-            long upper = (value) >> 32;
-            long lower = (value) & 0xffffffff;
-            this.Text.EmitMoveImmediate(upper.ToString(), "eax");
-            this.Text.EmitMoveImmediate(lower.ToString(), "edx");
-            throw new NotImplementedException();
-        }
-
-        private void EmitLoadConstantR4(float value)
-        {
-            /*
-              	.section .rdata,"dr"
-	            .align 4
-            LC0:
-	            .long	1078523331 
-            	.text
-            .globl _scheme_entry
-	            .def	_scheme_entry;	.scl	2;	.type	32;	.endef
-            _scheme_entry:
-	            flds	LC0
-	            ret
-             */
-            var label = this.ROData.Label(section => section.EmitLong(value.ToIEEE754()));
-            this.Text.Emit("\tflds\t{0}", label);
-        }
-
-        private void EmitLoadConstantR8(double value)
-        {
-            /*
-            	.section .rdata,"dr"
-            	.align 8
-            LC0:
-            	.long	1374389535
-            	.long	1074339512
-            	.text
-            	.p2align 4,,15
-            .globl _scheme_entry
-            	.def	_scheme_entry;	.scl	2;	.type	32;	.endef
-            _scheme_entry:
-            	fldl	LC0
-            	ret
-             */
-            throw new NotImplementedException();
-            //Emit("movl ${0}, %eax", value);
-        }
+        //private void EmitLoadConstantI8(long value)
+        //{
+        //    //split into upper 8 and lower 8
+        //    long upper = (value) >> 32;
+        //    long lower = (value) & 0xffffffff;
+        //    this.Text.EmitMoveImmediate(upper.ToString(), "eax");
+        //    this.Text.EmitMoveImmediate(lower.ToString(), "edx");
+        //    throw new NotImplementedException();
+        //}
 
         public override void VisitInstruction(IInstruction instr)
         {
             var instruction = instr as Instruction;
             if (instruction != null)
             {
-                Helper.Break();
+                Helper.NotSupported(instruction.OpCode.ToString());
                 return;
             }
 

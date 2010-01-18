@@ -40,7 +40,7 @@ namespace Compiler
 
         public void Compile()
         {
-            this.MethodDefinition.Body.Accept(new CilToX86CodeVisitor());
+            this.MethodDefinition.Body.Accept(new CilToX86CodeVisitor(this));
             this.MethodDefinition.Body.Accept(this.Emitter);
         }
 
