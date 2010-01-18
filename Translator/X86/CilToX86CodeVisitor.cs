@@ -10,6 +10,7 @@ namespace Compiler.X86
     {
         public MethodCompiler MethodCompiler { get; set; }
         private CilWorker _worker;
+        private int _stackIndex = -4;
 
         public CilToX86CodeVisitor(MethodCompiler methodCompiler)
         {
@@ -41,65 +42,82 @@ namespace Compiler.X86
 
         public override void VisitInstruction(Instruction instr)
         {
-            switch(instr.OpCode.Code)
+            switch (instr.OpCode.Code)
             {
+                case Mono.Cecil.Cil.Code.Ldc_I4_S:
                 case Mono.Cecil.Cil.Code.Ldc_I4:
-                    ReplaceLoadConstantI4(instr, (int)instr.Operand);
+                    ReplaceLoadConstantI4(instr);
                     break;
-
                 case Mono.Cecil.Cil.Code.Ldc_I4_M1:
-                    ReplaceLoadConstantI4(instr,-1);
+                    ReplaceLoadConstantI4(instr, -1);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_0:
-                    ReplaceLoadConstantI4(instr,0);
+                    ReplaceLoadConstantI4(instr, 0);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_1:
-                    ReplaceLoadConstantI4(instr,1);
+                    ReplaceLoadConstantI4(instr, 1);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_2:
-                    ReplaceLoadConstantI4(instr,2);
+                    ReplaceLoadConstantI4(instr, 2);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_3:
-                    ReplaceLoadConstantI4(instr,3);
+                    ReplaceLoadConstantI4(instr, 3);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_4:
-                    ReplaceLoadConstantI4(instr,4);
+                    ReplaceLoadConstantI4(instr, 4);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_5:
-                    ReplaceLoadConstantI4(instr,5);
+                    ReplaceLoadConstantI4(instr, 5);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_6:
-                    ReplaceLoadConstantI4(instr,6);
+                    ReplaceLoadConstantI4(instr, 6);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_7:
-                    ReplaceLoadConstantI4(instr,7);
+                    ReplaceLoadConstantI4(instr, 7);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_I4_8:
-                    ReplaceLoadConstantI4(instr,8);
-                    break;
-                case Mono.Cecil.Cil.Code.Ldc_I4_S:
-                    ReplaceLoadConstantI4(instr,Convert.ToInt16((sbyte)instr.Operand));
+                    ReplaceLoadConstantI4(instr, 8);
                     break;
                 case Mono.Cecil.Cil.Code.Ldc_R4:
                     ReplaceLoadConstantR4(instr);
                     break;
-                case Mono.Cecil.Cil.Code.Ret: 
+                case Mono.Cecil.Cil.Code.Ret:
                     Replace(instr, new X86Instruction(OpCodes.Return));
                     break;
             }
         }
 
-        private void ReplaceLoadConstantR4(Instruction instr)
+        private string ImmediateRepresentation(object x)
         {
-            var value = (float)instr.Operand;
-            var rodata = this.MethodCompiler.Emitter.Section(SectionType.ReadOnlyData);
-            var label = rodata.Label(secton => secton.EmitLong(value.ToIEEE754()));
-            this.Replace(instr, new X86Instruction(OpCodes.LoadReal, label));
+            if(x is int)
+                return string.Format("${0}", x);
+
+            if (x is sbyte)
+                return string.Format("${0}", Convert.ToInt16((sbyte)x));
+
+            if(x is float)
+            {
+                var rodata = this.MethodCompiler.Emitter.Section(SectionType.ReadOnlyData);
+                var label = rodata.Label(secton => secton.EmitLong(((float)x).ToIEEE754()));
+                return label.ToString();
+            }
+
+            Helper.NotSupported();
+            return null;
         }
 
-        private void ReplaceLoadConstantI4(Instruction instr, int value)
+        private void PrimitiveCall(Instruction instr)
         {
-            Replace(instr, new X86Instruction(OpCodes.Move, string.Format("${0}", value), Registers.Eax));
+        }
+
+        private void ReplaceLoadConstantR4(Instruction instr)
+        {
+            this.Replace(instr, new X86Instruction(OpCodes.LoadReal, ImmediateRepresentation(instr.Operand)));
+        }
+
+        private void ReplaceLoadConstantI4(Instruction instr, object value = null)
+        {
+            Replace(instr, new X86Instruction(OpCodes.Move, ImmediateRepresentation(value ?? instr.Operand), Registers.Eax));
         }
 
         private void Replace(IInstruction original, IInstruction newInstruction)
