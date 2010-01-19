@@ -64,6 +64,7 @@ namespace Compiler.Tests
         {
             File.Delete("TempAssembly.dll");
             File.Delete("test.s");
+            File.Delete("stack.s");
             File.Delete("runtime.c");
             File.Delete("test.exe");
         }
@@ -118,7 +119,7 @@ namespace Compiler.Tests
         protected virtual void GenerateRuntime(TextWriter runtime, MethodDefinition method)
         {
             string printf;
-            string function = method.Name + "()";
+            string function = "setup_stack(stack_base)";
             string returnType;
             switch (method.ReturnType.ReturnType.Name.ToLower())
             {
@@ -149,12 +150,17 @@ namespace Compiler.Tests
 
             runtime.WriteLine("#include <stdio.h>");
             runtime.WriteLine("#include <stdbool.h>");
+            runtime.WriteLine("#include <stdlib.h>");
             runtime.WriteLine();
-            runtime.WriteLine(string.Format("{0} {1}();", returnType, method.Name));
+            runtime.WriteLine(string.Format("{0} setup_stack(char*);", returnType));
             runtime.WriteLine();
             runtime.WriteLine("int main(int argc, char** argv)");
             runtime.WriteLine("{");
+            runtime.WriteLine("	int stack_size = (16 * 4096);");
+            runtime.WriteLine("	char* stack_top = malloc(stack_size);");
+            runtime.WriteLine("	char* stack_base = stack_top + stack_size;");
             runtime.WriteLine(string.Format("	printf(\"{0}\\n\", {1});", printf, function));
+            runtime.WriteLine("	free(stack_top);");
             runtime.WriteLine("	return 0;");
             runtime.WriteLine("}");
         }
@@ -164,6 +170,18 @@ namespace Compiler.Tests
             using (var runtime = new StreamWriter("runtime.c"))
             {
                 GenerateRuntime(runtime, method);
+            }
+
+            using (var runtime = new StreamWriter("stack.s"))
+            {
+                runtime.WriteLine(".globl _setup_stack");
+                runtime.WriteLine("	.def	_setup_stack;	.scl	2;	.type	32;	.endef");
+                runtime.WriteLine("_setup_stack:");
+                runtime.WriteLine("	movl %esp, %ecx");
+                runtime.WriteLine("	movl 4(%esp), %esp");
+                runtime.WriteLine("	call _{0}", method.Name);
+                runtime.WriteLine("	movl %ecx, %esp");
+                runtime.WriteLine("	ret");
             }
         }
 
@@ -179,7 +197,7 @@ namespace Compiler.Tests
         {
             string output;
             string error;
-            if (Execute("gcc -Wall test.s runtime.c -o test.exe", out error, out output) == 0) 
+            if (Execute("gcc -Wall test.s stack.s runtime.c -o test.exe", out error, out output) == 0) 
                 return;
 
             Helper.Break();
