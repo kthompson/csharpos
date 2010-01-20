@@ -206,8 +206,15 @@ namespace Compiler
         [DebuggerHidden]
         public static void NotSupported(string message = "")
         {
-            Break();
-            throw new NotSupportedException(message);
+            Throw(() => new NotSupportedException(message));
+        }
+
+        [DebuggerHidden]
+        public static void Stop(Func<Exception> ex = null)
+        {
+            if(ex == null)
+                Throw(() => new Exception());
+            Throw(ex);
         }
 
         #endregion
