@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildException.cs" />
     <Compile Include="CompilerTest.cs" />
     <Compile Include="ImmediateConstants.cs" />
     <Compile Include="IntegerTests.cs" />

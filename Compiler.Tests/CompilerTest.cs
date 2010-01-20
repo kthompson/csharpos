@@ -200,7 +200,7 @@ namespace Compiler.Tests
             if (Execute("gcc -Wall test.s stack.s runtime.c -o test.exe", out error, out output) == 0) 
                 return;
 
-            Helper.Break();
+            Helper.Stop(() => new BuildException(error, output));
         }
 
         private static void CompileMethod(MethodDefinition method)
