@@ -56,7 +56,7 @@ namespace Compiler
 
         public override void VisitInstructionCollection(InstructionCollection instructions)
         {
-            foreach (var instruction in instructions)
+            foreach (Instruction instruction in instructions)
                 this.VisitInstruction(instruction);
         }
 
@@ -70,16 +70,16 @@ namespace Compiler
         //    throw new NotImplementedException();
         //}
 
-        public override void VisitInstruction(IInstruction instr)
+        public override void VisitInstruction(Instruction instruction)
         {
-            var instruction = instr as Instruction;
-            if (instruction != null)
-            {
+            //var instruction = instr as Instruction;
+            //if (instruction != null)
+            //{
                 Helper.NotSupported(instruction.OpCode.ToString());
                 return;
-            }
+            //}
 
-            this.Text.Emit(instr.ToString());
+            //this.Text.Emit(instr.ToString());
         }
 
         public override void TerminateMethodBody(MethodBody body)

@@ -49,7 +49,7 @@ namespace Compiler
         {
             var typeName = method.DeclaringType.FullName;
             return (from asm in this.Assemblies
-                    from type in asm.Modules.Select(module => module.Types[typeName])
+                    from type in asm.Modules.Cast<ModuleDefinition>().Select(module => module.Types[typeName])
                     where type != null
                     select type.Methods.GetMethod(method.Name, method.Parameters)).FirstOrDefault();
         }

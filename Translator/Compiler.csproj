@@ -90,6 +90,10 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\cecil-150675\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -128,13 +132,9 @@
     <Compile Include="X86\CilToX86CodeVisitor.cs" />
     <Compile Include="X86\Register.cs" />
     <Compile Include="X86\Registers.cs" />
-    <Compile Include="X86\X86Instruction.cs" />
-    <Compile Include="X86\OpCode.cs" />
-    <Compile Include="X86\OpCodes.cs" />
     <Compile Include="X86\Operand.cs" />
     <Compile Include="X86\OperandType.cs" />
     <Compile Include="X86\Translator.cs" />
-    <Compile Include="IInstruction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="X86\Instructions\x86reference.xml">
@@ -160,12 +160,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\external\cecil\Mono.Cecil.csproj">
-      <Project>{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}</Project>
-      <Name>Mono.Cecil</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

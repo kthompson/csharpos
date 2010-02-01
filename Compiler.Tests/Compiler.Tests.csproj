@@ -65,6 +65,10 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\cecil-150675\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Reference Include="Moq">
       <HintPath>..\Resources\moq-4.0.812.4\Moq.dll</HintPath>
     </Reference>
@@ -88,10 +92,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\external\cecil\Mono.Cecil.csproj">
-      <Project>{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}</Project>
-      <Name>Mono.Cecil</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Translator\Compiler.csproj">
       <Project>{457965B7-FD67-493E-B46A-EEFE59486A4C}</Project>
       <Name>Compiler %28Compiler\Compiler%29</Name>

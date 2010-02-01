@@ -202,7 +202,7 @@ namespace VirtualExecutionSystem
 
         public void VisitTypeDefinitionCollection(TypeDefinitionCollection types)
         {
-            foreach (var item in types.Values)
+            foreach (TypeDefinition item in types)
             {
                 VisitTypeDefinition(item);
             }

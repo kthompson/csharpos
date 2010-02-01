@@ -11,6 +11,7 @@ namespace Compiler.X86
         public MethodCompiler MethodCompiler { get; set; }
         private CilWorker _worker;
         private int _stackIndex = -4;
+        private int _variableCount;
 
         public CilToX86CodeVisitor(MethodCompiler methodCompiler)
         {
@@ -25,6 +26,7 @@ namespace Compiler.X86
         public override void VisitMethodBody(MethodBody body)
         {
             _worker = body.CilWorker;
+            _variableCount = body.Variables.Count;
         }
 
         public override void VisitInstructionCollection(InstructionCollection instructions)
@@ -33,12 +35,12 @@ namespace Compiler.X86
                 this.VisitInstruction(instructions[i]);
         }
 
-        public override void VisitInstruction(IInstruction instr)
-        {
-            var instruction = instr as Instruction;
-            if (instruction != null)
-                this.VisitInstruction(instruction);
-        }
+        //public override void VisitInstruction(IInstruction instr)
+        //{
+        //    var instruction = instr as Instruction;
+        //    if (instruction != null)
+        //        this.VisitInstruction(instruction);
+        //}
 
         public override void VisitInstruction(Instruction instr)
         {
@@ -64,7 +66,8 @@ namespace Compiler.X86
                     LoadConstantR4(instr);
                     break;
                 case Mono.Cecil.Cil.Code.Ret:
-                    Replace(instr, new X86Instruction(OpCodes.Return));
+                    throw new NotImplementedException();
+                    //Replace(instr, new X86Instruction(OpCodes.Return));
                     break;
             }
         }
@@ -94,17 +97,17 @@ namespace Compiler.X86
 
         private void LoadConstantR4(Instruction instr)
         {
-            this.Replace(instr, new X86Instruction(OpCodes.LoadReal, ImmediateRepresentation(instr.Operand)));
+            //this.Replace(instr, new X86Instruction(OpCodes.LoadReal, ImmediateRepresentation(instr.Operand)));
         }
 
         private void LoadConstantI4(Instruction instr, object value = null)
         {
-            Replace(instr, new X86Instruction(OpCodes.Move, ImmediateRepresentation(value ?? instr.Operand), Registers.Eax));
+            //Replace(instr, new X86Instruction(OpCodes.Move, ImmediateRepresentation(value ?? instr.Operand), Registers.Eax));
         }
 
-        private void Replace(IInstruction original, IInstruction newInstruction)
-        {
-            _worker.Replace(original, newInstruction);
-        }
+        //private void Replace(IInstruction original, IInstruction newInstruction)
+        //{
+        //    _worker.Replace(original, newInstruction);
+        //}
     }
 }

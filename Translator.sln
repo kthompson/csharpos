@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualExecutionSystem", "V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualExecutionSystem.Tests", "VirtualExecutionSystem.Tests\VirtualExecutionSystem.Tests.csproj", "{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil", "external\cecil\Mono.Cecil.csproj", "{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime", "Runtime\Runtime.csproj", "{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime.Tests", "Runtime.Tests\Runtime.Tests.csproj", "{3672C9AD-B76F-457E-B70F-6EB493173949}"
@@ -73,14 +71,6 @@ Global
 		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Release|x86.ActiveCfg = Release|x86
 		{58D7CBBE-45AE-4FF2-B3E7-03C8B74FFAA4}.Release|x86.Build.0 = Release|x86
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Debug|x86.ActiveCfg = Debug|x86
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Debug|x86.Build.0 = Debug|x86
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Release|x86.ActiveCfg = Release|x86
-		{D8F63DFF-5230-43E4-9AB2-DA6E721A1FAE}.Release|x86.Build.0 = Release|x86
 		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D6BC1DD-A220-48D3-BCD8-3F3C34E3EE45}.Debug|x86.ActiveCfg = Debug|x86
