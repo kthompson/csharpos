@@ -96,6 +96,24 @@ namespace Compiler
             }
         }
 
+        public override void VisitUnaryExpression(UnaryExpression node)
+        {
+            switch (node.Operator)
+            {
+                case UnaryOperator.BitwiseNot:
+                    break;
+                case UnaryOperator.LogicalNot:
+                    break;
+                case UnaryOperator.Negate:
+                    break;
+                default:
+                    Helper.NotSupported();
+                    break;
+            }
+            
+            base.VisitUnaryExpression(node);
+        }
+
     }
 }
 

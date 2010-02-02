@@ -90,6 +90,7 @@
   <ItemGroup>
     <Compile Include="BuildException.cs" />
     <Compile Include="CompilerTest.cs" />
+    <Compile Include="ExpressionTests.cs" />
     <Compile Include="ImmediateTests.cs" />
     <Compile Include="MathExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
