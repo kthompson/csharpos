@@ -207,7 +207,7 @@ namespace Compiler.Tests
         {
             using (var output = new StreamWriter("test.s"))
             {
-                var compiler = new MethodCompiler(method, new Emitter(output), null);
+                var compiler = new MethodCompiler(method, null, output);
                 compiler.Compile();
             }
         }

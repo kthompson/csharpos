@@ -90,6 +90,9 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cecil.Decompiler">
+      <HintPath>..\Resources\cecil-150675\Cecil.Decompiler.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\cecil-150675\Mono.Cecil.dll</HintPath>
@@ -110,6 +113,7 @@
   <ItemGroup>
     <Compile Include="AssemblyCompiler.cs" />
     <Compile Include="Assert.cs" />
+    <Compile Include="BaseEmitter.cs" />
     <Compile Include="DuplicateLabelException.cs" />
     <Compile Include="Emitter.cs" />
     <Compile Include="IAssemblyCompiler.cs" />

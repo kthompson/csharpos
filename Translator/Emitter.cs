@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Cecil.Decompiler.Ast;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Cecil.Decompiler;
 
 namespace Compiler
 {
-    public class Emitter : BaseCodeVisitor, IEmitter
+    public class Emitter : Cecil.Decompiler.Ast.BaseCodeVisitor
     {
         private TextWriter _out;
 
@@ -19,8 +22,8 @@ namespace Compiler
             _out = writer;
         }
 
-        private Dictionary<SectionType, Section> _sections = new Dictionary<SectionType, Section>();
-        public Section Section(SectionType type)
+        private readonly Dictionary<SectionType, Section> _sections = new Dictionary<SectionType, Section>();
+        public virtual Section Section(SectionType type)
         {
             if(!_sections.ContainsKey(type))
                 _sections.Add(type, new Section(type));
@@ -44,45 +47,23 @@ namespace Compiler
             }
         }
 
-        #region ICodeVisitor Members
-
-        public override void VisitMethodBody(MethodBody body)
+        public void VisitMethodDefinition(MethodDefinition method)
         {
-            var name = body.Method.Name;
+            var name = method.Name;
             this.Text.Emit(".globl _{0}", name);
             this.Text.Emit("\t.def\t_{0};\t.scl\t2;\t.type\t32;\t.endef", name);
             this.Text.Emit("_{0}:", name);
+            this.VisitMethodBody(method.Body);
+            this.TerminateMethodBody(method.Body);
         }
 
-        public override void VisitInstructionCollection(InstructionCollection instructions)
+        public void VisitMethodBody(MethodBody body)
         {
-            foreach (Instruction instruction in instructions)
-                this.VisitInstruction(instruction);
+            var block = body.Decompile();
+            this.Visit(block);
         }
 
-        //private void EmitLoadConstantI8(long value)
-        //{
-        //    //split into upper 8 and lower 8
-        //    long upper = (value) >> 32;
-        //    long lower = (value) & 0xffffffff;
-        //    this.Text.EmitMoveImmediate(upper.ToString(), "eax");
-        //    this.Text.EmitMoveImmediate(lower.ToString(), "edx");
-        //    throw new NotImplementedException();
-        //}
-
-        public override void VisitInstruction(Instruction instruction)
-        {
-            //var instruction = instr as Instruction;
-            //if (instruction != null)
-            //{
-                Helper.NotSupported(instruction.OpCode.ToString());
-                return;
-            //}
-
-            //this.Text.Emit(instr.ToString());
-        }
-
-        public override void TerminateMethodBody(MethodBody body)
+        public void TerminateMethodBody(MethodBody body)
         {
             if (this._sections.ContainsKey(SectionType.ReadOnlyData))
                 this._sections[SectionType.ReadOnlyData].Flush(_out);
@@ -91,7 +72,24 @@ namespace Compiler
                 this._sections[SectionType.Text].Flush(_out);
         }
 
-        #endregion
+        public override void VisitReturnStatement(ReturnStatement node)
+        {
+            base.VisitReturnStatement(node);
+            this.Text.EmitReturn();
+        }
+
+        public override void VisitLiteralExpression(LiteralExpression node)
+        {
+            if(node.Value is int)
+            {
+                this.Text.EmitMoveImmediate(node.Value.ToString(), "eax");
+            }
+            else
+            {
+                Helper.NotSupported();
+            }
+        }
+
     }
 }
 

@@ -1,8 +1,14 @@
-﻿namespace Compiler
+﻿using Mono.Cecil;
+using Mono.Cecil.Cil;
+
+namespace Compiler
 {
-    public interface IEmitter : Mono.Cecil.Cil.ICodeVisitor
+    public interface IEmitter 
     {
         Section Section(SectionType type);
+
+        void Emit(MethodDefinition methodDefinition);
+        void Emit(MethodBody methodBody);
     }
 }
 

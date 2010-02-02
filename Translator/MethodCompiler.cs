@@ -1,9 +1,11 @@
-﻿using Compiler.X86;
+﻿using System.IO;
+using Compiler.X86;
 using Mono.Cecil;
+using Cecil.Decompiler;
 
 namespace Compiler
 {
-    public class MethodCompiler : IMethodCompiler
+    public class MethodCompiler
     {
         public IAssemblyCompiler AssemblyCompiler { get; private set; }
 
@@ -16,32 +18,24 @@ namespace Compiler
         #region IMethodCompiler Members
 
         public MethodReference Method { get; private set; }
-        public IEmitter Emitter { get; private set; }
+        public Emitter Emitter { get; private set; }
 
         #endregion
 
-        public MethodCompiler(MethodReference method, IAssemblyCompiler ac)
-            : this(method, new Emitter(), ac)
-        {
-
-        }
-
-        public MethodCompiler(MethodReference method, IEmitter emitter, IAssemblyCompiler ac)
+        public MethodCompiler(MethodReference method, IAssemblyCompiler ac, TextWriter writer = null)
         {
             Helper.IsNotNull(method);
-            Helper.IsNotNull(emitter);
 
             this.AssemblyCompiler = ac;
             this.Method = method;
-            this.Emitter = emitter;
+            this.Emitter = new Emitter(writer ?? new StringWriter());
         }
 
         #region ICompiler Members
 
         public void Compile()
         {
-            this.MethodDefinition.Body.Accept(new CilToX86CodeVisitor(this));
-            this.MethodDefinition.Body.Accept(this.Emitter);
+            this.Emitter.VisitMethodDefinition(this.MethodDefinition);
         }
 
         #endregion

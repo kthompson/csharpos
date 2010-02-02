@@ -193,11 +193,10 @@ namespace VirtualExecutionSystem
         public void VisitTypeDefinition(TypeDefinition type)
         {
             if (this.Type != null) return;
-            if (_type.FullName == type.FullName)
-            {
-                this.Type = type;
-                this.Type.Accept(this);
-            }
+            if (_type.FullName != type.FullName) return;
+
+            this.Type = type;
+            this.Type.Accept(this);
         }
 
         public void VisitTypeDefinitionCollection(TypeDefinitionCollection types)
