@@ -53,15 +53,7 @@ namespace Compiler
         }
 
 
-        public void EmitMoveImmediate(string value, string register)
-        {
-            this.Emit("\tmovl\t${0}, %{1}", value, register);
-        }
-
-        public void EmitReturn()
-        {
-            this.Emit("\tret");
-        }
+      
         #endregion
 
         private static string SectionTypeToLabel(SectionType type)

@@ -135,6 +135,8 @@
     <Compile Include="X86\AddressingMethod.cs" />
     <Compile Include="X86\Code.cs" />
     <Compile Include="X86\CilToX86CodeVisitor.cs" />
+    <Compile Include="X86\OpCode.cs" />
+    <Compile Include="X86\OpCodes.cs" />
     <Compile Include="X86\Register.cs" />
     <Compile Include="X86\Registers.cs" />
     <Compile Include="X86\Operand.cs" />

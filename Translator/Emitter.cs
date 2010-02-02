@@ -75,14 +75,20 @@ namespace Compiler
         public override void VisitReturnStatement(ReturnStatement node)
         {
             base.VisitReturnStatement(node);
-            this.Text.EmitReturn();
+            this.Text.Emit(X86.OpCodes.Return.Create());
         }
 
         public override void VisitLiteralExpression(LiteralExpression node)
         {
             if(node.Value is int)
             {
-                this.Text.EmitMoveImmediate(node.Value.ToString(), "eax");
+                this.Text.Emit(X86.OpCodes.Move.Create("$" + node.Value, "%eax"));
+            }
+            else if(node.Value is float)
+            {
+                var value = (float)node.Value;
+                var label = this.ROData.Label(section => section.EmitLong(value.ToIEEE754()));
+                this.Text.Emit(X86.OpCodes.LoadReal.Create(label));
             }
             else
             {

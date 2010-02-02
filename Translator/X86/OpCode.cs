@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cecil.Decompiler.Ast;
 using Mono.Cecil.Cil;
 
 namespace Compiler.X86
 {
-    public class OpCode : IOpCode
+    public class OpCode 
     {
         public Code Code { get; private set; }
         public string Format { get; private set; }
@@ -17,16 +18,9 @@ namespace Compiler.X86
             this.Code = code;
         }
 
-        #region IOpCode Members
-
-        byte IOpCode.Code
+        public string Create(params object[] operands)
         {
-            get
-            {
-                return (byte)this.Code;
-            }
+            return string.Format(this.Format, operands);
         }
-
-        #endregion
     }
 }
