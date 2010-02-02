@@ -62,11 +62,13 @@ namespace Compiler.Tests
 
         protected virtual void Cleanup()
         {
-            File.Delete("TempAssembly.dll");
-            File.Delete("test.s");
-            File.Delete("stack.s");
-            File.Delete("runtime.c");
-            File.Delete("test.exe");
+            Try.Each(
+                        () => File.Delete("TempAssembly.dll"),
+                        () => File.Delete("test.s"),
+                        () => File.Delete("stack.s"),
+                        () => File.Delete("runtime.c"),
+                        () => File.Delete("test.exe")
+                );
         }
 
         protected TypeDefinition GenerateType(
@@ -248,7 +250,10 @@ namespace Compiler.Tests
 
         private static string FullCommandPath(string command)
         {
-            var path = Directory.GetCurrentDirectory() +";" + Environment.GetEnvironmentVariable("PATH");
+            var path = Directory.GetCurrentDirectory() +";"
+                     + Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) + ";"
+                     + Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+
             var paths = path.Split(';');
 
             foreach (var baseDir in paths)

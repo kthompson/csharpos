@@ -131,6 +131,7 @@
     <Compile Include="Section.cs" />
     <Compile Include="SectionLabel.cs" />
     <Compile Include="SectionType.cs" />
+    <Compile Include="Try.cs" />
     <Compile Include="X86\AddressingMethod.cs" />
     <Compile Include="X86\Code.cs" />
     <Compile Include="X86\CilToX86CodeVisitor.cs" />
