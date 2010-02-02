@@ -13,8 +13,18 @@ namespace Compiler.Tests
          [Test]
          public void UnaryLogicalNotExpression()
          {
-             Assert.AreEqual("False", CompileAndRunMethod(Expression.Lambda<Func<bool>>(Expression.Not(Expression.Constant(true, typeof(bool)))).Compile()));
-             Assert.AreEqual("True", CompileAndRunMethod(Expression.Lambda<Func<bool>>(Expression.Not(Expression.Constant(false, typeof(bool)))).Compile()));
+
+
+             Assert.AreEqual("False", CompileAndRunMethod(() =>
+                                                              {
+                                                                  var fieldT = true;
+                                                                  return !fieldT;
+                                                              }));
+             Assert.AreEqual("True", CompileAndRunMethod(() =>
+                                                             {
+                                                                 var fieldF = false;
+                                                                 return !fieldF;
+                                                             }));
          }
 
          [Test]
