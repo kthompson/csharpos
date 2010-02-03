@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace Compiler.Tests
 {
      [TestFixture]
-    public class ExpressionTests : CompilerTest
+    public class UnaryExpressionTests : CompilerTest
     {
          [Test]
          public void UnaryLogicalNotExpression()

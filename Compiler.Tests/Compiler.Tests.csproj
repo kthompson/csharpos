@@ -88,9 +88,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryExpressionTests.cs" />
     <Compile Include="BuildException.cs" />
     <Compile Include="CompilerTest.cs" />
-    <Compile Include="ExpressionTests.cs" />
+    <Compile Include="UnaryExpressionTests.cs" />
     <Compile Include="ImmediateTests.cs" />
     <Compile Include="MathExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -222,6 +222,21 @@ namespace Compiler
                 case BinaryOperator.Subtract:
                     this.Text.Emit("subl {0}(%esp), %eax", si);
                     break;
+                case BinaryOperator.BitwiseAnd:
+                    this.Text.Emit("andl {0}(%esp), %eax", si);
+                    break;
+                case BinaryOperator.BitwiseOr:
+                    this.Text.Emit("orl {0}(%esp), %eax", si);
+                    break;
+                case BinaryOperator.BitwiseXor:
+                    this.Text.Emit("xorl {0}(%esp), %eax", si);
+                    break;
+                case BinaryOperator.Multiply:
+                    //this.Text.Emit("imull {0}(%esp)", si);
+                    //break;
+                case BinaryOperator.Divide:
+                    //this.Text.Emit("idivl {0}(%esp)", si);
+                    //break;
                 default:
                     Helper.NotSupported();
                     break;
