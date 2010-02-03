@@ -62,5 +62,75 @@ namespace Compiler.Tests
                 return fieldF;
             }));
         }
+
+        [Test]
+        public void Addition()
+        {
+            Assert.AreEqual("3", CompileAndRunMethod(() =>
+            {
+                var field1 = 1;
+                var field2 = 2;
+                return field1 + field2;
+            }));
+
+            Assert.AreEqual("3", CompileAndRunMethod(() =>
+            {
+                var field1 = 1;
+                var field2 = 2;
+                var field3 = field1 + field2;
+                return field3;
+            }));
+
+            Assert.AreEqual("1", CompileAndRunMethod(() =>
+            {
+                var field1 = -1;
+                var field2 = 2;
+                var field3 = field1 + field2;
+                return field3;
+            }));
+
+            Assert.AreEqual("1", CompileAndRunMethod(() =>
+            {
+                var field1 = -1;
+                var field2 = 2;
+                var field3 = field1 + field2;
+                return field3;
+            }));
+        }
+
+        [Test]
+        public void Subtraction()
+        {
+            Assert.AreEqual("-1", CompileAndRunMethod(() =>
+            {
+                var field1 = 1;
+                var field2 = 2;
+                return field1 - field2;
+            }));
+
+            Assert.AreEqual("-1", CompileAndRunMethod(() =>
+            {
+                var field1 = 1;
+                var field2 = 2;
+                var field3 = field1 - field2;
+                return field3;
+            }));
+
+            Assert.AreEqual("-3", CompileAndRunMethod(() =>
+            {
+                var field1 = -1;
+                var field2 = 2;
+                var field3 = field1 - field2;
+                return field3;
+            }));
+
+            Assert.AreEqual("-3", CompileAndRunMethod(() =>
+            {
+                var field1 = -1;
+                var field2 = 2;
+                var field3 = field1 - field2;
+                return field3;
+            }));
+        }
     }
 }

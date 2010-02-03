@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Cecil.Decompiler.Ast;
@@ -8,7 +9,7 @@ using Cecil.Decompiler;
 
 namespace Compiler
 {
-    public class Emitter : Cecil.Decompiler.Ast.BaseCodeVisitor
+    public class Emitter 
     {
         private TextWriter _out;
         private readonly Dictionary<string, int> _variableLocations = new Dictionary<string,int>();
@@ -72,7 +73,7 @@ namespace Compiler
                 }
             }
             var block = body.Decompile();
-            this.Visit(block);
+            EmitBlockStatement(block, _stackIndex);
         }
 
         public void TerminateMethodBody(MethodBody body)
@@ -84,13 +85,82 @@ namespace Compiler
                 this._sections[SectionType.Text].Flush(_out);
         }
 
-        public override void VisitReturnStatement(ReturnStatement node)
+        public void EmitBlockStatement(BlockStatement node, int si)
         {
-            Visit(node.Expression);
+            Emit(node.Statements, si);
+        }
+
+        public void Emit(IEnumerable collection, int si)
+        {
+            foreach (ICodeNode node in collection)
+                Emit(node, si);
+        }
+
+        public void Emit(ICodeNode node, int si)
+        {
+            if (node == null)
+                return;
+
+            if(node is Expression)
+                EmitExpression((Expression)node, si);
+            else if(node is Statement)
+                EmitStatement((Statement)node, si);
+            else
+                Helper.Break();
+        }
+
+        public void EmitStatement(Statement node, int si)
+        {
+            switch (node.CodeNodeType)
+            {
+                case CodeNodeType.ReturnStatement:
+                    EmitReturnStatement((ReturnStatement)node, si);
+                    break;
+                case CodeNodeType.ExpressionStatement:
+                    EmitExpressionStatement((ExpressionStatement)node, si);
+                    break;
+                default:
+                    Helper.NotSupported();
+                    break;
+            }
+        }
+
+        public void EmitExpressionStatement(ExpressionStatement node, int si)
+        {
+            EmitExpression(node.Expression, si);
+        }
+
+        public void EmitExpression(Expression node, int si)
+        {
+            this.Text.Emit("#" + node.ToCodeString());
+
+            switch (node.CodeNodeType)
+            {
+                case CodeNodeType.AssignExpression:
+                    EmitAssignExpression((AssignExpression)node, si);
+                    break;
+                case CodeNodeType.BinaryExpression:
+                    EmitBinaryExpression((BinaryExpression)node, si);
+                    break;
+                case CodeNodeType.LiteralExpression:
+                    EmitLiteralExpression((LiteralExpression)node, si);
+                    break;
+                case CodeNodeType.VariableReferenceExpression:
+                    EmitVariableReferenceExpression((VariableReferenceExpression)node, si);
+                    break;
+                default:
+                    Helper.NotSupported();
+                    break;
+            }
+        }
+
+        public void EmitReturnStatement(ReturnStatement node, int si)
+        {
+            Emit(node.Expression, si);
             this.Text.Emit(X86.OpCodes.Return.Create());
         }
 
-        public override void VisitLiteralExpression(LiteralExpression node)
+        public void EmitLiteralExpression(LiteralExpression node, int si)
         {
             if(node.Value is int)
             {
@@ -108,7 +178,7 @@ namespace Compiler
             }
         }
 
-        public override void VisitUnaryExpression(UnaryExpression node)
+        public void EmitUnaryExpression(UnaryExpression node, int si)
         {
             switch (node.Operator)
             {
@@ -119,235 +189,51 @@ namespace Compiler
                     Helper.NotSupported();
                     break;
             }
-            
-            base.VisitUnaryExpression(node);
         }
 
-        public override void VisitAddressDereferenceExpression(AddressDereferenceExpression node)
+        public void EmitAssignExpression(AssignExpression node, int si)
         {
-            Helper.NotSupported();
+            EmitExpression(node.Expression, si);
+            this.Text.Emit("movl %eax, {0}(%esp)", LookupVariable(node.Target));
         }
 
-        public override void VisitAddressOfExpression(AddressOfExpression node)
+        private int LookupVariable(Expression node)
         {
-            Helper.NotSupported();
-        }
-
-        public override void VisitAddressReferenceExpression(AddressReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitArrayCreationExpression(ArrayCreationExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitArrayIndexerExpression(ArrayIndexerExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitAssignExpression(AssignExpression node)
-        {
-            Visit(node.Expression);
-            VisitSaveExpression(node.Target);
-        }
-
-        public override void VisitBaseReferenceExpression(BaseReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitBinaryExpression(BinaryExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitBlockExpression(BlockExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitBreakStatement(BreakStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitCanCastExpression(CanCastExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitCastExpression(CastExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitCatchClause(CatchClause node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitConditionCase(ConditionCase node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitConditionExpression(ConditionExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitContinueStatement(ContinueStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitDefaultCase(DefaultCase node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitDelegateCreationExpression(DelegateCreationExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitDelegateInvocationExpression(DelegateInvocationExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitDoWhileStatement(DoWhileStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitForEachStatement(ForEachStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitForStatement(ForStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitGotoStatement(GotoStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitIfStatement(IfStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitLabeledStatement(LabeledStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitNullCoalesceExpression(NullCoalesceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitObjectCreationExpression(ObjectCreationExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitSafeCastExpression(SafeCastExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitSwitchStatement(SwitchStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitThisReferenceExpression(ThisReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitThrowStatement(ThrowStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitTryStatement(TryStatement node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitTypeOfExpression(TypeOfExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitTypeReferenceExpression(TypeReferenceExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
-        {
-            Helper.NotSupported();
-        }
-
-        public virtual void VisitSaveExpression(Expression node)
-        {
-            if (node is VariableReferenceExpression)
-                VisitSaveVariableReferenceExpression((VariableReferenceExpression)node);
-            else
+            var var = node as VariableReferenceExpression;
+            if (var == null)
                 Helper.NotSupported();
+            
+            return _variableLocations[var.Variable.Name];
         }
 
-        public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
+       
+
+        public void EmitBinaryExpression(BinaryExpression node, int si)
         {
-            //move eax into variable
-            this.Text.Emit(X86.OpCodes.Move.Create(this._variableLocations[node.Variable.Name] + "(%esp)", "%eax"));
+            EmitExpression(node.Right, si);
+            this.Text.Emit("movl %eax, {0}(%esp)", si);
+            EmitExpression(node.Left, si - 4);
+
+            switch (node.Operator)
+            {
+                case BinaryOperator.Add:
+                    this.Text.Emit("addl {0}(%esp), %eax", si);
+                    break;
+                case BinaryOperator.Subtract:
+                    this.Text.Emit("subl {0}(%esp), %eax", si);
+                    break;
+                default:
+                    Helper.NotSupported();
+                    break;
+            }
         }
 
-        public virtual void VisitSaveVariableReferenceExpression(VariableReferenceExpression node)
+        public void EmitVariableReferenceExpression(VariableReferenceExpression node, int si)
         {
-            //move variable into eax
-            this.Text.Emit(X86.OpCodes.Move.Create("%eax", this._variableLocations[node.Variable.Name] + "(%esp)"));
+            this.Text.Emit("movl {0}(%esp), %eax", this._variableLocations[node.Variable.Name]);
         }
 
-        public override void VisitWhileStatement(WhileStatement node)
-        {
-            Helper.NotSupported();
-        }
+      
     }
 }
 
