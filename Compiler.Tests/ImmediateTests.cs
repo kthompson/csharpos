@@ -70,5 +70,17 @@ namespace Compiler.Tests
             Assert.AreEqual("0.141", CompileAndRunMethod(() => 0.141234f));
             Assert.AreEqual("1233.114", CompileAndRunMethod(() => 1233.114f));
         }
+
+        [Test]
+        public void Doubles()
+        {
+            Assert.AreEqual("3.140", CompileAndRunMethod(() => 3.14d));
+            Assert.AreEqual("-3.140", CompileAndRunMethod(() => -3.14d));
+            Assert.AreEqual("-9.750", CompileAndRunMethod(() => -9.75d));
+            Assert.AreEqual("9.750", CompileAndRunMethod(() => 9.75d));
+            Assert.AreEqual("0.141", CompileAndRunMethod(() => 0.141234d));
+            Assert.AreEqual("1233.114", CompileAndRunMethod(() => 1233.114d));
+        }
+
     }
 }
