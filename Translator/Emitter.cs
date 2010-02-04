@@ -148,6 +148,9 @@ namespace Compiler
                 case CodeNodeType.VariableReferenceExpression:
                     EmitVariableReferenceExpression((VariableReferenceExpression)node, si);
                     break;
+                case CodeNodeType.UnaryExpression:
+                    EmitUnaryExpression((UnaryExpression)node, si);
+                    break;
                 default:
                     Helper.NotSupported();
                     break;
@@ -183,8 +186,12 @@ namespace Compiler
             switch (node.Operator)
             {
                 case UnaryOperator.BitwiseNot:
-                case UnaryOperator.LogicalNot:
+                    this.Text.Emit("notl %eax");
+                    break;
                 case UnaryOperator.Negate:
+                    this.Text.Emit("negl %eax");
+                    break;
+                case UnaryOperator.LogicalNot:
                 default:
                     Helper.NotSupported();
                     break;
