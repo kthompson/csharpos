@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Compiler.X86;
 using Mono.Cecil;
 using Cecil.Decompiler;
 

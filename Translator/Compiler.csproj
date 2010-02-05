@@ -132,24 +132,6 @@
     <Compile Include="SectionLabel.cs" />
     <Compile Include="SectionType.cs" />
     <Compile Include="Try.cs" />
-    <Compile Include="X86\AddressingMethod.cs" />
-    <Compile Include="X86\Code.cs" />
-    <Compile Include="X86\CilToX86CodeVisitor.cs" />
-    <Compile Include="X86\OpCode.cs" />
-    <Compile Include="X86\OpCodes.cs" />
-    <Compile Include="X86\Register.cs" />
-    <Compile Include="X86\Registers.cs" />
-    <Compile Include="X86\Operand.cs" />
-    <Compile Include="X86\OperandType.cs" />
-    <Compile Include="X86\Translator.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="X86\Instructions\x86reference.xml">
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="X86\Instructions\x86reference.dtd" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

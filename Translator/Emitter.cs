@@ -160,20 +160,20 @@ namespace Compiler
         public void EmitReturnStatement(ReturnStatement node, int si)
         {
             Emit(node.Expression, si);
-            this.Text.Emit(X86.OpCodes.Return.Create());
+            this.Text.Emit("ret");
         }
 
         public void EmitLiteralExpression(LiteralExpression node, int si)
         {
             if(node.Value is int)
             {
-                this.Text.Emit(X86.OpCodes.Move.Create("$" + node.Value, "%eax"));
+                this.Text.Emit("movl ${0}, %eax", node.Value);
             }
             else if(node.Value is float)
             {
                 var value = (float)node.Value;
                 var label = this.ROData.Label(section => section.EmitLong(value.ToIEEE754()));
-                this.Text.Emit(X86.OpCodes.LoadReal.Create(label));
+                this.Text.Emit("flds {0}", label);
             }
             else
             {
