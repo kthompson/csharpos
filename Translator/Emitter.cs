@@ -25,6 +25,21 @@ namespace Compiler
             _out = writer;
         }
 
+        private int _labelCount;
+        protected string GetUniqueLabel()
+        {
+            return string.Format("L_{0}", _labelCount++);
+        }
+
+        private readonly Dictionary<string, string> _mappedLabels = new Dictionary<string, string>();
+        protected string GetMappedLabel(string ilLabel)
+        {
+            if (!_mappedLabels.ContainsKey(ilLabel))
+                _mappedLabels.Add(ilLabel, GetUniqueLabel());
+
+            return _mappedLabels[ilLabel];
+        }
+
         private readonly Dictionary<SectionType, Section> _sections = new Dictionary<SectionType, Section>();
         public virtual Section Section(SectionType type)
         {
@@ -52,8 +67,11 @@ namespace Compiler
 
         public void VisitMethodDefinition(MethodDefinition method)
         {
+            //cleanup
             this._variableLocations.Clear();
             this._stackIndex = 0;
+            this._labelCount = 0;
+
             var name = method.Name;
             this.Text.Emit(".globl _{0}", name);
             this.Text.Emit("\t.def\t_{0};\t.scl\t2;\t.type\t32;\t.endef", name);
@@ -123,6 +141,19 @@ namespace Compiler
                     Helper.NotSupported();
                     break;
             }
+        }
+
+        private void EmitComparePattern(string left, string right, Action then, Action @else)
+        {
+            var altLabel = GetUniqueLabel();
+            var endLabel = GetUniqueLabel();
+            this.Text.Emit("cmp {0}, {1}", left, right);
+            this.Text.Emit("je {0}", altLabel);
+            @else();
+            this.Text.Emit("jmp {0}", endLabel);
+            this.Text.Emit("{0}:", altLabel);
+            then();
+            this.Text.Emit("{0}:", endLabel);
         }
 
         public void EmitExpressionStatement(ExpressionStatement node, int si)
@@ -237,6 +268,16 @@ namespace Compiler
                     break;
                 case BinaryOperator.BitwiseXor:
                     this.Text.Emit("xorl {0}(%esp), %eax", si);
+                    break;
+                case BinaryOperator.ValueEquality:
+                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                        () => this.Text.Emit("movl ${0}, %eax", 1),
+                        () => this.Text.Emit("movl ${0}, %eax", 0));
+                    break;
+                case BinaryOperator.ValueInequality:
+                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                        () => this.Text.Emit("movl ${0}, %eax", 0),
+                        () => this.Text.Emit("movl ${0}, %eax", 1));
                     break;
                 case BinaryOperator.Multiply:
                     //this.Text.Emit("imull {0}(%esp)", si);

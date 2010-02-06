@@ -295,5 +295,97 @@ namespace Compiler.Tests
             }));
         }
 
+        [Test]
+        public void EqualityTests()
+        {
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 6;
+                var field2 = 2;
+                return field1 == field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = 8;
+                return field1 == field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 8;
+                var field2 = 8;
+                return field1 == field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = true;
+                var field2 = false;
+                return field1 == field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'b';
+                return field1 == field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'a';
+                return field1 == field2;
+            }));
+        }
+
+        [Test]
+        public void InequalityTests()
+        {
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 6;
+                var field2 = 2;
+                return field1 != field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = 8;
+                return field1 != field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 8;
+                var field2 = 8;
+                return field1 != field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = true;
+                var field2 = false;
+                return field1 != field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'b';
+                return field1 != field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'a';
+                return field1 != field2;
+            }));
+        }
+
     }
 }
