@@ -387,5 +387,167 @@ namespace Compiler.Tests
             }));
         }
 
+        [Test]
+        public void LessThan()
+        {
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 2;
+                var field2 = 6;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = 8;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 8;
+                var field2 = 8;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'b';
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'a';
+                return field1 < field2;
+            }));
+        }
+
+        [Test]
+        public void LessThanOrEqual()
+        {
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 2;
+                var field2 = 6;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -2;
+                var field2 = 6;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = 8;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 8;
+                var field2 = 8;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'b';
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'a';
+                return field1 <= field2;
+            }));
+        }
+
+        [Test]
+        public void GreaterThan()
+        {
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 2;
+                var field2 = 6;
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = 8;
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 8;
+                var field2 = 8;
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'b';
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'a';
+                return field1 > field2;
+            }));
+        }
+
+        [Test]
+        public void GreaterThanOrEqual()
+        {
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 2;
+                var field2 = 6;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = 8;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 8;
+                var field2 = 8;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'b';
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 'a';
+                var field2 = 'a';
+                return field1 >= field2;
+            }));
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using Cecil.Decompiler.Ast;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -143,12 +144,20 @@ namespace Compiler
             }
         }
 
-        private void EmitComparePattern(string left, string right, Action then, Action @else)
+        private void EmitComparePattern(string left, string right, Action then, Action @else, string jmpType = "je")
+        {
+            EmitBranchPattern(() =>
+                              this.Text.Emit("cmp {0}, {1}", left, right),
+                              @else,
+                              then, jmpType);
+        }
+
+        private void EmitBranchPattern(Action test, Action @else, Action then, string jmpType = "je")
         {
             var altLabel = GetUniqueLabel();
             var endLabel = GetUniqueLabel();
-            this.Text.Emit("cmp {0}, {1}", left, right);
-            this.Text.Emit("je {0}", altLabel);
+            test();
+            this.Text.Emit("{0} {1}",jmpType, altLabel);
             @else();
             this.Text.Emit("jmp {0}", endLabel);
             this.Text.Emit("{0}:", altLabel);
@@ -279,12 +288,33 @@ namespace Compiler
                         () => this.Text.Emit("movl ${0}, %eax", 0),
                         () => this.Text.Emit("movl ${0}, %eax", 1));
                     break;
-                case BinaryOperator.Multiply:
-                    //this.Text.Emit("imull {0}(%esp)", si);
-                    //break;
+                case BinaryOperator.LessThan:
+                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                        () => this.Text.Emit("movl ${0}, %eax", 1),
+                        () => this.Text.Emit("movl ${0}, %eax", 0), "jb");
+                    break;
+                case BinaryOperator.LessThanOrEqual:
+                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                        () => this.Text.Emit("movl ${0}, %eax", 1),
+                        () => this.Text.Emit("movl ${0}, %eax", 0), "jbe");
+                    break;
+                case BinaryOperator.GreaterThan:
+                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                        () => this.Text.Emit("movl ${0}, %eax", 1),
+                        () => this.Text.Emit("movl ${0}, %eax", 0), "ja");
+                    break;
+                case BinaryOperator.GreaterThanOrEqual:
+                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                        () => this.Text.Emit("movl ${0}, %eax", 1),
+                        () => this.Text.Emit("movl ${0}, %eax", 0), "jae");
+                    break;
                 case BinaryOperator.Divide:
-                    //this.Text.Emit("idivl {0}(%esp)", si);
-                    //break;
+                case BinaryOperator.LogicalOr:
+                case BinaryOperator.LogicalAnd:
+                case BinaryOperator.LeftShift:
+                case BinaryOperator.RightShift:
+                case BinaryOperator.Modulo:
+                case BinaryOperator.Multiply:
                 default:
                     Helper.NotSupported();
                     break;
