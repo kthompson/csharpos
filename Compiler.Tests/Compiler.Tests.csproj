@@ -67,11 +67,11 @@
   <ItemGroup>
     <Reference Include="Cecil.Decompiler, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Resources\cecil-150675\Cecil.Decompiler.dll</HintPath>
+      <HintPath>..\Resources\Cecil.Decompiler.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Resources\cecil-150675\Mono.Cecil.dll</HintPath>
+      <HintPath>..\Resources\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Moq">
       <HintPath>..\Resources\moq-4.0.812.4\Moq.dll</HintPath>
