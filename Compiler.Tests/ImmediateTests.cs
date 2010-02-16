@@ -5,8 +5,8 @@ using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.IO;
-using NUnit.Framework;
-using Assert = NUnit.Framework.Assert;
+using MbUnit.Framework;
+using Assert = MbUnit.Framework.Assert;
 
 namespace Compiler.Tests
 {
