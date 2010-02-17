@@ -114,6 +114,14 @@
   <ItemGroup>
     <Compile Include="AssemblyCompiler.cs" />
     <Compile Include="Assert.cs" />
+    <Compile Include="Ast\Extensions.cs" />
+    <Compile Include="Ast\ITypedCodeNode.cs" />
+    <Compile Include="Ast\TypedAssignExpression.cs" />
+    <Compile Include="Ast\TypedBinaryExpression.cs" />
+    <Compile Include="Ast\TypedLiteralExpression.cs" />
+    <Compile Include="Ast\TypedTransformer.cs" />
+    <Compile Include="Ast\TypedUnaryExpression.cs" />
+    <Compile Include="Ast\TypedVariableReferenceExpression.cs" />
     <Compile Include="BaseEmitter.cs" />
     <Compile Include="DuplicateLabelException.cs" />
     <Compile Include="Emitter.cs" />
@@ -151,6 +159,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

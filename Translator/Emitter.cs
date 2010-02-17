@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Cecil.Decompiler.Ast;
+using Compiler.Ast;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Cecil.Decompiler;
@@ -92,6 +93,7 @@ namespace Compiler
                 }
             }
             var block = body.Decompile();
+            block = (BlockStatement)new TypedTransformer().VisitBlockStatement(block);
             EmitBlockStatement(block, _stackIndex);
         }
 
