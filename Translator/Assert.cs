@@ -93,13 +93,13 @@ namespace Compiler
         /// <typeparam name="T"></typeparam>
         /// <param name="arg"></param>
         /// <param name="value"></param>
-        /// <param name="argName"></param>
+        /// <param name="message"></param>
         /// <exception cref="System.ArgumentException"></exception>
         [DebuggerHidden]
-        public static void AreEqual<T>(T arg, T value, string argName)
+        public static void AreEqual<T>(T arg, T value, string message)
         {
             if (!Equals(arg, value))
-                Throw(() => new ArgumentException("Unexpected Argument", argName));
+                Throw(() => new ArgumentException(message, string.Empty));
         }
 
         /// <summary>
