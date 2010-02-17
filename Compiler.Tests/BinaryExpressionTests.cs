@@ -392,6 +392,20 @@ namespace Compiler.Tests
         {
             Assert.AreEqual("True", CompileAndRunMethod(() =>
             {
+                var field1 = int.MinValue;
+                var field2 = int.MaxValue;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = uint.MinValue;
+                var field2 = uint.MaxValue;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
                 var field1 = 2;
                 var field2 = 6;
                 return field1 < field2;
@@ -401,6 +415,20 @@ namespace Compiler.Tests
             {
                 var field1 = 32;
                 var field2 = 8;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -32;
+                var field2 = 8;
+                return field1 < field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -123;
+                var field2 = 2343;
                 return field1 < field2;
             }));
 
@@ -431,6 +459,20 @@ namespace Compiler.Tests
         {
             Assert.AreEqual("True", CompileAndRunMethod(() =>
             {
+                var field1 = int.MinValue;
+                var field2 = int.MaxValue;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = uint.MinValue;
+                var field2 = uint.MaxValue;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
                 var field1 = 2;
                 var field2 = 6;
                 return field1 <= field2;
@@ -440,6 +482,13 @@ namespace Compiler.Tests
             {
                 var field1 = -2;
                 var field2 = 6;
+                return field1 <= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -32;
+                var field2 = 32;
                 return field1 <= field2;
             }));
 
@@ -475,6 +524,21 @@ namespace Compiler.Tests
         [Test]
         public void GreaterThan()
         {
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = int.MaxValue;
+                var field2 = int.MinValue;
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = uint.MaxValue;
+                var field2 = uint.MinValue;
+                return field1 > field2;
+            }));
+
             Assert.AreEqual("False", CompileAndRunMethod(() =>
             {
                 var field1 = 2;
@@ -486,6 +550,20 @@ namespace Compiler.Tests
             {
                 var field1 = 32;
                 var field2 = 8;
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("False", CompileAndRunMethod(() =>
+            {
+                var field1 = -32;
+                var field2 = 8;
+                return field1 > field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -8;
+                var field2 = -32;
                 return field1 > field2;
             }));
 
@@ -525,6 +603,42 @@ namespace Compiler.Tests
             {
                 var field1 = 32;
                 var field2 = 8;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = int.MaxValue;
+                var field2 = int.MinValue;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = uint.MaxValue;
+                var field2 = uint.MinValue;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -12;
+                var field2 = -12;
+                return field1 >= field2;
+            }));
+
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = -122;
+                var field2 = -128;
+                return field1 >= field2;
+            }));
+
+            Assert.AreEqual("True", CompileAndRunMethod(() =>
+            {
+                var field1 = 32;
+                var field2 = -8;
                 return field1 >= field2;
             }));
 

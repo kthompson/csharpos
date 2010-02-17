@@ -182,7 +182,7 @@ namespace Compiler
                     EmitAssignExpression((AssignExpression)node, si);
                     break;
                 case CodeNodeType.BinaryExpression:
-                    EmitBinaryExpression((BinaryExpression)node, si);
+                    EmitBinaryExpression((TypedBinaryExpression)node, si);
                     break;
                 case CodeNodeType.LiteralExpression:
                     EmitLiteralExpression((LiteralExpression)node, si);
@@ -257,7 +257,7 @@ namespace Compiler
 
        
 
-        public void EmitBinaryExpression(BinaryExpression node, int si)
+        public void EmitBinaryExpression(TypedBinaryExpression node, int si)
         {
             EmitExpression(node.Right, si);
             this.Text.Emit("movl %eax, {0}(%esp)", si);
@@ -293,22 +293,22 @@ namespace Compiler
                 case BinaryOperator.LessThan:
                     EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
-                        () => this.Text.Emit("movl ${0}, %eax", 0), "jb");
+                        () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jl" : "jb");
                     break;
                 case BinaryOperator.LessThanOrEqual:
                     EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
-                        () => this.Text.Emit("movl ${0}, %eax", 0), "jbe");
+                        () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jle" : "jbe");
                     break;
                 case BinaryOperator.GreaterThan:
                     EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
-                        () => this.Text.Emit("movl ${0}, %eax", 0), "ja");
+                        () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jg" : "ja");
                     break;
                 case BinaryOperator.GreaterThanOrEqual:
                     EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
-                        () => this.Text.Emit("movl ${0}, %eax", 0), "jae");
+                        () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jge" : "jae");
                     break;
                 case BinaryOperator.Divide:
                 case BinaryOperator.LogicalOr:
