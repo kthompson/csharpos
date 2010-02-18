@@ -2,6 +2,8 @@ GOALS
 ===============================
 
 1. Create a CIL to x86 compiler that could later be used to create a csharp/cil based OS.
+2. Create a new CLR written in .Net that can be converted to x86 via the compiler
+3. Create a CIL based Operating System
 
 DEVELOPMENT
 ===============================
@@ -11,12 +13,24 @@ In order to run the tests you must first download and install a few dependecies:
 2. Gallio (http://www.gallio.org/) for unit tests
 3. Begin hacking away. 
 
+Other tools that may be helpful:
+ 
+* IDAPro (http://www.hex-rays.com/idapro/)
+
 BRANCHES
 ===============================
-master: main development branch.
-pu: commits to be reviewed and included into master. Subject to rebasing.
-cecil: Import of Mono.Cecil svn repository
-decompiler: Import of Cecil.Decompiler svn repository
+* master
+	> main development branch.
+		
+* pu
+	> commits to be reviewed and included into master. 
+	> Subject to rebasing.
+		
+* cecil
+	> Import of Mono.Cecil svn repository
+		
+* decompiler
+	> Import of Cecil.Decompiler svn repository
 
 LICENSE
 ===============================
