@@ -140,6 +140,18 @@ namespace Compiler
                 case CodeNodeType.ExpressionStatement:
                     EmitExpressionStatement((ExpressionStatement)node, si);
                     break;
+                case CodeNodeType.IfStatement:
+                    EmitIfStatement((IfStatement)node, si);
+                    break;
+                case CodeNodeType.BlockStatement:
+                    EmitBlockStatement((BlockStatement)node, si);
+                    break;
+                case CodeNodeType.GotoStatement:
+                    EmitGotoStatement((GotoStatement)node, si);
+                    break;
+                case CodeNodeType.LabeledStatement:
+                    EmitLabeledStatement((LabeledStatement)node, si);
+                    break;
                 default:
                     Helper.NotSupported();
                     break;
@@ -177,6 +189,29 @@ namespace Compiler
             this.Text.Emit("{0}:", endLabel);
         }
 
+        public void EmitLabeledStatement(LabeledStatement node, int si)
+        {
+            var label = GetMappedLabel(node.Label);
+            this.Text.Emit("{0}:", label);
+        }
+
+        public void EmitGotoStatement(GotoStatement node, int si)
+        {
+            var label = GetMappedLabel(node.Label);
+            this.Text.Emit("jmp {0}", label);
+        }
+
+        public void EmitIfStatement(IfStatement node, int si)
+        {
+            this.Text.Emit("# if({0})", node.Condition.ToCodeString());
+            EmitExpression(node.Condition, si);
+            EmitComparePattern("$1", "%eax",
+                () => { this.Text.Emit("# then:"); Emit(node.Then, si); },
+                () => { this.Text.Emit("# else:"); Emit(node.Else, si); this.Text.Emit("# endif"); });
+        }
+
+        
+
         public void EmitExpressionStatement(ExpressionStatement node, int si)
         {
             EmitExpression(node.Expression, si);
@@ -211,6 +246,7 @@ namespace Compiler
 
         public void EmitReturnStatement(ReturnStatement node, int si)
         {
+            this.Text.Emit("# return {0}", node.Expression.ToCodeString());
             Emit(node.Expression, si);
             this.Text.Emit("ret");
         }
