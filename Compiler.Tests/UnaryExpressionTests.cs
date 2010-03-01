@@ -75,6 +75,13 @@ namespace Compiler.Tests
                  var field = 673;
                  return -field;
              }));
+
+
+             Assert.AreEqual("-3.400", CompileAndRunMethod(() =>
+             {
+                 var field = 3.4f;
+                 return -field;
+             }));
          }
     }
 }
