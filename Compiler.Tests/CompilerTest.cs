@@ -218,7 +218,7 @@ namespace Compiler.Tests
         {
             var parts = command.Split(' ');
             var cmd = parts.First();
-            var args = string.Join(" ", parts.Skip(1));
+            var args = string.Join(" ", parts.Skip(1).ToArray());
             var proc = Process.Start(new ProcessStartInfo(FullCommandPath(cmd), args)
             {
                 CreateNoWindow = true,
