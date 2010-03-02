@@ -136,6 +136,7 @@
     <Compile Include="MethodCompiler.cs" />
     <Compile Include="MethodContext.cs" />
     <Compile Include="MethodDependencies.cs" />
+    <Compile Include="OptionParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="SectionLabel.cs" />

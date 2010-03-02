@@ -96,6 +96,7 @@
     <Compile Include="BinaryExpressionTests.cs" />
     <Compile Include="BuildException.cs" />
     <Compile Include="CompilerTest.cs" />
+    <Compile Include="OptionParserTests.cs" />
     <Compile Include="UnaryExpressionTests.cs" />
     <Compile Include="ImmediateTests.cs" />
     <Compile Include="MathExtensionsTests.cs" />
