@@ -116,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyCompiler.cs" />
-    <Compile Include="Assert.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Ast\Extensions.cs" />
     <Compile Include="Ast\ITypedCodeNode.cs" />
     <Compile Include="Ast\TypedAssignExpression.cs" />
