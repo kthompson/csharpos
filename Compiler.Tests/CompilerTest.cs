@@ -23,10 +23,8 @@ namespace Compiler.Tests
 
         protected MethodDefinition GenerateMethod<TReturn>(Action<CilWorker> action)
         {
-            var type = GenerateType();
             var method = new MethodDefinition(RandomString("TestMethod"), MethodAttributes.Static | MethodAttributes.Public, GetCorlibType<TReturn>());
             action(method.Body.CilWorker);
-            type.Methods.Add(method);
             return method;
         }
 
@@ -69,24 +67,6 @@ namespace Compiler.Tests
                         () => File.Delete("runtime.c"),
                         () => File.Delete("test.exe")
                 );
-        }
-
-        protected TypeDefinition GenerateType(
-            string name = null,
-            string ns = "TestNamespace", 
-            TypeAttributes attributes = TypeAttributes.Class | TypeAttributes.Public, 
-            TypeReference baseType = null, 
-            params Func<TypeDefinition, MethodDefinition>[] generateMethods)
-        {
-            if (name == null)
-                name = RandomString("class");
-
-            var type = new TypeDefinition(name, ns, attributes, baseType);
-            foreach (var generateMethod in generateMethods)
-                type.Methods.Add(generateMethod(type));
-
-            this.Assembly.MainModule.Types.Add(type);
-            return type;
         }
 
         protected static string RandomString(string prefix, int length = 32)
