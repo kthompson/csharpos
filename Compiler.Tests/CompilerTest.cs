@@ -23,7 +23,7 @@ namespace Compiler.Tests
 
         protected MethodDefinition GenerateMethod<TReturn>(Action<CilWorker> action)
         {
-            var method = new MethodDefinition(RandomString("TestMethod"), MethodAttributes.Static | MethodAttributes.Public, GetCorlibType<TReturn>());
+            var method = new MethodDefinition(Helper.GetRandomString("TestMethod"), MethodAttributes.Static | MethodAttributes.Public, GetCorlibType<TReturn>());
             action(method.Body.CilWorker);
             return method;
         }
@@ -31,7 +31,7 @@ namespace Compiler.Tests
         protected MethodDefinition GenerateMethod<T>(Func<T> action)
         {
             var method = this.Assembly.MainModule.Import(action.Method).Resolve();
-            method.Name = RandomString("TestMethod");
+            method.Name = Helper.GetRandomString("TestMethod");
             method.Body.Simplify();
             return method;
         }
@@ -69,15 +69,7 @@ namespace Compiler.Tests
                 );
         }
 
-        protected static string RandomString(string prefix, int length = 32)
-        {
-            string tempString = prefix;
-            
-            while (tempString.Length < length)
-                tempString += Guid.NewGuid().ToString().Replace("-", "").ToLower(); 
-
-            return tempString.Substring(0, length); 
-        }
+  
 
         protected static TypeDefinition GetCorlibType<T>()
         {
@@ -171,7 +163,7 @@ namespace Compiler.Tests
         {
             string output;
             string error;
-            Execute("test.exe", out error, out output);
+            Helper.Execute("test.exe", out error, out output);
             return output;
         }
 
@@ -179,7 +171,7 @@ namespace Compiler.Tests
         {
             string output;
             string error;
-            if (Execute("gcc -Wall test.s stack.s runtime.c -o test.exe", out error, out output) == 0) 
+            if (Helper.Execute("gcc -Wall test.s stack.s runtime.c -o test.exe", out error, out output) == 0) 
                 return;
 
             Helper.Stop(() => new BuildException(error, output));
@@ -189,65 +181,11 @@ namespace Compiler.Tests
         {
             using (var output = new StreamWriter("test.s"))
             {
-                var compiler = new MethodCompiler(method, null, output);
-                compiler.Compile();
+                var compiler = new MethodCompilerStage();
+                compiler.Run(new MethodCompilerContext(method, output));
             }
         }
 
-        private static int Execute(string command, out string error, out string output)
-        {
-            var parts = command.Split(' ');
-            var cmd = parts.First();
-            var args = string.Join(" ", parts.Skip(1).ToArray());
-            var proc = Process.Start(new ProcessStartInfo(FullCommandPath(cmd), args)
-            {
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                UseShellExecute = false
-            });
-
-            var outputTmp = new StringBuilder();
-            var errorTmp = new StringBuilder();
-
-            proc.OutputDataReceived += (sender, e) => outputTmp.AppendLine(e.Data);
-            proc.ErrorDataReceived += (sender, e) => errorTmp.AppendLine(e.Data);
-            
-            proc.BeginOutputReadLine();
-            proc.BeginErrorReadLine();
-            
-            proc.WaitForExit();
-
-            outputTmp.Remove(outputTmp.Length - 2, 2);
-            errorTmp.Remove(errorTmp.Length - 2, 2);
-
-            output = outputTmp.ToString().Trim();
-            error = errorTmp.ToString();
-
-            return proc.ExitCode;
-        }
-
-        private static string FullCommandPath(string command)
-        {
-            var path = Directory.GetCurrentDirectory() +";"
-                     + Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) + ";"
-                     + Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
-
-            var paths = path.Split(';');
-
-            foreach (var baseDir in paths)
-            {
-                string file = Path.Combine(baseDir, command);
-                if (File.Exists(file))
-                    return file;
-
-                file = Path.Combine(baseDir, command + ".exe");
-                if (File.Exists(file))
-                    return file;
-            }
-
-            return command;
-        }
+       
     }
 }
