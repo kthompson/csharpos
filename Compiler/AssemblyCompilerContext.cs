@@ -17,6 +17,7 @@ namespace Compiler
         {
             this.AssemblyDefinition = assemblyDefinition;
             this.Methods = new List<MethodDefinition>(methods);
+            this.OutputFiles = new List<OutputFile>();
         }
 
         public TextWriter GetOutputFileWriter(string filename)
