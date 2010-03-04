@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using MbUnit.Framework;
 using Kernel;
 
 namespace Kernel.Tests
@@ -13,26 +13,26 @@ namespace Kernel.Tests
         public void ConstructorTests()
         {
             var m = new MemorySpace(0, 100);
-            Assert.AreEqual(100, m.Size,"#001");
-            Assert.AreEqual(0, m.StartAddress, "#002");
-            Assert.AreEqual(99, m.EndAddress, "#003");
+            Assert.AreEqual(100u, m.Size,"#001");
+            Assert.AreEqual(0u, m.StartAddress, "#002");
+            Assert.AreEqual(99u, m.EndAddress, "#003");
             Assert.IsFalse(m.Free, "#004");
             Assert.IsNull(m.Next, "#005");
             Assert.IsNull(m.Previous, "#006");
             
 
             m = new MemorySpace(true, 0, 99);
-            Assert.AreEqual(100, m.Size, "#007");
-            Assert.AreEqual(0, m.StartAddress, "#008");
-            Assert.AreEqual(99, m.EndAddress, "#009");
+            Assert.AreEqual(100u, m.Size, "#007");
+            Assert.AreEqual(0u, m.StartAddress, "#008");
+            Assert.AreEqual(99u, m.EndAddress, "#009");
             Assert.IsTrue(m.Free, "#010");
             Assert.IsNull(m.Next, "#011");
             Assert.IsNull(m.Previous, "#012");
 
             m = new MemorySpace(0, 100, false);
-            Assert.AreEqual(100, m.Size, "#013");
-            Assert.AreEqual(0, m.StartAddress, "#014");
-            Assert.AreEqual(99, m.EndAddress, "#015");
+            Assert.AreEqual(100u, m.Size, "#013");
+            Assert.AreEqual(0u, m.StartAddress, "#014");
+            Assert.AreEqual(99u, m.EndAddress, "#015");
             Assert.IsFalse(m.Free, "#016");
             Assert.IsNull(m.Next, "#017");
             Assert.IsNull(m.Previous, "#018");
@@ -41,9 +41,9 @@ namespace Kernel.Tests
             var prev = new MemorySpace(0, 0);
             var next = new MemorySpace(0, 0);
             m = new MemorySpace(false, 0, 99, prev, next);
-            Assert.AreEqual(100, m.Size, "#019");
-            Assert.AreEqual(0, m.StartAddress, "#020");
-            Assert.AreEqual(99, m.EndAddress, "#021");
+            Assert.AreEqual(100u, m.Size, "#019");
+            Assert.AreEqual(0u, m.StartAddress, "#020");
+            Assert.AreEqual(99u, m.EndAddress, "#021");
             Assert.IsFalse(m.Free, "#022");
             Assert.AreEqual(next, m.Next, "#023");
             Assert.AreEqual(prev, m.Previous, "#024");
@@ -53,9 +53,9 @@ namespace Kernel.Tests
             prev = new MemorySpace(0, 0);
             next = new MemorySpace(0, 0);
             m = new MemorySpace(0, 100,false, prev, next);
-            Assert.AreEqual(100, m.Size, "#027");
-            Assert.AreEqual(0, m.StartAddress, "#028");
-            Assert.AreEqual(99, m.EndAddress, "#029");
+            Assert.AreEqual(100u, m.Size, "#027");
+            Assert.AreEqual(0u, m.StartAddress, "#028");
+            Assert.AreEqual(99u, m.EndAddress, "#029");
             Assert.IsFalse(m.Free, "#030");
             Assert.AreEqual(next, m.Next, "#031");
             Assert.AreEqual(prev, m.Previous, "#032");
@@ -68,18 +68,18 @@ namespace Kernel.Tests
         public void SizeChange()
         {
             var m = new MemorySpace(0, 100);
-            Assert.AreEqual(100, m.Size, "#001");
-            Assert.AreEqual(0, m.StartAddress, "#002");
-            Assert.AreEqual(99, m.EndAddress, "#003");
+            Assert.AreEqual(100u, m.Size, "#001");
+            Assert.AreEqual(0u, m.StartAddress, "#002");
+            Assert.AreEqual(99u, m.EndAddress, "#003");
             Assert.IsFalse(m.Free, "#004");
             Assert.IsNull(m.Next, "#005");
             Assert.IsNull(m.Previous, "#006");
 
             m.Size = 30;
 
-            Assert.AreEqual(30, m.Size, "#007");
-            Assert.AreEqual(0, m.StartAddress, "#008");
-            Assert.AreEqual(29, m.EndAddress, "#009");
+            Assert.AreEqual(30u, m.Size, "#007");
+            Assert.AreEqual(0u, m.StartAddress, "#008");
+            Assert.AreEqual(29u, m.EndAddress, "#009");
             Assert.IsFalse(m.Free, "#010");
             Assert.IsNull(m.Next, "#011");
             Assert.IsNull(m.Previous, "#012");
