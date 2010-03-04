@@ -1,0 +1,36 @@
+.gallio-report .testKind-Root
+{
+    background-image: url(../img/testkinds/Root.png);
+}
+.gallio-report .testKind-Assembly
+{
+    background-image: url(../img/testkinds/Assembly.png);
+}
+.gallio-report .testKind-File
+{
+    background-image: url(../img/testkinds/File.png);
+}
+.gallio-report .testKind-Namespace
+{
+    background-image: url(../img/testkinds/Namespace.png);
+}
+.gallio-report .testKind-Group
+{
+    background-image: url(../img/testkinds/Group.png);
+}
+.gallio-report .testKind-Suite
+{
+    background-image: url(../img/testkinds/Suite.png);
+}
+.gallio-report .testKind-Fixture
+{
+    background-image: url(../img/testkinds/Fixture.png);
+}
+.gallio-report .testKind-Test
+{
+    background-image: url(../img/testkinds/Test.png);
+}
+.gallio-report .testKind-Unsupported
+{
+    background-image: url(../img/testkinds/Unsupported.png);
+}
