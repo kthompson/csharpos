@@ -11,7 +11,12 @@ namespace Compiler
     {
         public Option Option { get; private set; }
 
-        protected OptionParserException(Option option, string message = "")
+        protected OptionParserException(Option option)
+            : this(option, string.Empty)
+        {
+        }
+
+        protected OptionParserException(Option option, string message)
             : base(message)
         {
             this.Option = option;
@@ -20,7 +25,13 @@ namespace Compiler
 
     public class MissingOptionException : OptionParserException
     {
-        public MissingOptionException(Option option, string message = "")
+        public MissingOptionException(Option option)
+            : base(option, string.Empty)
+        {
+
+        }
+
+        public MissingOptionException(Option option, string message)
             : base(option, message)
         {
 
@@ -29,7 +40,12 @@ namespace Compiler
 
     public class MissingOptionParameterException : OptionParserException
     {
-        public MissingOptionParameterException(Option option, string message = "")
+        public MissingOptionParameterException(Option option)
+            : base(option, string.Empty)
+        {
+        }
+
+        public MissingOptionParameterException(Option option, string message)
             : base(option, message)
         {
             

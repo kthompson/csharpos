@@ -146,7 +146,12 @@ namespace Compiler
             }
         }
 
-        private void EmitComparePattern(string left, string right, Action then, Action @else, string jmpType = "je")
+        private void EmitComparePattern(string left, string right, Action then, Action @else)
+        {
+            EmitComparePattern(left, right, then, @else, "je");
+        }
+
+        private void EmitComparePattern(string left, string right, Action then, Action @else, string jmpType)
         {
             EmitBranchPattern(() =>
                               this.Text.Emit("cmp {0}, {1}", left, right),
@@ -154,7 +159,12 @@ namespace Compiler
                               then, jmpType);
         }
 
-        private void EmitBranchPattern(Action test, Action @else, Action then, string jmpType = "je")
+        private void EmitBranchPattern(Action test, Action @else, Action then)
+        {
+            EmitBranchPattern(test, @else, then, "je");
+        }
+
+        private void EmitBranchPattern(Action test, Action @else, Action then, string jmpType)
         {
             var altLabel = GetUniqueLabel();
             var endLabel = GetUniqueLabel();

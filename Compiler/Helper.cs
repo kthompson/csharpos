@@ -205,15 +205,26 @@ namespace Compiler
                 Throw(() => new ArgumentOutOfRangeException(argName));
         }
 
+        [DebuggerHidden]
+        public static void NotSupported()
+        {
+            NotSupported(string.Empty);
+        }
 
         [DebuggerHidden]
-        public static void NotSupported(string message = "")
+        public static void NotSupported(string message)
         {
             Throw(() => new NotSupportedException(message));
         }
 
         [DebuggerHidden]
-        public static void Stop(Func<Exception> ex = null)
+        public static void Stop()
+        {
+            Stop(null);
+        }
+
+        [DebuggerHidden]
+        public static void Stop(Func<Exception> ex)
         {
             if(ex == null)
                 Throw(() => new Exception());
@@ -262,7 +273,17 @@ namespace Compiler
             return proc.ExitCode;
         }
 
-        public static string GetRandomString(string prefix, int length = 32, string suffix = "")
+        public static string GetRandomString(string prefix)
+        {
+            return GetRandomString(prefix, 32);
+        }
+
+        public static string GetRandomString(string prefix, int length)
+        {
+            return GetRandomString(prefix, length, "");
+        }
+
+        public static string GetRandomString(string prefix, int length, string suffix)
         {
             var tempString = prefix;
 
@@ -272,7 +293,7 @@ namespace Compiler
             return tempString.Substring(0, length) + suffix;
         }
 
-        public static string GetFullCommandPath(string command)
+        private static string GetFullCommandPath(string command)
         {
             var path = Directory.GetCurrentDirectory() + ";"
                      + Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) + ";"
