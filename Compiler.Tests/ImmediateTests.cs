@@ -11,7 +11,7 @@ using Assert = MbUnit.Framework.Assert;
 namespace Compiler.Tests
 {
     [TestFixture]
-    public class IntegerTests : CompilerTest
+    public class ImmediateTests : CompilerTest
     {
         [Test]
         public void Integers()
