@@ -5,14 +5,7 @@ using System.Text;
 
 namespace Compiler
 {
-    public class MethodContext
+    public interface ICompilerContext
     {
-        
-
-        public MethodContext()
-        {
-            
-            
-        }
     }
 }

@@ -82,7 +82,7 @@ namespace Compiler
             this.TerminateMethodBody(method.Body);
         }
 
-        public void VisitMethodBody(MethodBody body)
+        protected void VisitMethodBody(MethodBody body)
         {
             if (body.HasVariables)
             {
