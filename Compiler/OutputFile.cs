@@ -16,5 +16,10 @@ namespace Compiler
             this.Filename = filename;
             this.Out = new StreamWriter(filename);
         }
+
+        public override string ToString()
+        {
+            return this.Filename;
+        }
     }
 }
