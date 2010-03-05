@@ -42,6 +42,22 @@ namespace Compiler.Tests
                 var field3 = field1 + field2;
                 return field3;
             }));
+
+            Assert.AreEqual("-854348638811", CompileAndRunMethod(() =>
+            {
+                var field1 = -1987245987348L;
+                var field2 =  1132897348537L;
+                var field3 = field1 + field2;
+                return field3;
+            }));
+
+            Assert.AreEqual("1640874859927", CompileAndRunMethod(() =>
+            {
+                var field1 = 311936321943U;
+                var field2 = 1328938537984U;
+                var field3 = field1 + field2;
+                return field3;
+            }));
         }
 
         [Test]
