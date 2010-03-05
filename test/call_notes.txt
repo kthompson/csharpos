@@ -1,0 +1,2 @@
+X(%ebp) where X>8 is a parameter
+X(%ebp) where X<0 is a local variable
