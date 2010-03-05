@@ -184,7 +184,7 @@ namespace Compiler
 
         public void EmitExpression(Expression node, int si)
         {
-            this.Text.Emit("#" + node.ToCodeString());
+            this.Text.Emit("/* " + node.ToCodeString() + " */");
 
             switch (node.CodeNodeType)
             {
@@ -220,6 +220,15 @@ namespace Compiler
             if(node.Value is int)
             {
                 this.Text.Emit("movl ${0}, %eax", node.Value);
+            }
+            else if (node.Value is long)
+            {
+                var value = (long)node.Value;
+                var upper = (int)(value >> 32);
+                var lower = (int)(value & 0xffffffff);
+
+                this.Text.Emit("movl ${0}, %eax", lower); 
+                this.Text.Emit("movl ${0}, %edx", upper);
             }
             else if(node.Value is float)
             {

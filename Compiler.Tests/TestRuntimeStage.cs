@@ -44,8 +44,12 @@ namespace Compiler.Tests
                         returnType = "float";
                         break;
                     case "int32":
-                        printf = "%d";
+                        printf = "%li";
                         returnType = "long";
+                        break;
+                    case "uint32":
+                        printf = "%lu";
+                        returnType = "unsigned long";
                         break;
                     case "boolean":
                         printf = "%s";
@@ -55,6 +59,14 @@ namespace Compiler.Tests
                     case "char":
                         printf = "%c";
                         returnType = "char";
+                        break;
+                    case "int64":
+                        printf = "%lli";
+                        returnType = "__int64";
+                        break;
+                    case "uint64":
+                        printf = "%llu";
+                        returnType = "unsigned __int64";
                         break;
                     default:
                         printf = "%d";

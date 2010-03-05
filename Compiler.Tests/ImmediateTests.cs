@@ -28,10 +28,27 @@ namespace Compiler.Tests
         }
 
         [Test]
+        public void UnsignedIntegers()
+        {
+            Assert.AreEqual("0", CompileAndRunMethod(() => 0U));
+            Assert.AreEqual("1", CompileAndRunMethod(() => 1U));
+            Assert.AreEqual("10", CompileAndRunMethod(() => 10U));
+            Assert.AreEqual("2736", CompileAndRunMethod(() => 2736U));
+            Assert.AreEqual("536870911", CompileAndRunMethod(() => 536870911U));
+        }
+
+        [Test]
         public void Longs()
         {
             Assert.AreEqual("-5368709121234", CompileAndRunMethod(() => -5368709121234L));
             Assert.AreEqual("429496121113456735", CompileAndRunMethod(() => 429496121113456735L));
+        }
+
+        [Test]
+        public void UnsignedLongs()
+        {
+            Assert.AreEqual("5368709121234", CompileAndRunMethod(() => 5368709121234LU));
+            Assert.AreEqual("429496121113456735", CompileAndRunMethod(() => 429496121113456735LU));
         }
 
         [Test]
