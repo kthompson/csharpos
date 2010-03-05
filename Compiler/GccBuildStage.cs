@@ -34,7 +34,12 @@ namespace Compiler
             string output;
             string error;
             if (Helper.Execute(cmd.ToString(), out error, out output) == 0)
+            {
+                if (!string.IsNullOrEmpty(error))
+                    Helper.Break();
+
                 return context;
+            }
 
             Helper.Stop(() => new BuildException(error, output));
 
