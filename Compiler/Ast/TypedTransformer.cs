@@ -34,6 +34,12 @@ namespace Compiler.Ast
             return new TypedVariableReferenceExpression(node.Variable);
         }
 
+        public override ICodeNode VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
+        {
+            node = (ArgumentReferenceExpression)base.VisitArgumentReferenceExpression(node);
+            return new TypedArgumentReferenceExpression(node.Parameter);
+        }
+
         public override ICodeNode VisitAssignExpression(AssignExpression node)
         {
             node = (AssignExpression)base.VisitAssignExpression(node);

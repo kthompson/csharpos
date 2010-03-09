@@ -9,75 +9,31 @@ namespace Compiler.Tests
     [TestFixture]
     public class BinaryExpressionTests : CompilerTest
     {
-        [Test]
-        public void Addition()
+        public void AssertBinaryExpression<T>(T a, T b, T c, Func<T, T, T> action)
         {
-            Assert.AreEqual("3", CompileAndRunMethod(() =>
-            {
-                var field1 = 1;
-                var field2 = 2;
-                return field1 + field2;
-            }));
-
-            Assert.AreEqual("3", CompileAndRunMethod(() =>
-            {
-                var field1 = 1;
-                var field2 = 2;
-                var field3 = field1 + field2;
-                return field3;
-            }));
-
-            Assert.AreEqual("1", CompileAndRunMethod(() =>
-            {
-                var field1 = -1;
-                var field2 = 2;
-                var field3 = field1 + field2;
-                return field3;
-            }));
-
-            Assert.AreEqual("1", CompileAndRunMethod(() =>
-            {
-                var field1 = -1;
-                var field2 = 2;
-                var field3 = field1 + field2;
-                return field3;
-            }));
+            Assert.AreEqual(c.ToString(), CompileAndRunMethod<Func<T, T, T>, T>(action, a, b));
         }
 
         [Test]
-        public void Subtraction()
+        [Row(1, 2, 3)]
+        [Row(-1, 2, 1)]
+        [Row(-45, 2, -43)]
+        public void Addition(int a, int b, int c)
         {
-            Assert.AreEqual("-1", CompileAndRunMethod(() =>
-            {
-                var field1 = 1;
-                var field2 = 2;
-                return field1 - field2;
-            }));
-
-            Assert.AreEqual("-1", CompileAndRunMethod(() =>
-            {
-                var field1 = 1;
-                var field2 = 2;
-                var field3 = field1 - field2;
-                return field3;
-            }));
-
-            Assert.AreEqual("-3", CompileAndRunMethod(() =>
-            {
-                var field1 = -1;
-                var field2 = 2;
-                var field3 = field1 - field2;
-                return field3;
-            }));
-
-            Assert.AreEqual("-3", CompileAndRunMethod(() =>
-            {
-                var field1 = -1;
-                var field2 = 2;
-                var field3 = field1 - field2;
-                return field3;
-            }));
+            AssertBinaryExpression<int>(a, b, c, (aa, bb) => aa + bb);
         }
+
+        [Test]
+        [Row(1, 2, -1)]
+        [Row(-1, 2, -3)]
+        [Row(0, 2, -2)]
+        [Row(0, 0, 0)]
+        [Row(-45, 2, -47)]
+        public void Subtraction(int a, int b, int c)
+        {
+            AssertBinaryExpression<int>(a, b, c, (aa, bb) => aa - bb);
+        }
+
 
         [Test]
         public void Division()

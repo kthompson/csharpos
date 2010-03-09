@@ -13,9 +13,14 @@ namespace Compiler.Tests
     {
         protected string CompileAndRunMethod<T>(Func<T> action)
         {
+            return CompileAndRunMethod<Func<T>, object>(action);
+        }
+
+        protected string CompileAndRunMethod<TDelegate, TParam>(TDelegate action, params TParam[] arguments)
+        {
             var asm = GetAssembly();
             var method = ImportMethod(asm, action);
-            var context = new AssemblyCompilerContext(asm, method);
+            var context = new TestContext(asm, method, arguments.Cast<object>().ToArray());
             
             try
             {
@@ -39,9 +44,12 @@ namespace Compiler.Tests
             return this.Compiler.Stages.OfType<GccBuildStage>().First().Filename;
         }
 
-        private MethodDefinition ImportMethod<T>(AssemblyDefinition asm, Func<T> action)
+        private MethodDefinition ImportMethod<T>(AssemblyDefinition asm, T action)
         {
-            var method = asm.MainModule.Import(action.Method).Resolve();
+            var delegateAction = action as Delegate;
+            if (delegateAction == null)
+                throw new InvalidOperationException("action must be a delegate type");
+            var method = asm.MainModule.Import(delegateAction.Method).Resolve();
             method.Name = Helper.GetRandomString("TestMethod");
             return method;
         }

@@ -97,6 +97,7 @@
     <Compile Include="BinaryExpressionTests.cs" />
     <Compile Include="CompilerTest.cs" />
     <Compile Include="OptionParserTests.cs" />
+    <Compile Include="TestContext.cs" />
     <Compile Include="TestRuntimeStage.cs" />
     <Compile Include="UnaryExpressionTests.cs" />
     <Compile Include="ImmediateTests.cs" />
@@ -113,12 +114,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="Test" DependsOnTargets="Build">
     <Message Text="==== Starting Gallio to run tests ===" />
-    <Gallio 
-    	IgnoreFailures="true" 
-    	Files="$(TargetPath)"
-    	ReportDirectory="$(OutDir)"
-    	ReportTypes="html;xml"
-    	ReportNameFormat="$(TargetName)Report"/>
+    <Gallio IgnoreFailures="true" Files="$(TargetPath)" ReportDirectory="$(OutDir)" ReportTypes="html;xml" ReportNameFormat="$(TargetName)Report" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

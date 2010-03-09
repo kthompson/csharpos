@@ -15,27 +15,28 @@ namespace Compiler.Tests
             get { return "Test Runtime Generator"; }
         }
 
-        public override ICompilerContext Run(ICompilerContext context)
+        public override ICompilerContext Run(ICompilerContext ctxt)
         {
-            var assemblyContext = context as AssemblyCompilerContext;
-            if (assemblyContext == null)
-                return context;
+            var context = ctxt as TestContext;
+            if (context == null)
+                return ctxt;
 
-            var method = assemblyContext.Methods.First();
+            var method = context.Methods.First();
 
-            CreateRuntime(assemblyContext, method);
+            CreateRuntime(context, method);
 
-            CreateStack(assemblyContext, method);
+            //CreateStack(assemblyContext, method);
 
             return context;
         }
 
-        private void CreateRuntime(AssemblyCompilerContext assemblyContext, MethodDefinition method)
+        private void CreateRuntime(TestContext context, MethodDefinition method)
         {
-            using (var runtime = assemblyContext.GetOutputFileWriter("runtime.c"))
+            using (var runtime = context.GetOutputFileWriter("runtime.c"))
             {
                 string printf;
-                string function = "setup_stack(stack_base)";
+                //string function = "setup_stack(stack_base)";
+                string function = string.Format("{0}({1})", method.Name, string.Join(", ", context.Arguments.Select(o => o.ToString()).ToArray()) );
                 string returnType;
                 switch (method.ReturnType.ReturnType.Name.ToLower())
                 {
@@ -68,15 +69,15 @@ namespace Compiler.Tests
                 runtime.WriteLine("#include <stdbool.h>");
                 runtime.WriteLine("#include <stdlib.h>");
                 runtime.WriteLine();
-                runtime.WriteLine(string.Format("{0} setup_stack(char*);", returnType));
-                runtime.WriteLine();
+                //runtime.WriteLine(string.Format("{0} setup_stack(char*);", returnType));
+                //runtime.WriteLine();
                 runtime.WriteLine("int main(int argc, char** argv)");
                 runtime.WriteLine("{");
-                runtime.WriteLine("	int stack_size = (16 * 4096);");
-                runtime.WriteLine("	char* stack_top = malloc(stack_size);");
-                runtime.WriteLine("	char* stack_base = stack_top + stack_size;");
+                //runtime.WriteLine("	int stack_size = (16 * 4096);");
+                //runtime.WriteLine("	char* stack_top = malloc(stack_size);");
+                //runtime.WriteLine("	char* stack_base = stack_top + stack_size;");
                 runtime.WriteLine(string.Format("	printf(\"{0}\\n\", {1});", printf, function));
-                runtime.WriteLine("	free(stack_top);");
+                //runtime.WriteLine("	free(stack_top);");
                 runtime.WriteLine("	return 0;");
                 runtime.WriteLine("}");
             }

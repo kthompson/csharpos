@@ -14,7 +14,8 @@ namespace Compiler
     public class Emitter 
     {
         private TextWriter _out;
-        private readonly Dictionary<string, int> _variableLocations = new Dictionary<string,int>();
+        private readonly Dictionary<string, int> _variableLocations = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _parameterLocations = new Dictionary<string, int>();
         private int _stackIndex;
 
         public Emitter()
@@ -84,17 +85,43 @@ namespace Compiler
 
         protected void VisitMethodBody(MethodBody body)
         {
+            var localVariableSize = 0;
             if (body.HasVariables)
             {
                 foreach (VariableDefinition variable in body.Variables)
                 {
-                    _stackIndex -= 4;
-                    _variableLocations.Add(variable.Name, _stackIndex);
+                    localVariableSize += GetVariableSize(variable);
+                    _variableLocations.Add(variable.Name, -localVariableSize);
                 }
             }
+
+            if (body.Method.HasParameters)
+            {
+                var size = 4; //skip return point
+                foreach (ParameterDefinition item in body.Method.Parameters)
+                {
+                    size += 4;
+                    _parameterLocations.Add(item.Name, size);
+                }
+            }
+
             var block = body.Decompile();
             block = (BlockStatement)new TypedTransformer().VisitBlockStatement(block);
-            EmitBlockStatement(block, _stackIndex);
+            EmitMethodEntry(localVariableSize);
+            EmitBlockStatement(block, -localVariableSize);
+        }
+
+        private void EmitMethodEntry(int localVariableSize)
+        {
+            this.Text.Emit("pushl	%ebp");
+            this.Text.Emit("movl	%esp, %ebp");
+            if (localVariableSize > 0)
+                this.Text.Emit("subl	${0}, %esp", localVariableSize);
+        }
+
+        private int GetVariableSize(VariableDefinition variable)
+        {
+            return 4;
         }
 
         public void TerminateMethodBody(MethodBody body)
@@ -191,6 +218,9 @@ namespace Compiler
                 case CodeNodeType.AssignExpression:
                     EmitAssignExpression((AssignExpression)node, si);
                     break;
+                case CodeNodeType.ArgumentReferenceExpression:
+                    EmitArgumentReferenceExpression((ArgumentReferenceExpression)node, si);
+                    break;
                 case CodeNodeType.BinaryExpression:
                     EmitBinaryExpression((TypedBinaryExpression)node, si);
                     break;
@@ -209,9 +239,15 @@ namespace Compiler
             }
         }
 
+        private void EmitArgumentReferenceExpression(ArgumentReferenceExpression node, int si)
+        {
+            this.Text.Emit("movl {0}(%ebp), %eax", this._parameterLocations[node.Parameter.Name]);
+        }
+
         public void EmitReturnStatement(ReturnStatement node, int si)
         {
             Emit(node.Expression, si);
+            this.Text.Emit("leave");
             this.Text.Emit("ret");
         }
 
@@ -253,7 +289,7 @@ namespace Compiler
         public void EmitAssignExpression(AssignExpression node, int si)
         {
             EmitExpression(node.Expression, si);
-            this.Text.Emit("movl %eax, {0}(%esp)", LookupVariable(node.Target));
+            this.Text.Emit("movl %eax, {0}(%ebp)", LookupVariable(node.Target));
         }
 
         private int LookupVariable(Expression node)
@@ -270,53 +306,53 @@ namespace Compiler
         public void EmitBinaryExpression(TypedBinaryExpression node, int si)
         {
             EmitExpression(node.Right, si);
-            this.Text.Emit("movl %eax, {0}(%esp)", si);
-            EmitExpression(node.Left, si - 4);
+            this.Text.Emit("movl %eax, {0}(%ebp)", si);
+            EmitExpression(node.Left, si + 4);
 
             switch (node.Operator)
             {
                 case BinaryOperator.Add:
-                    this.Text.Emit("addl {0}(%esp), %eax", si);
+                    this.Text.Emit("addl {0}(%ebp), %eax", si);
                     break;
                 case BinaryOperator.Subtract:
-                    this.Text.Emit("subl {0}(%esp), %eax", si);
+                    this.Text.Emit("subl {0}(%ebp), %eax", si);
                     break;
                 case BinaryOperator.BitwiseAnd:
-                    this.Text.Emit("andl {0}(%esp), %eax", si);
+                    this.Text.Emit("andl {0}(%ebp), %eax", si);
                     break;
                 case BinaryOperator.BitwiseOr:
-                    this.Text.Emit("orl {0}(%esp), %eax", si);
+                    this.Text.Emit("orl {0}(%ebp), %eax", si);
                     break;
                 case BinaryOperator.BitwiseXor:
-                    this.Text.Emit("xorl {0}(%esp), %eax", si);
+                    this.Text.Emit("xorl {0}(%ebp), %eax", si);
                     break;
                 case BinaryOperator.ValueEquality:
-                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                    EmitComparePattern(string.Format("{0}(%ebp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
                         () => this.Text.Emit("movl ${0}, %eax", 0));
                     break;
                 case BinaryOperator.ValueInequality:
-                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                    EmitComparePattern(string.Format("{0}(%ebp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 0),
                         () => this.Text.Emit("movl ${0}, %eax", 1));
                     break;
                 case BinaryOperator.LessThan:
-                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                    EmitComparePattern(string.Format("{0}(%ebp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
                         () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jl" : "jb");
                     break;
                 case BinaryOperator.LessThanOrEqual:
-                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                    EmitComparePattern(string.Format("{0}(%ebp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
                         () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jle" : "jbe");
                     break;
                 case BinaryOperator.GreaterThan:
-                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                    EmitComparePattern(string.Format("{0}(%ebp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
                         () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jg" : "ja");
                     break;
                 case BinaryOperator.GreaterThanOrEqual:
-                    EmitComparePattern(string.Format("{0}(%esp)", si), "%eax",
+                    EmitComparePattern(string.Format("{0}(%ebp)", si), "%eax",
                         () => this.Text.Emit("movl ${0}, %eax", 1),
                         () => this.Text.Emit("movl ${0}, %eax", 0), node.IsSigned() ? "jge" : "jae");
                     break;
@@ -335,7 +371,7 @@ namespace Compiler
 
         public void EmitVariableReferenceExpression(VariableReferenceExpression node, int si)
         {
-            this.Text.Emit("movl {0}(%esp), %eax", this._variableLocations[node.Variable.Name]);
+            this.Text.Emit("movl {0}(%ebp), %eax", this._variableLocations[node.Variable.Name]);
         }
 
       

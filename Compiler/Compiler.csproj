@@ -97,6 +97,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\Cecil.Decompiler.dll</HintPath>
     </Reference>
+    <Reference Include="Gallio, Version=3.1.0.0, Culture=neutral, PublicKeyToken=eb9cfa67ee6ab36e, processorArchitecture=MSIL" />
+    <Reference Include="MbUnit, Version=3.1.0.0, Culture=neutral, PublicKeyToken=eb9cfa67ee6ab36e, processorArchitecture=MSIL" />
     <Reference Include="Mono.Cecil, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\Mono.Cecil.dll</HintPath>
@@ -118,6 +120,7 @@
     <Compile Include="AssemblyCompiler.cs" />
     <Compile Include="AssemblyCompilerContext.cs" />
     <Compile Include="AssemblyQueuingStage.cs" />
+    <Compile Include="Ast\TypedArgumentReferenceExpression.cs" />
     <Compile Include="BaseCompiler.cs" />
     <Compile Include="BaseCompilerStage.cs" />
     <Compile Include="BuildException.cs" />
