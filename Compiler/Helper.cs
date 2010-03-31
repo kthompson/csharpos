@@ -11,7 +11,7 @@ namespace Compiler
     /// </summary>
     public static class Helper
     {
-        #region Public Methods
+        #region Public MethodContexts
 
         /// <summary>
         /// Stops the debugger if attached and does nothing with the exception
@@ -74,6 +74,19 @@ namespace Compiler
                 Throw(() => new ArgumentNullException(argName));
         }
 
+        /// <summary>
+        /// Throws an ArgumentNullException if the argument is null
+        /// </summary>
+        /// <typeparam name="T">Class</typeparam>
+        /// <param name="arg">Value to validate</param>
+        /// <param name="argName">Name of the argument being validated</param>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        [DebuggerHidden]
+        public static void IsNotNullOrEmpty(string arg)
+        {
+            if (string.IsNullOrEmpty(arg))
+                Throw(() => new ArgumentNullException());
+        }
 
         /// <summary>
         /// Throws an ArgumentNullException if the argument is null
@@ -317,7 +330,7 @@ namespace Compiler
 
         #endregion
 
-        #region Internal Methods
+        #region Internal MethodContexts
 
         /// <summary>
         /// Stops the debugger if attached and throws the exception
