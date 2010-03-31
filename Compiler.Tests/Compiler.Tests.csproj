@@ -106,6 +106,10 @@
     <Compile Include="VariableTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Compiler.X86\Compiler.X86.csproj">
+      <Project>{C2557ECB-9E33-48BC-865E-FF92E5F0A05B}</Project>
+      <Name>Compiler.X86</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Compiler\Compiler.csproj">
       <Project>{457965B7-FD67-493E-B46A-EEFE59486A4C}</Project>
       <Name>Compiler %28Compiler\Compiler%29</Name>
