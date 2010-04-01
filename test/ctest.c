@@ -8,7 +8,7 @@ long test_entryInt32(long a, long b){
 	return a+b; 
 }
 
-short test_entryInt(short a, short b){
+short test_entryInt16(short a, short b){
 	return a+b; 
 }
 
@@ -24,7 +24,7 @@ long test_retInt32(long a){
 	return a; 
 }
 
-short test_retInt(short a){
+short test_retInt16(short a){
 	return a; 
 }
 
@@ -40,7 +40,7 @@ void test_entryInt32V(long a, long b){
 	long c = a+b; 
 }
 
-void test_entryIntV(short a, short b){
+void test_entryInt16V(short a, short b){
 	short c = a+b; 
 }
 
