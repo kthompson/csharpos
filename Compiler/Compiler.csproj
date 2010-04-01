@@ -121,8 +121,6 @@
     <Compile Include="AssemblyCompilerContext.cs" />
     <Compile Include="AssemblyQueuingStage.cs" />
     <Compile Include="Ast\TypedArgumentReferenceExpression.cs" />
-    <Compile Include="BaseCompiler.cs" />
-    <Compile Include="BaseCompilerStage.cs" />
     <Compile Include="BuildException.cs" />
     <Compile Include="CilInstruction.cs" />
     <Compile Include="CodeStream.cs" />
@@ -154,9 +152,6 @@
     <Compile Include="Ast\TypedVariableReferenceExpression.cs" />
     <Compile Include="DuplicateLabelException.cs" />
     <Compile Include="Emitter.cs" />
-    <Compile Include="ICompiler.cs" />
-    <Compile Include="ICompilerContext.cs" />
-    <Compile Include="ICompilerStage.cs" />
     <Compile Include="IInstruction.cs" />
     <Compile Include="MathExtensions.cs" />
     <Compile Include="MethodCompiler.cs" />
