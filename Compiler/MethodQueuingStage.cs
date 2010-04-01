@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Compiler.Framework;
 using Mono.Cecil;
 
 namespace Compiler
@@ -9,27 +10,26 @@ namespace Compiler
     /// <summary>
     /// Stage that will queue methods for compilation
     /// </summary>
-    public class MethodQueuingStage : BaseCompilerStage
+    public class MethodQueuingStage : CompilerStageBase
     {
         public override string Name
         {
             get { return "MethodQueuingStage"; }
         }
 
-        public MethodQueuingStage()
+        public override IAssemblyCompilerContext Run(IAssemblyCompiler compiler, IAssemblyCompilerContext context)
         {
-        }
+            var ac = context as AssemblyCompilerContext;
+            Helper.IsNotNull(ac);
 
-        public override ICompilerContext Run(ICompilerContext context)
-        {
-            var assemblyContext = context as AssemblyCompilerContext;
-            if (assemblyContext == null)
-                return context;
+            var asm = ac.AssemblyDefinition;
+            var mc = compiler.MethodCompiler;
+            foreach (ModuleDefinition module in asm.Modules)
+                foreach (TypeDefinition type in module.Types)
+                    foreach (MethodDefinition method in type.Methods)
+                        ac.MethodContexts.Add(mc.GetContext(context, method));
 
-            var asm = assemblyContext.AssemblyDefinition;
-            assemblyContext.Methods.Add(asm.EntryPoint);
-
-            return assemblyContext;
+            return ac;
         }
     }
 }

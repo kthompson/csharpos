@@ -29,11 +29,11 @@ namespace Compiler
                 Console.WriteLine(parser.GetUsage());
                 return;
             }
-
-            var assembly = AssemblyFactory.GetAssembly(inputs[0]);
-            var compiler = new AssemblyCompiler(new MethodCompilerStage(), new GccBuildStage(outputFile));
-            var context = new AssemblyCompilerContext(assembly, assembly.EntryPoint);
-            compiler.Compile(context);
+            //FIXME: make this use architecture etc
+            //var assembly = AssemblyFactory.GetAssembly(inputs[0]);
+            //var compiler = new AssemblyCompiler(new MethodCompilerStage(), new GccBuildStage(outputFile));
+            //var context = new AssemblyCompilerContext(assembly, assembly.EntryPoint);
+            //compiler.Compile(context);
         }
     }
 }

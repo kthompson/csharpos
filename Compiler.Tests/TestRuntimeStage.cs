@@ -4,33 +4,34 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Compiler.Framework;
 using Mono.Cecil;
 
 namespace Compiler.Tests
 {
-    class TestRuntimeStage : BaseCompilerStage
+    class TestRuntimeStage : CompilerStageBase
     {
         public override string Name
         {
             get { return "Test Runtime Generator"; }
         }
 
-        public override ICompilerContext Run(ICompilerContext ctxt)
+        public override IAssemblyCompilerContext Run(IAssemblyCompiler compiler, IAssemblyCompilerContext ctxt)
         {
             var context = ctxt as TestContext;
             if (context == null)
                 return ctxt;
 
-            var method = context.Methods.First();
+            var mc = context.MethodContexts.First();
 
-            CreateRuntime(context, method);
+            CreateRuntime(context, mc.Method);
 
             //CreateStack(assemblyContext, method);
 
             return context;
         }
 
-        private void CreateRuntime(TestContext context, MethodDefinition method)
+        private static void CreateRuntime(TestContext context, MethodReference method)
         {
             using (var runtime = context.GetOutputFileWriter("runtime.c"))
             {
@@ -68,9 +69,9 @@ namespace Compiler.Tests
                 runtime.WriteLine("#include <stdio.h>");
                 runtime.WriteLine("#include <stdbool.h>");
                 runtime.WriteLine("#include <stdlib.h>");
-                runtime.WriteLine();
-                //runtime.WriteLine(string.Format("{0} setup_stack(char*);", returnType));
                 //runtime.WriteLine();
+                //runtime.WriteLine(string.Format("{0} setup_stack(char*);", returnType));
+                runtime.WriteLine();
                 runtime.WriteLine("int main(int argc, char** argv)");
                 runtime.WriteLine("{");
                 //runtime.WriteLine("	int stack_size = (16 * 4096);");
@@ -83,7 +84,7 @@ namespace Compiler.Tests
             }
         }
 
-        private void CreateStack(AssemblyCompilerContext assemblyContext, MethodDefinition method)
+        private void CreateStack(AssemblyCompilerContext assemblyContext, IMemberReference method)
         {
             using (var runtime = assemblyContext.GetOutputFileWriter("stack.s"))
             {

@@ -1,22 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using Compiler.Framework;
 using Mono.Cecil;
 using Cecil.Decompiler;
 
 namespace Compiler
 {
-    public class MethodCompilerStage :  BaseCompilerStage
+    public class MethodCompilerStage :  CompilerStageBase
     {
-        #region ICompiler Members
-        public override ICompilerContext Run(ICompilerContext context)
+        #region IAssemblyCompiler Members
+        public override IAssemblyCompilerContext Run(IAssemblyCompiler compiler, IAssemblyCompilerContext context)
         {
             var assemblyContext = context as AssemblyCompilerContext;
             if (assemblyContext == null)
                 return context;
 
-            foreach (var method in assemblyContext.Methods)
-                EmitMethod(assemblyContext, method);
+            var list = new List<IMethodCompilerContext>(assemblyContext.MethodContexts);
+            assemblyContext.MethodContexts.Clear();
 
+            foreach (var mc in list)
+                assemblyContext.MethodContexts.Add(compiler.MethodCompiler.Compile(mc));
+            
             return assemblyContext;
         }
         #endregion
@@ -26,14 +31,6 @@ namespace Compiler
             get { return "Method Compiler"; }
         }
 
-        private void EmitMethod(AssemblyCompilerContext assemblyContext, MethodDefinition method)
-        {
-            using (var writer = assemblyContext.GetOutputFileWriter(Helper.GetRandomString(method.Name + "-", 40, ".s")))
-            {
-                var emitter = new Emitter(writer);
-                emitter.VisitMethodDefinition(method);
-            }
-        }
     }
 }
 

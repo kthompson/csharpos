@@ -1,32 +1,26 @@
 ﻿using System.Text;
+using Compiler.Framework;
 
 namespace Compiler
 {
     /// <summary>
     /// Run gcc to compile the runtime and ASM together
     /// </summary>
-    public class GccBuildStage : BaseCompilerStage
+    public class GccBuildStage : CompilerStageBase
     {
         public override string Name
         {
             get { return "Build Stage"; }
         }
 
-        public string Filename { get; private set; }
-
-        public GccBuildStage(string filename)
-        {
-            this.Filename = filename;  
-        }
-
-        public override ICompilerContext Run(ICompilerContext context)
+        public override IAssemblyCompilerContext Run(IAssemblyCompiler compiler, IAssemblyCompilerContext context)
         {
             var assemblyContext = context as AssemblyCompilerContext;
             if (assemblyContext == null)
                 return context;
 
             var cmd = new StringBuilder("gcc -Wall -o ");
-            cmd.Append(this.Filename);
+            cmd.Append(assemblyContext.Output);
 
             foreach (var file in assemblyContext.OutputFiles)
                 cmd.AppendFormat(" {0}", file.Filename);

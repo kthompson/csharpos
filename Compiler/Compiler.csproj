@@ -163,6 +163,7 @@
     <Compile Include="MethodCompilerStage.cs" />
     <Compile Include="MethodDependencies.cs" />
     <Compile Include="MethodQueuingStage.cs" />
+    <Compile Include="MethodToAsmStage.cs" />
     <Compile Include="OptionParser.cs" />
     <Compile Include="OutputFile.cs" />
     <Compile Include="Program.cs" />

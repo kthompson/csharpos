@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using Compiler.Framework;
 using Mono.Cecil;
 
 namespace Compiler
 {
-    public class AssemblyCompiler : BaseCompiler
+    public class AssemblyCompiler : CompilerBase
     {
-        public AssemblyCompiler(params ICompilerStage[] stages)
-            : base(stages)
+        public AssemblyCompiler(IArchitecture architecture, IMethodCompiler mc, IEnumerable<IAssemblyCompilerStage> stages)
+            : base(architecture, mc, stages)
         {
         }
 
-        protected override void OnAfterCompile(ICompilerContext context)
+        protected override void OnAfterCompile(IAssemblyCompilerContext context)
         {
             //save resultant context info
         }

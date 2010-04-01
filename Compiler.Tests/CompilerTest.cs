@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Autofac;
+using Compiler.Framework;
 using Mono.Cecil;
 using System.IO;
 using System.Diagnostics;
@@ -11,6 +14,29 @@ namespace Compiler.Tests
 {
     public abstract class CompilerTest
     {
+        protected readonly ContainerBuilder Builder;
+
+        protected CompilerTest()
+        {
+            this.Builder = new ContainerBuilder();
+            
+            this.Builder.RegisterModule(new x86.X86Module());
+
+            this.Builder.Register(c => new MethodCompiler(c.Resolve<IArchitecture>()))
+                .As<IMethodCompiler>()
+                .OnActivated(e => e.Instance.Stages.Add(new MethodToAsmStage()));
+
+            this.Builder.RegisterType<AssemblyCompiler>()
+                .As<IAssemblyCompiler>()
+                .OnActivated(e =>
+                {
+                    e.Instance.Stages.Add(new MethodQueuingStage());
+                    e.Instance.Stages.Add(new MethodCompilerStage());
+                    e.Instance.Stages.Add(new TestRuntimeStage());
+                    e.Instance.Stages.Add(new GccBuildStage());
+                });
+        }
+
         protected string CompileAndRunMethod<T>(Func<T> action)
         {
             return CompileAndRunMethod<Func<T>, object>(action);
@@ -20,28 +46,34 @@ namespace Compiler.Tests
         {
             var asm = GetAssembly();
             var method = ImportMethod(asm, action);
-            var context = new TestContext(asm, method, arguments.Cast<object>().ToArray());
-            
+
+            var context = new TestContext(asm, arguments.Cast<object>().ToArray());
+            context.MethodContexts.Add(CodeStream.Create(context, method));
+
             try
             {
                 //compile 
-                this.Compiler.Compile(context);
+                context = this.AssemblyCompiler.Compile(context) as TestContext;
+                Helper.IsNotNull(context);
 
                 //run the compiled exe and return output
-                return Helper.Execute(GetTestExecutable());
+                return Helper.Execute(context.Output);
+            }
+            catch (Exception e)
+            {
+                Helper.Break();
+                throw;
             }
             finally
             {
-                foreach (var file in context.OutputFiles)
-                    File.Delete(file.Filename);
+                if (context != null)
+                {
+                    foreach (var file in context.OutputFiles)
+                        File.Delete(file.Filename);
 
-                File.Delete(GetTestExecutable());
+                    File.Delete(context.Output);
+                }
             }
-        }
-
-        private string GetTestExecutable()
-        {
-            return this.Compiler.Stages.OfType<GccBuildStage>().First().Filename;
         }
 
         private MethodDefinition ImportMethod<T>(AssemblyDefinition asm, T action)
@@ -54,24 +86,20 @@ namespace Compiler.Tests
             return method;
         }
 
-        protected virtual ICompilerStage GetRuntimeStage()
-        {
-            return new TestRuntimeStage();
-        }
-
         private AssemblyDefinition GetAssembly()
         {
             return AssemblyFactory.DefineAssembly("TempAssembly", AssemblyKind.Dll);
         }
 
-        private ICompiler _compiler;
-        private ICompiler Compiler
+        private IAssemblyCompiler _assemblyCompiler;
+        private IAssemblyCompiler AssemblyCompiler
         {
             get
             {
-                if(_compiler == null)
-                    _compiler = new AssemblyCompiler(GetRuntimeStage(), new MethodCompilerStage(), new GccBuildStage("test.exe"));
-                return _compiler;
+                if (_assemblyCompiler == null)
+                    _assemblyCompiler = this.Builder.Build().Resolve<IAssemblyCompiler>();
+
+                return _assemblyCompiler;
             }
         }
     }

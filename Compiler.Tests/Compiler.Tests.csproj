@@ -67,6 +67,10 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=2.1.12.802, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Resources\Autofac-2.1.12.802-NET35\Library\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Cecil.Decompiler, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Resources\Cecil.Decompiler.dll</HintPath>
