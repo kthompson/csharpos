@@ -123,7 +123,9 @@
     <Compile Include="Ast\TypedArgumentReferenceExpression.cs" />
     <Compile Include="BuildException.cs" />
     <Compile Include="CilInstruction.cs" />
+    <Compile Include="CilToX86Stage.cs" />
     <Compile Include="CodeStream.cs" />
+    <Compile Include="Formatter.cs" />
     <Compile Include="Framework\ArchitectureBase.cs" />
     <Compile Include="Framework\CompilerBase.cs" />
     <Compile Include="Framework\CompilerStageBase.cs" />
