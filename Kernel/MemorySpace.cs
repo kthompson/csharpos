@@ -48,11 +48,11 @@ namespace Kernel
                 prev.Next = this;
             }
 
-            if (next != null)
-            {
-                this.Next = next;
-                next.Previous = this;
-            }
+            if (next == null) 
+                return;
+
+            this.Next = next;
+            next.Previous = this;
         }
 
         public uint StartAddress { get; private set; }

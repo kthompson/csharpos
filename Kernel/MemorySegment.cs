@@ -41,17 +41,13 @@ namespace Kernel
             uint nSize = n.Size;
             n.Free = false;
             if (nSize == size)
-            {
                 return n;
-            }
-            else
-            {
-                //resize it
-                n.Size = size;
-                //insert new memory space in between
-                new MemorySpace(n.EndAddress + 1, nSize - n.Size, true, n, n.Next);
-                return n;
-            }
+
+            //resize it
+            n.Size = size;
+            //insert new memory space in between
+            new MemorySpace(n.EndAddress + 1, nSize - n.Size, true, n, n.Next);
+            return n;
         }
 
         public MemorySpace AllocateMemory(uint size)

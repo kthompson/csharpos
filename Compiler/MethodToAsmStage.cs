@@ -13,13 +13,14 @@ namespace Compiler
         {
             context = base.Run(context);
             var acc = context.AssemblyCompilerContext as AssemblyCompilerContext;
-            if (acc != null)
+            if (acc == null) 
+                return context;
+
+            using (var writer = acc.GetOutputFileWriter(GetFilename(context)))
             {
-                using (var writer = acc.GetOutputFileWriter(GetFilename(context)))
-                {
-                    new Emitter(writer).VisitMethodDefinition(context.Method);
-                }
+                new Emitter(writer).VisitMethodDefinition(context.Method);
             }
+
             return context;
         }
 

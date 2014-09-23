@@ -194,7 +194,7 @@ namespace Compiler
                 match.Found = true;
             }
 
-            var notFound = this.Where(o => o.Required && !o.Found).FirstOrDefault();
+            var notFound = this.FirstOrDefault(o => o.Required && !o.Found);
             if(notFound != null)
                 throw new MissingOptionException(notFound);
 
