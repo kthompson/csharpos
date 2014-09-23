@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Autofac;
 using Compiler.Framework;
+using Envelop;
 using Mono.Cecil;
 using System.IO;
 using System.Diagnostics;
@@ -14,27 +14,23 @@ namespace Compiler.Tests
 {
     public abstract class CompilerTest
     {
-        protected readonly ContainerBuilder Builder;
+        protected readonly IKernel Builder;
 
         protected CompilerTest()
         {
-            this.Builder = new ContainerBuilder();
+            this.Builder = Kernel.Create();
             
-            this.Builder.RegisterModule(new x86.X86Module());
+            this.Builder.Load(new x86.X86Module());
 
-            this.Builder.Register(c => new MethodCompiler(c.Resolve<IArchitecture>()))
-                .As<IMethodCompiler>()
-                .OnActivated(e => e.Instance.Stages.Add(new MethodToAsmStage()));
+            this.Builder.Bind<IMethodCompiler>().To<MethodCompiler>();
+            this.Builder.Bind<IMethodCompilerStage>().To<MethodToAsmStage>();
 
-            this.Builder.RegisterType<AssemblyCompiler>()
-                .As<IAssemblyCompiler>()
-                .OnActivated(e =>
-                {
-                    e.Instance.Stages.Add(new MethodQueuingStage());
-                    e.Instance.Stages.Add(new MethodCompilerStage());
-                    e.Instance.Stages.Add(new TestRuntimeStage());
-                    e.Instance.Stages.Add(new GccBuildStage());
-                });
+            this.Builder.Bind<IAssemblyCompiler>().To<AssemblyCompiler>();
+
+            this.Builder.Bind<IAssemblyCompilerStage>().To<GccBuildStage>();
+            this.Builder.Bind<IAssemblyCompilerStage>().To<TestRuntimeStage>();
+            this.Builder.Bind<IAssemblyCompilerStage>().To<MethodCompilerStage>();
+            this.Builder.Bind<IAssemblyCompilerStage>().To<MethodQueuingStage>();
         }
 
         protected string CompileAndRunMethod<T>(Func<T> action)
@@ -97,7 +93,7 @@ namespace Compiler.Tests
             get
             {
                 if (_assemblyCompiler == null)
-                    _assemblyCompiler = this.Builder.Build().Resolve<IAssemblyCompiler>();
+                    _assemblyCompiler = this.Builder.Resolve<IAssemblyCompiler>();
 
                 return _assemblyCompiler;
             }

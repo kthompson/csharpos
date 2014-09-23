@@ -1,88 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MbUnit.Framework;
 using Kernel;
+using Xunit;
 
 namespace Kernel.Tests
 {
-    [TestFixture]
     public class MemorySpaceTests
     {
-        [Test]
+        [Fact]
         public void ConstructorTests()
         {
             var m = new MemorySpace(0, 100);
-            Assert.AreEqual(100u, m.Size,"#001");
-            Assert.AreEqual(0u, m.StartAddress, "#002");
-            Assert.AreEqual(99u, m.EndAddress, "#003");
-            Assert.IsFalse(m.Free, "#004");
-            Assert.IsNull(m.Next, "#005");
-            Assert.IsNull(m.Previous, "#006");
+            Assert.Equal(100u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(99u, m.EndAddress);
+            Assert.False(m.Free);
+            Assert.Null(m.Next);
+            Assert.Null(m.Previous);
             
 
             m = new MemorySpace(true, 0, 99);
-            Assert.AreEqual(100u, m.Size, "#007");
-            Assert.AreEqual(0u, m.StartAddress, "#008");
-            Assert.AreEqual(99u, m.EndAddress, "#009");
-            Assert.IsTrue(m.Free, "#010");
-            Assert.IsNull(m.Next, "#011");
-            Assert.IsNull(m.Previous, "#012");
+            Assert.Equal(100u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(99u, m.EndAddress);
+            Assert.True(m.Free);
+            Assert.Null(m.Next);
+            Assert.Null(m.Previous);
 
             m = new MemorySpace(0, 100, false);
-            Assert.AreEqual(100u, m.Size, "#013");
-            Assert.AreEqual(0u, m.StartAddress, "#014");
-            Assert.AreEqual(99u, m.EndAddress, "#015");
-            Assert.IsFalse(m.Free, "#016");
-            Assert.IsNull(m.Next, "#017");
-            Assert.IsNull(m.Previous, "#018");
+            Assert.Equal(100u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(99u, m.EndAddress);
+            Assert.False(m.Free);
+            Assert.Null(m.Next);
+            Assert.Null(m.Previous);
 
             
             var prev = new MemorySpace(0, 0);
             var next = new MemorySpace(0, 0);
             m = new MemorySpace(false, 0, 99, prev, next);
-            Assert.AreEqual(100u, m.Size, "#019");
-            Assert.AreEqual(0u, m.StartAddress, "#020");
-            Assert.AreEqual(99u, m.EndAddress, "#021");
-            Assert.IsFalse(m.Free, "#022");
-            Assert.AreEqual(next, m.Next, "#023");
-            Assert.AreEqual(prev, m.Previous, "#024");
-            Assert.AreEqual(m, next.Previous, "#025");
-            Assert.AreEqual(m, prev.Next, "#026");
+            Assert.Equal(100u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(99u, m.EndAddress);
+            Assert.False(m.Free);
+            Assert.Equal(next, m.Next);
+            Assert.Equal(prev, m.Previous);
+            Assert.Equal(m, next.Previous);
+            Assert.Equal(m, prev.Next);
 
             prev = new MemorySpace(0, 0);
             next = new MemorySpace(0, 0);
             m = new MemorySpace(0, 100,false, prev, next);
-            Assert.AreEqual(100u, m.Size, "#027");
-            Assert.AreEqual(0u, m.StartAddress, "#028");
-            Assert.AreEqual(99u, m.EndAddress, "#029");
-            Assert.IsFalse(m.Free, "#030");
-            Assert.AreEqual(next, m.Next, "#031");
-            Assert.AreEqual(prev, m.Previous, "#032");
-            Assert.AreEqual(m, next.Previous, "#033");
-            Assert.AreEqual(m, prev.Next, "#034");
+            Assert.Equal(100u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(99u, m.EndAddress);
+            Assert.False(m.Free);
+            Assert.Equal(next, m.Next);
+            Assert.Equal(prev, m.Previous);
+            Assert.Equal(m, next.Previous);
+            Assert.Equal(m, prev.Next);
 
         }
 
-        [Test]
+        [Fact]
         public void SizeChange()
         {
             var m = new MemorySpace(0, 100);
-            Assert.AreEqual(100u, m.Size, "#001");
-            Assert.AreEqual(0u, m.StartAddress, "#002");
-            Assert.AreEqual(99u, m.EndAddress, "#003");
-            Assert.IsFalse(m.Free, "#004");
-            Assert.IsNull(m.Next, "#005");
-            Assert.IsNull(m.Previous, "#006");
+            Assert.Equal(100u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(99u, m.EndAddress);
+            Assert.False(m.Free);
+            Assert.Null(m.Next);
+            Assert.Null(m.Previous);
 
             m.Size = 30;
 
-            Assert.AreEqual(30u, m.Size, "#007");
-            Assert.AreEqual(0u, m.StartAddress, "#008");
-            Assert.AreEqual(29u, m.EndAddress, "#009");
-            Assert.IsFalse(m.Free, "#010");
-            Assert.IsNull(m.Next, "#011");
-            Assert.IsNull(m.Previous, "#012");
+            Assert.Equal(30u, m.Size);
+            Assert.Equal(0u, m.StartAddress);
+            Assert.Equal(29u, m.EndAddress);
+            Assert.False(m.Free);
+            Assert.Null(m.Next);
+            Assert.Null(m.Previous);
         }
     }
 }

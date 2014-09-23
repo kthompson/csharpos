@@ -3,3 +3,4 @@ obj
 _ReSharper.*
 *.user
 *.suo
+packages

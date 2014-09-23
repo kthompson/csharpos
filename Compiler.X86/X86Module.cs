@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Autofac;
 using Compiler.Framework;
+using Envelop;
 
 namespace Compiler.x86
 {
     public class X86Module : Module
     {
-        protected override void Load(ContainerBuilder builder)
+        protected override void Load()
         {
-            builder.Register(c => new Architecture()).As<IArchitecture>();
-            base.Load(builder);
+            this.Bind<IArchitecture>().To<Architecture>();
         }
     }
 }

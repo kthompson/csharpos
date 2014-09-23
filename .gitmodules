@@ -1,3 +1,0 @@
-[submodule "external/cecil"]
-	path = external/cecil
-	url = git@github.com:kthompson/csharpos.git

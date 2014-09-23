@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gallio.Framework;
-using MbUnit.Framework;
-using MbUnit.Framework.ContractVerifiers;
+using Xunit;
 
 namespace Compiler.Tests
 {
-    [TestFixture]
     public class OptionParserTests
     {
         private class Options
@@ -18,46 +15,46 @@ namespace Compiler.Tests
             public string D { get; set; }
         }
 
-        [Test]
-        [Row("/a", "/b")]
-        [Row("-a", "-b")]
-        [Row("--a", "--b")]
-        [Row("--alpha", "--bravo")]
+        [Theory]
+        [InlineData("/a", "/b")]
+        [InlineData("-a", "-b")]
+        [InlineData("--a", "--b")]
+        [InlineData("--alpha", "--bravo")]
         public void Test1(string arg1, string arg2)
         {
             var options = new Options();
             var unparsed = RunParser(options, new[]{arg1, arg2});
-            Assert.AreEqual(0, unparsed.Length);
-            Assert.IsTrue(options.A);
-            Assert.IsTrue(options.B);
-            Assert.IsFalse(options.C);
-            Assert.IsNull(options.D);
+            Assert.Equal(0, unparsed.Length);
+            Assert.True(options.A);
+            Assert.True(options.B);
+            Assert.False(options.C);
+            Assert.Null(options.D);
         }
 
-        [Test]
-        [Row("/a", "/d=top", null)]
-        [Row("-a", "-d=top", null)]
-        [Row("-alpha", "-delta=top", null)]
-        [Row("--alpha", "--delta=top", null)]
-        [Row("/alpha", "/delta=top", null)]
-        [Row("/a", "/d", "top")]
-        [Row("-a", "-d", "top")]
-        [Row("-alpha", "-delta", "top")]
-        [Row("--alpha", "--delta", "top")]
-        [Row("/alpha", "/delta", "top")]
+        [Theory]
+        [InlineData("/a", "/d=top", null)]
+        [InlineData("-a", "-d=top", null)]
+        [InlineData("-alpha", "-delta=top", null)]
+        [InlineData("--alpha", "--delta=top", null)]
+        [InlineData("/alpha", "/delta=top", null)]
+        [InlineData("/a", "/d", "top")]
+        [InlineData("-a", "-d", "top")]
+        [InlineData("-alpha", "-delta", "top")]
+        [InlineData("--alpha", "--delta", "top")]
+        [InlineData("/alpha", "/delta", "top")]
         public void Test2(string arg1, string arg2, string arg3)
         {
             var args = arg3 == null ? new[] {arg1, arg2} : new[] {arg1, arg2, arg3};
             var options = new Options();
             var unparsed = RunParser(options, args);
-            Assert.AreEqual(0, unparsed.Length);
-            Assert.IsTrue(options.A);
-            Assert.IsFalse(options.B);
-            Assert.IsFalse(options.C);
-            Assert.AreEqual("top", options.D);
+            Assert.Equal(0, unparsed.Length);
+            Assert.True(options.A);
+            Assert.False(options.B);
+            Assert.False(options.C);
+            Assert.Equal("top", options.D);
         }
 
-        [Test]
+        [Fact]
         public void GetUsageTests()
         {
             var options = new Options();
@@ -69,36 +66,34 @@ namespace Compiler.Tests
                                  new Option {ShortForm = "d", LongForm = "delta", ActionWithParam = param => options.D = param, Description = "Set the delta standing"},
                              };
 
-            Assert.Inconclusive(parser.GetUsage());
-
+            
+            parser.GetUsage();
         }
 
-        [Test]
-        [Row("/d")]
-        [Row("-d")]
-        [Row("--d")]
-        [Row("/delta")]
-        [Row("-delta")]
-        [Row("--delta")]
-        [ExpectedException(typeof(MissingOptionParameterException))]
+        [Theory]
+        [InlineData("/d")]
+        [InlineData("-d")]
+        [InlineData("--d")]
+        [InlineData("/delta")]
+        [InlineData("-delta")]
+        [InlineData("--delta")]
         public void MissingOptionParameterTest(string arg)
         {
             var options = new Options();
-            RunParser(options, "/a", arg);
+            Assert.Throws<MissingOptionParameterException>(() => RunParser(options, "/a", arg));
         }
 
-        [Test]
-        [Row("/b")]
-        [Row("-b")]
-        [Row("--b")]
-        [Row("/bravo")]
-        [Row("-bravo")]
-        [Row("--bravo")]
-        [ExpectedException(typeof(MissingOptionException))]
+        [Theory]
+        [InlineData("/b")]
+        [InlineData("-b")]
+        [InlineData("--b")]
+        [InlineData("/bravo")]
+        [InlineData("-bravo")]
+        [InlineData("--bravo")]
         public void MissingOptionTest(string arg)
         {
             var options = new Options();
-            RunParser(options, arg);
+            Assert.Throws<MissingOptionException>(() => RunParser(options, arg));
         }
 
         private static string[] RunParser(Options options,params string[] args)
@@ -112,7 +107,6 @@ namespace Compiler.Tests
                              };
 
             return parser.Parse(args);
-            
         }
     }
 }

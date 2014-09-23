@@ -77,7 +77,7 @@ namespace Compiler.Tests
                 //runtime.WriteLine("	int stack_size = (16 * 4096);");
                 //runtime.WriteLine("	char* stack_top = malloc(stack_size);");
                 //runtime.WriteLine("	char* stack_base = stack_top + stack_size;");
-                runtime.WriteLine(string.Format("	printf(\"{0}\\n\", {1});", printf, function));
+                runtime.WriteLine("	printf(\"{0}\\n\", {1});", printf, function);
                 //runtime.WriteLine("	free(stack_top);");
                 runtime.WriteLine("	return 0;");
                 runtime.WriteLine("}");

@@ -1,49 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MbUnit.Framework;
 using System.Reflection;
+using Xunit;
 
 namespace Kernel.Tests
 {
-    [TestFixture]
     public class HeapTests
     {
-        [Test]
+        [Fact]
         public void AllocationTest()
         {
            var heap = Heap.Instance;
 
-            Assert.IsNotNull(heap, "#01");
+            Assert.NotNull(heap);
             var m1 = Heap.Instance.AllocateMemory(10);
-            Assert.AreEqual(0u, m1.StartAddress, "#02");
-            Assert.AreEqual(10u, m1.Size, "#03");
-            Assert.AreEqual(9u, m1.EndAddress, "#04");
-            Assert.IsFalse(m1.Free, "#05");
+            Assert.Equal(0u, m1.StartAddress);
+            Assert.Equal(10u, m1.Size);
+            Assert.Equal(9u, m1.EndAddress);
+            Assert.False(m1.Free);
 
             var m2 = Heap.Instance.AllocateMemory(10);
-            Assert.AreEqual(10u, m2.StartAddress, "#06");
-            Assert.AreEqual(10u, m2.Size, "#07");
-            Assert.AreEqual(19u, m2.EndAddress, "#08");
-            Assert.IsFalse(m2.Free, "#09");
+            Assert.Equal(10u, m2.StartAddress);
+            Assert.Equal(10u, m2.Size);
+            Assert.Equal(19u, m2.EndAddress);
+            Assert.False(m2.Free);
 
             var m3 = Heap.Instance.AllocateMemory(10);
-            Assert.AreEqual(20u, m3.StartAddress, "#10");
-            Assert.AreEqual(10u, m3.Size, "#11");
-            Assert.AreEqual(29u, m3.EndAddress, "#12");
-            Assert.IsFalse(m3.Free, "#13");
+            Assert.Equal(20u, m3.StartAddress);
+            Assert.Equal(10u, m3.Size);
+            Assert.Equal(29u, m3.EndAddress);
+            Assert.False(m3.Free);
 
             Heap.Instance.FreeMemory(m2);
 
-            Assert.IsTrue(m2.Free, "#14");
+            Assert.True(m2.Free);
 
             var m4 = Heap.Instance.AllocateMemory(5);
-            Assert.AreEqual(10u, m4.StartAddress, "#15");
-            Assert.AreEqual(5u, m4.Size, "#16");
-            Assert.AreEqual(14u, m4.EndAddress, "#17");
-            Assert.IsFalse(m3.Free, "#18");
-            
-
+            Assert.Equal(10u, m4.StartAddress);
+            Assert.Equal(5u, m4.Size);
+            Assert.Equal(14u, m4.EndAddress);
+            Assert.False(m3.Free);
         }
     }
 }
